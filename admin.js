@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // DOM Elements
   const dateInput = document.getElementById('current-date');
+  const dateDisplay = document.getElementById('date-display');
   const btnClearMenu = document.getElementById('btn-clear-menu');
   const menuButtons = document.querySelectorAll('.menu-btn');
   const timeline = document.getElementById('timeline');
@@ -39,22 +40,28 @@ document.addEventListener('DOMContentLoaded', () => {
   let selectedExistingBlocks = []; // [bookingId, ...]
 
   // Initialize
-  dateInput.value = formatDate(currentDate);
+  updateDateDisplay();
   renderTimeline();
+
+  function updateDateDisplay() {
+    dateInput.value = formatDate(currentDate);
+    dateDisplay.innerText = formatDisplayDate(currentDate);
+  }
 
   // Event Listeners
   document.getElementById('prev-day').addEventListener('click', () => {
     currentDate.setDate(currentDate.getDate() - 1);
-    dateInput.value = formatDate(currentDate);
+    updateDateDisplay();
     renderTimeline();
   });
   document.getElementById('next-day').addEventListener('click', () => {
     currentDate.setDate(currentDate.getDate() + 1);
-    dateInput.value = formatDate(currentDate);
+    updateDateDisplay();
     renderTimeline();
   });
   dateInput.addEventListener('change', (e) => {
     currentDate = new Date(e.target.value);
+    updateDateDisplay();
     renderTimeline();
   });
 
@@ -226,11 +233,21 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Utils
+  const daysOfWeek = ['日', '月', '火', '水', '木', '金', '土'];
+  
   function formatDate(d) {
     const y = d.getFullYear();
     const m = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
     return `${y}-${m}-${day}`;
+  }
+  
+  function formatDisplayDate(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const dow = daysOfWeek[d.getDay()];
+    return `${y}/${m}/${day} (${dow})`;
   }
   
   function timeToMinutes(timeStr) {
