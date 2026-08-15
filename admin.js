@@ -86,11 +86,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (selectedMenuName) {
           mobileMenuToggle.innerText = `${selectedMenuName} (${selectedMenuDuration}分) ▼`;
           mobileMenuToggle.classList.remove('btn-outline');
-          mobileMenuToggle.classList.add('btn');
         } else {
           mobileMenuToggle.innerText = 'メニューを選択 ▼';
           mobileMenuToggle.classList.add('btn-outline');
-          mobileMenuToggle.classList.remove('btn');
         }
       }
       
@@ -134,7 +132,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.innerWidth < 768 && mobileMenuToggle) {
       mobileMenuToggle.innerText = 'メニューを選択 ▼';
       mobileMenuToggle.classList.add('btn-outline');
-      mobileMenuToggle.classList.remove('btn');
     }
     
     renderTimeline();
