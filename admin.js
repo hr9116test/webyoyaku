@@ -244,8 +244,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Utils
-  const daysOfWeek = ['日', '月', '火', '水', '木', '金', '土'];
-  
   function formatDate(d) {
     const y = d.getFullYear();
     const m = String(d.getMonth() + 1).padStart(2, '0');
@@ -254,6 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   
   function formatDisplayDate(d) {
+    const daysOfWeek = ['日', '月', '火', '水', '木', '金', '土'];
     const y = d.getFullYear();
     const m = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
