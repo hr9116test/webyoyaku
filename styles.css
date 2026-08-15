@@ -1,0 +1,521 @@
+/* styles.css */
+:root {
+  /* 和モダン カラーパレット */
+  --color-base: #F7F6F2; /* 白練 (Shironeri) - オフホワイト */
+  --color-surface: #FFFFFF;
+  --color-text-main: #33312E; /* 墨 (Sumi) - 濃いグレー/黒 */
+  --color-text-sub: #7A7571;
+  --color-accent: #9B332B; /* 臙脂 (Enji) - 落ち着いた赤 */
+  --color-accent-hover: #7A2822;
+  --color-border: #DCD8D3;
+  --color-disabled: #EAE8E3;
+  --color-success: #4D7653; /* 千歳緑 (Chitosemidori) */
+  
+  /* タイポグラフィ */
+  --font-family-base: 'Noto Serif JP', 'Shippori Mincho', serif;
+  --font-family-sans: 'Inter', 'Noto Sans JP', sans-serif;
+  
+  /* シャドウ・角丸 */
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
+  --shadow-md: 0 8px 24px rgba(0,0,0,0.08);
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  
+  /* トランジション */
+  --transition-fast: 0.2s ease;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family-base);
+  background-color: var(--color-base);
+  color: var(--color-text-main);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-weight: 400;
+  letter-spacing: 0.05em;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* 共通コンテナ */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+/* カード */
+.card {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* ボタン */
+.btn {
+  display: inline-block;
+  font-family: var(--font-family-sans);
+  background-color: var(--color-accent);
+  color: #fff;
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
+  text-align: center;
+  text-decoration: none;
+}
+
+.btn:hover {
+  background-color: var(--color-accent-hover);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--color-text-main);
+  border: 1px solid var(--color-border);
+}
+
+.btn-outline:hover {
+  background-color: var(--color-disabled);
+}
+
+.btn-full {
+  width: 100%;
+}
+
+.btn-disabled {
+  background-color: var(--color-disabled);
+  color: var(--color-text-sub);
+  cursor: not-allowed;
+}
+
+.btn-disabled:hover {
+  background-color: var(--color-disabled);
+}
+
+/* フォーム要素 */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  font-family: var(--font-family-sans);
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: var(--color-text-sub);
+}
+
+.form-select, .form-input {
+  width: 100%;
+  font-family: var(--font-family-sans);
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface);
+  color: var(--color-text-main);
+  transition: border-color var(--transition-fast);
+}
+
+.form-select:focus, .form-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+/* 選択グリッド (メニュー・スタッフ・時間用) */
+.selection-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.selection-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 1.5rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  background-color: var(--color-surface);
+}
+
+.selection-card:hover {
+  border-color: var(--color-text-sub);
+  background-color: var(--color-base);
+}
+
+.selection-card.selected {
+  border-color: var(--color-accent);
+  background-color: rgba(155, 51, 43, 0.05);
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+.selection-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.selection-desc {
+  font-size: 0.85rem;
+  color: var(--color-text-sub);
+  font-family: var(--font-family-sans);
+}
+
+/* ヘッダー */
+.header {
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: 1rem 0;
+  text-align: center;
+}
+
+.header h1 {
+  font-size: 1.5rem;
+  color: var(--color-text-main);
+}
+
+/* ステッパー */
+.stepper {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  position: relative;
+  font-family: var(--font-family-sans);
+  font-size: 0.85rem;
+  color: var(--color-text-sub);
+}
+
+.stepper::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 20px;
+  right: 20px;
+  height: 1px;
+  background-color: var(--color-border);
+  z-index: 0;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+  background-color: var(--color-base);
+  padding: 0 10px;
+}
+
+.step-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+  transition: all var(--transition-fast);
+}
+
+.step.active .step-circle {
+  border-color: var(--color-accent);
+  background-color: var(--color-accent);
+  color: white;
+}
+
+.step.completed .step-circle {
+  border-color: var(--color-text-main);
+  background-color: var(--color-text-main);
+  color: white;
+}
+
+/* カレンダー (簡易) */
+.calendar-wrapper {
+  margin-bottom: 1.5rem;
+  max-width: 450px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+  text-align: center;
+  font-family: var(--font-family-sans);
+}
+
+.calendar-day-header {
+  font-size: 0.85rem;
+  color: var(--color-text-sub);
+  padding: 0.5rem 0;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all var(--transition-fast);
+}
+
+.calendar-day:hover:not(.disabled) {
+  background-color: var(--color-disabled);
+}
+
+.calendar-day.selected {
+  background-color: var(--color-accent);
+  color: white;
+}
+
+.calendar-day.disabled {
+  color: var(--color-border);
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+/* 時間スロット */
+.time-slots {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.time-slot {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem;
+  text-align: center;
+  font-family: var(--font-family-sans);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  background-color: var(--color-surface);
+}
+
+.time-slot:hover:not(.disabled) {
+  border-color: var(--color-text-main);
+}
+
+.time-slot.selected {
+  background-color: var(--color-accent);
+  color: white;
+  border-color: var(--color-accent);
+}
+
+.time-slot.disabled {
+  background-color: var(--color-disabled);
+  color: var(--color-text-sub);
+  cursor: not-allowed;
+  border-style: dashed;
+}
+
+/* 管理画面特有 */
+.admin-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: bold;
+  font-family: var(--font-family-sans);
+}
+.badge-blocked {
+  background-color: #F8D7DA;
+  color: #721C24;
+}
+.badge-booked {
+  background-color: #CCE5FF;
+  color: #004085;
+}
+
+/* タイムライン (管理画面) */
+.timeline-container {
+  display: flex;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+}
+.timeline-time-col {
+  width: 70px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--color-border);
+  background-color: var(--color-base);
+  height: max-content;
+  min-height: 100%;
+}
+.timeline-staff-col {
+  flex: 1;
+  min-width: 200px;
+  border-right: 1px solid var(--color-border);
+  position: relative;
+  background-color: var(--color-surface);
+  height: max-content;
+  min-height: 100%;
+}
+.timeline-staff-col:last-child {
+  border-right: none;
+}
+.timeline-header {
+  padding: 10px;
+  text-align: center;
+  font-weight: bold;
+  border-bottom: 1px solid var(--color-border);
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background-color: inherit;
+}
+.timeline-time-cell {
+  height: 40px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: var(--color-text-sub);
+  padding-top: 5px;
+  border-bottom: 1px solid var(--color-border);
+  box-sizing: border-box;
+}
+.timeline-slot {
+  height: 40px;
+  border-bottom: 1px dashed var(--color-border);
+  position: relative;
+  transition: background-color var(--transition-fast);
+  box-sizing: border-box;
+}
+.timeline-slot:nth-child(even) {
+  border-bottom: 1px solid var(--color-border);
+}
+.timeline-slot:hover {
+  background-color: var(--color-base);
+}
+/* Booking Block */
+.booking-block {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  border-radius: var(--radius-sm);
+  padding: 6px;
+  font-size: 0.85rem;
+  overflow: hidden;
+  z-index: 10;
+  border-left: 4px solid;
+  font-family: var(--font-family-sans);
+  line-height: 1.2;
+}
+.booking-booked {
+  background-color: #FFF2E4;
+  border-left-color: #D06C14;
+  color: #5a2e07;
+  border-top: 1px solid #FFE4C4;
+  border-right: 1px solid #FFE4C4;
+  border-bottom: 1px solid #FFE4C4;
+}
+.booking-blocked {
+  background-color: #F8D7DA;
+  border-left-color: #721C24;
+  color: #491217;
+  border-top: 1px solid #F5C6CB;
+  border-right: 1px solid #F5C6CB;
+  border-bottom: 1px solid #F5C6CB;
+}
+/* Highlight state */
+.timeline-slot.available {
+  background-color: rgba(155, 51, 43, 0.08);
+  cursor: pointer;
+}
+.timeline-slot.available:hover {
+  background-color: rgba(155, 51, 43, 0.15);
+}
+.timeline-slot.unavailable {
+  background-color: #EAE8E3;
+  cursor: not-allowed;
+}
+
+/* 検索サジェスト (Autocomplete) */
+.autocomplete-wrapper {
+  position: relative;
+}
+.autocomplete-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  max-height: 150px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: var(--shadow-md);
+  margin-top: -1px;
+}
+.autocomplete-item {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-family: var(--font-family-sans);
+  font-size: 0.9rem;
+  border-bottom: 1px solid var(--color-base);
+}
+.autocomplete-item:last-child {
+  border-bottom: none;
+}
+.autocomplete-item:hover {
+  background-color: rgba(155, 51, 43, 0.05);
+}
+
+/* ユーティリティ */
+.text-center { text-align: center; }
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mt-4 { margin-top: 2rem; }
+.mb-2 { margin-bottom: 1rem; }
+.mb-4 { margin-bottom: 2rem; }
+.d-none { display: none !important; }
