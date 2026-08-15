@@ -582,6 +582,9 @@ a {
     font-size: 0.8rem;
     padding: 5px;
   }
+  .header {
+    justify-content: center;
+  }
 }
 
 /* 検索サジェスト (Autocomplete) */
