@@ -429,10 +429,12 @@ document.addEventListener('DOMContentLoaded', () => {
               if (selectedMenuType === 'blocked') {
                 document.getElementById('proxy-name').value = 'お休み (用事)';
                 document.getElementById('proxy-name').required = false;
+                document.getElementById('proxy-phone').required = false;
                 document.getElementById('proxy-phone').parentElement.classList.add('d-none');
               } else {
                 document.getElementById('proxy-name').value = '';
                 document.getElementById('proxy-name').required = true;
+                document.getElementById('proxy-phone').required = true;
                 document.getElementById('proxy-phone').parentElement.classList.remove('d-none');
               }
               
