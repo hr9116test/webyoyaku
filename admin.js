@@ -64,6 +64,17 @@ document.addEventListener('DOMContentLoaded', () => {
     updateDateDisplay();
     renderTimeline();
   });
+  
+  // PC等のブラウザで、透明なinput領域のどこをクリックしてもカレンダーが開くようにする
+  dateInput.addEventListener('click', function(e) {
+    if (typeof this.showPicker === 'function') {
+      try {
+        this.showPicker();
+      } catch (err) {
+        // ignore
+      }
+    }
+  });
 
   menuButtons.forEach(btn => {
     btn.addEventListener('click', () => {
