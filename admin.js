@@ -366,7 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
           
           currentDetailId = b.id;
           
-          document.getElementById('detail-datetime').innerText = `${b.date.replace(/-/g, '/')} ${b.startTime} 〜`;
+          document.getElementById('detail-datetime').innerText = `${formatDisplayDate(new Date(b.date))} ${b.startTime} 〜`;
           
           const cancelBtn = document.getElementById('btn-cancel-booking');
           if (b.type === 'blocked') {
@@ -446,7 +446,7 @@ document.addEventListener('DOMContentLoaded', () => {
               type: selectedMenuType
             };
               
-              document.getElementById('modal-datetime').innerText = `${selectedDateStr.replace(/-/g, '/')} ${sTime} 〜`;
+              document.getElementById('modal-datetime').innerText = `${formatDisplayDate(currentDate)} ${sTime} 〜`;
               document.getElementById('modal-menu').innerText = `${menuName} (${requiredDuration}分)`;
               document.getElementById('modal-staff').innerText = `担当: ${staff.name}`;
               
