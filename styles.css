@@ -388,7 +388,7 @@ a {
 }
 .timeline-staff-col {
   flex: 1;
-  min-width: 200px;
+  min-width: 0; /* Mobile will share available space to prevent horizontal scroll */
   border-right: 1px solid var(--color-border);
   position: relative;
   background-color: var(--color-surface);
@@ -477,6 +477,111 @@ a {
 .timeline-slot.unavailable {
   background-color: #EAE8E3;
   cursor: not-allowed;
+}
+
+/* 管理画面全体コンテナ */
+.admin-container {
+  max-width: 100%;
+  padding: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 管理画面 左右レイアウト (PC表示) */
+.admin-layout {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  gap: 0; /* 余白をなくす */
+}
+
+.admin-sidebar {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 0;
+  border-radius: 0;
+  box-shadow: none;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+}
+
+.admin-sidebar-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-sidebar-section-title {
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: var(--color-text-sub);
+  margin-bottom: 0.5rem;
+}
+
+.menu-buttons-container {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.menu-buttons-container > .btn {
+  flex: 1 1 auto;
+}
+
+@media (min-width: 768px) {
+  .admin-layout {
+    flex-direction: row;
+  }
+  .admin-sidebar {
+    width: 280px;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-bottom: none;
+    border-right: 1px solid var(--color-border);
+  }
+  .admin-sidebar .btn {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  .menu-buttons-container {
+    flex-direction: column;
+    align-items: stretch;
+    display: flex !important; /* 常に表示 */
+  }
+  .timeline-staff-col {
+    min-width: 200px;
+  }
+  .timeline-container {
+    border-radius: 0;
+    border: none;
+  }
+  .mobile-menu-toggle {
+    display: none !important;
+  }
+}
+
+/* モバイル用アコーディオン・微調整 */
+@media (max-width: 767px) {
+  .mobile-menu-toggle {
+    display: block !important;
+    margin-bottom: 0.5rem;
+  }
+  .mobile-accordion-content {
+    display: none; /* デフォルトは非表示 */
+  }
+  .mobile-accordion-content.show {
+    display: flex; /* class="show"で表示 */
+  }
+  .timeline-header {
+    font-size: 0.8rem;
+    padding: 5px;
+  }
 }
 
 /* 検索サジェスト (Autocomplete) */
