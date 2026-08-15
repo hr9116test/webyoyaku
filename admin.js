@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // startTime is 'HH:MM', duration is in minutes
   let mockBookings = [
     { id: 1, date: formatDate(new Date()), startTime: '09:00', duration: 60, staff: 'staffA', name: '小布施 太郎', type: 'booked' },
-    { id: 2, date: formatDate(new Date()), startTime: '10:00', duration: 120, staff: 'staffB', name: 'お休み (用事)', type: 'blocked' },
+    { id: 2, date: formatDate(new Date()), startTime: '10:00', duration: 120, staff: 'staffB', name: '休み', type: 'blocked' },
     { id: 3, date: formatDate(new Date()), startTime: '14:30', duration: 90, staff: 'staffA', name: '長野 花子', type: 'booked' },
   ];
 
@@ -26,6 +26,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnBlockMode = document.getElementById('btn-block-mode');
   const btnBlockConfirm = document.getElementById('btn-block-confirm');
   const btnBlockCancel = document.getElementById('btn-block-cancel');
+  
+  const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+  const menuButtonsContainer = document.getElementById('menu-buttons');
 
   let selectedMenuDuration = 0;
   let selectedMenuName = '';
@@ -77,9 +80,33 @@ document.addEventListener('DOMContentLoaded', () => {
         selectedMenuType = btn.dataset.type || 'booked';
       }
       
+      // モバイルアコーディオン連動
+      if (window.innerWidth < 768 && mobileMenuToggle) {
+        menuButtonsContainer.classList.remove('show');
+        if (selectedMenuName) {
+          mobileMenuToggle.innerText = `${selectedMenuName} (${selectedMenuDuration}分) ▼`;
+          mobileMenuToggle.classList.remove('btn-outline');
+          mobileMenuToggle.classList.add('btn');
+        } else {
+          mobileMenuToggle.innerText = 'メニューを選択 ▼';
+          mobileMenuToggle.classList.add('btn-outline');
+          mobileMenuToggle.classList.remove('btn');
+        }
+      }
+      
       renderTimeline();
     });
   });
+
+  // Mobile Accordion Toggle
+  if (mobileMenuToggle) {
+    mobileMenuToggle.addEventListener('click', () => {
+      menuButtonsContainer.classList.toggle('show');
+      mobileMenuToggle.innerText = menuButtonsContainer.classList.contains('show') 
+        ? 'メニューを閉じる ▲' 
+        : (selectedMenuName ? `${selectedMenuName} (${selectedMenuDuration}分) ▼` : 'メニューを選択 ▼');
+    });
+  }
 
   // Block Mode Logic
   btnBlockMode.addEventListener('click', () => {
@@ -102,6 +129,13 @@ document.addEventListener('DOMContentLoaded', () => {
     menuButtons.forEach(b => b.classList.add('btn-outline'));
     selectedMenuDuration = 0;
     selectedMenuName = '';
+    
+    // Reset mobile accordion button if active
+    if (window.innerWidth < 768 && mobileMenuToggle) {
+      mobileMenuToggle.innerText = 'メニューを選択 ▼';
+      mobileMenuToggle.classList.add('btn-outline');
+      mobileMenuToggle.classList.remove('btn');
+    }
     
     renderTimeline();
   });
@@ -128,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
         startTime: timeStr,
         duration: 30, // 30 min per slot
         staff: staffId,
-        name: 'お休み (用事)',
+        name: '休み',
         type: 'blocked'
       });
     });
@@ -297,7 +331,14 @@ document.addEventListener('DOMContentLoaded', () => {
           
           if (isBlockMode) return; // Ignore clicks on normal bookings while in block mode
           
-          if (b.type === 'blocked') return; // Ignore clicks on blocked slots outside of block mode
+          if (b.type === 'blocked') {
+            const newName = prompt('ブロックの名称を編集:', b.name);
+            if (newName !== null) {
+              b.name = newName.trim() || '休み';
+              renderTimeline();
+            }
+            return;
+          }
           
           currentDetailId = b.id;
           
