@@ -373,10 +373,11 @@ a {
 /* タイムライン (管理画面) */
 .timeline-container {
   display: flex;
-  background-color: var(--color-surface);
+  background-color: var(--color-base);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   overflow-x: auto;
+  padding-bottom: 80px;
 }
 .timeline-time-col {
   width: 70px;
