@@ -186,6 +186,11 @@ document.addEventListener('DOMContentLoaded', () => {
             state.time = timeString;
             btnNext3.classList.remove('btn-disabled');
             btnNext3.disabled = false;
+            
+            // 自動で「次へ進む」ボタンへスクロール
+            setTimeout(() => {
+              btnNext3.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }, 50);
           });
         }
         
