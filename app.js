@@ -465,6 +465,7 @@ document.addEventListener('DOMContentLoaded', () => {
       name: document.getElementById('user-name').value,
       phone: document.getElementById('user-phone').value,
       email: document.getElementById('user-email').value,
+      memo: document.getElementById('user-memo').value,
       menu: state.menuName,
       type: 'booked'
     };
