@@ -23,12 +23,12 @@ document.addEventListener('DOMContentLoaded', () => {
   
   const menuButtonsContainer = document.getElementById('menu-buttons');
   
-  // Accordion elements
-  const accBooking = document.getElementById('btn-accordion-booking');
-  const accBlock = document.getElementById('btn-accordion-block');
-  const accCustomer = document.getElementById('btn-accordion-customer');
-  const contentBooking = document.getElementById('accordion-content-booking');
-  const contentBlock = document.getElementById('accordion-content-block');
+  // Tab elements
+  const tabBooking = document.getElementById('btn-tab-booking');
+  const tabBlock = document.getElementById('btn-tab-block');
+  const tabCustomer = document.getElementById('btn-tab-customer');
+  const contentBooking = document.getElementById('tab-content-booking');
+  const contentBlock = document.getElementById('tab-content-block');
   
   // Customer Management elements
   const customerMgmtModal = document.getElementById('customer-mgmt-modal');
@@ -207,12 +207,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Accordion Logic
-  function closeAllAccordions() {
+  // Tab Logic
+  function resetTabs() {
     contentBooking.style.display = 'none';
     contentBlock.style.display = 'none';
-    accBooking.querySelector('.accordion-icon').innerText = '▼';
-    accBlock.querySelector('.accordion-icon').innerText = '▼';
+    
+    // reset button styles
+    tabBooking.classList.remove('btn');
+    tabBooking.classList.add('btn-outline');
+    tabBlock.classList.remove('btn');
+    tabBlock.classList.add('btn-outline');
+    tabCustomer.classList.remove('btn');
+    tabCustomer.classList.add('btn-outline');
     
     // Reset states
     if (isBlockMode) {
@@ -225,26 +231,23 @@ document.addEventListener('DOMContentLoaded', () => {
     allBtns.forEach(b => b.classList.add('btn-outline'));
   }
 
-  accBooking.addEventListener('click', () => {
-    const isClosed = contentBooking.style.display === 'none';
-    closeAllAccordions();
-    if (isClosed) {
-      contentBooking.style.display = 'block';
-      accBooking.querySelector('.accordion-icon').innerText = '▲';
-    }
+  tabBooking.addEventListener('click', () => {
+    resetTabs();
+    contentBooking.style.display = 'block';
+    tabBooking.classList.remove('btn-outline');
+    tabBooking.classList.add('btn');
   });
 
-  accBlock.addEventListener('click', () => {
-    const isClosed = contentBlock.style.display === 'none';
-    closeAllAccordions();
-    if (isClosed) {
-      contentBlock.style.display = 'block';
-      accBlock.querySelector('.accordion-icon').innerText = '▲';
-    }
+  tabBlock.addEventListener('click', () => {
+    resetTabs();
+    contentBlock.style.display = 'block';
+    tabBlock.classList.remove('btn-outline');
+    tabBlock.classList.add('btn');
   });
 
-  accCustomer.addEventListener('click', () => {
-    closeAllAccordions();
+  tabCustomer.addEventListener('click', () => {
+    // 顧客データはモーダルを開くので、元のタブを維持しても良いが
+    // わかりやすく「タブが押された」状態にするかはお好み。今回はモーダルを開くだけ。
     openCustomerMgmtModal();
   });
 
