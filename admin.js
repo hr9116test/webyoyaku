@@ -1,5 +1,5 @@
 // admin.js
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbz7Yn-gNLDIN7GcY2Ymxx0oa-iiHMQPc943HkMuwHJgGmPT3B2Junx6JwDlsqQ3EGAn/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxwHodHyyDHI-zfjV-ANJl3SCQ7Di9756o9dFCgpqsnuSUR0w_p-6dkvL8rp_VCBiVo/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
   // State
@@ -326,12 +326,18 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('customer-name').innerText = name;
     
     if (customer) {
+      document.getElementById('customer-kana').innerText = customer['ふりがな'] || "未登録";
+      document.getElementById('customer-address').innerText = customer['住所（市町村）'] || "未登録";
+      document.getElementById('customer-occupation').innerText = customer['職業'] || "未登録";
       document.getElementById('customer-phone').innerText = String(customer['電話番号']||"").replace(/'/g, "") || "未登録";
       document.getElementById('customer-email').innerText = customer['メールアドレス'] || "未登録";
       document.getElementById('customer-first-visit').innerText = customer['初回予約日'] || "-";
       document.getElementById('customer-last-visit').innerText = customer['最終来店日'] || "-";
       document.getElementById('customer-notes').innerText = customer['メモ'] || "なし";
     } else {
+      document.getElementById('customer-kana').innerText = "未登録";
+      document.getElementById('customer-address').innerText = "未登録";
+      document.getElementById('customer-occupation').innerText = "未登録";
       document.getElementById('customer-phone').innerText = phone || "未登録";
       document.getElementById('customer-email').innerText = "未登録";
       document.getElementById('customer-first-visit').innerText = "-";
