@@ -1,5 +1,5 @@
 // app.js
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbz5JqxPwbO2X46nAMS503ufwz7FDiFAd50uq9Jfb-7FQynEn-y0-dea0V6N3oJOcHgE/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxwHodHyyDHI-zfjV-ANJl3SCQ7Di9756o9dFCgpqsnuSUR0w_p-6dkvL8rp_VCBiVo/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
   // State
@@ -467,7 +467,7 @@ document.addEventListener('DOMContentLoaded', () => {
       email: document.getElementById('user-email').value,
       memo: document.getElementById('user-memo').value,
       menu: state.menuName,
-      type: 'booked'
+      type: '予約済'
     };
 
     fetch(GAS_URL, {
