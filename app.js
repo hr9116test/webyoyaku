@@ -110,7 +110,17 @@ document.addEventListener('DOMContentLoaded', () => {
       card.dataset.menu = menu.id;
       card.dataset.time = menu.duration;
       
-      const priceText = menu.price ? ` / ${menu.price}` : '';
+      let priceText = '';
+      if (menu.price) {
+        // 数字のみ入力された場合でも自動でカンマと「円」をつける
+        const numericPrice = parseInt(menu.price.toString().replace(/[^0-9]/g, ''), 10);
+        if (!isNaN(numericPrice)) {
+          priceText = ` / ${numericPrice.toLocaleString()}円`;
+        } else {
+          priceText = ` / ${menu.price}円`; // 万が一数字以外が入った場合のフォールバック
+        }
+      }
+      
       card.innerHTML = `
         <div class="selection-title">${menu.name}</div>
         <div class="selection-desc">約${menu.duration}分${priceText}</div>
