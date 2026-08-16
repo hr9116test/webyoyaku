@@ -216,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
       
       return fetch(GAS_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'createBooking', payload })
       }).then(res => res.json());
     });
@@ -299,7 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     fetch(GAS_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({ action: 'createBooking', payload })
     })
     .then(res => res.json())
