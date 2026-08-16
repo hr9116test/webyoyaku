@@ -1,5 +1,5 @@
 // app.js
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbyb7qWw21YJIkg_eykRYVvguXqlOesx1YeVFacGr5RrgpdJE0RAFrcqM2prg2m4S9yn/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxVxFU3mUiyiVXEfk3_WY3RmKf-HMzxGuLHqXP28UxVeJOUIJFUjbLmrtCU4IQnPpUL/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
   // State
@@ -35,7 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnPrev4 = document.getElementById('btn-prev-4');
   const form = document.getElementById('booking-form');
 
-  // Fetch Data
   const fetchAndRefreshData = () => {
     fetch(`${GAS_URL}?action=getInitialData`)
     .then(res => res.json())
@@ -56,6 +55,10 @@ document.addEventListener('DOMContentLoaded', () => {
           type: b['予約状況']
         }));
 
+        // データをブラウザに記憶させる（次回以降の爆速表示のため）
+        localStorage.setItem('hr_menus', JSON.stringify(menus));
+        localStorage.setItem('hr_staffs', JSON.stringify(staffs));
+
         renderMenus();
         renderStaffs();
       } else {
@@ -69,7 +72,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
-  // 最初のデータ取得を実行
+  // 起動時の初期化処理（キャッシュがあれば即表示）
+  const cachedMenus = localStorage.getItem('hr_menus');
+  const cachedStaffs = localStorage.getItem('hr_staffs');
+  if (cachedMenus && cachedStaffs) {
+    menus = JSON.parse(cachedMenus);
+    staffs = JSON.parse(cachedStaffs);
+    renderMenus();
+    renderStaffs();
+  }
+
+  // 裏側で最新データを取得（初めての場合はここで初めて表示される）
   fetchAndRefreshData();
 
   // 1分ごとにデータをバックグラウンドで自動更新（ダブルブッキング防止用）
