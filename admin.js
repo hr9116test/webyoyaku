@@ -1,5 +1,5 @@
 // admin.js
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwebp5RaGMoIOT7bVFXVV1q3YBa-ObsjKsHQ7-bPYALUWEfL6qduiWbYQxz4AuWqLWm/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyb7qWw21YJIkg_eykRYVvguXqlOesx1YeVFacGr5RrgpdJE0RAFrcqM2prg2m4S9yn/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
   // State
@@ -34,7 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
   updateDateDisplay();
   timeline.innerHTML = '<div style="padding:2rem; text-align:center; color: var(--color-text-sub);">データを読み込んでいます...</div>';
 
-  fetch(`${GAS_URL}?action=getInitialData`)
+  const fetchAndRefreshData = () => {
+    fetch(`${GAS_URL}?action=getInitialData`)
     .then(res => res.json())
     .then(result => {
       if(result.success) {
@@ -68,6 +69,42 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('通信エラー: ' + e.message);
       timeline.innerHTML = '<div style="padding:2rem; text-align:center; color: red;">通信エラーが発生しました。</div>';
     });
+  };
+
+  // 最初のデータ取得を実行
+  fetchAndRefreshData();
+
+  // 1分ごとにデータをバックグラウンドで自動更新（ダブルブッキング防止用）
+  setInterval(() => {
+    fetch(`${GAS_URL}?action=getInitialData`)
+      .then(res => res.json())
+      .then(result => {
+        if(result.success) {
+          menus = result.data.menus.map(m => ({
+            id: m['メニューID'], name: m['メニュー名'], duration: parseInt(m['所要時間(分)']), price: m['金額']
+          }));
+          staffs = result.data.staffs.map(s => ({
+            id: s['スタッフID'], name: s['スタッフ名']
+          }));
+          mockBookings = result.data.bookings.map(b => ({
+            id: b['予約ID'],
+            date: String(b['予約日']).substring(0, 10),
+            startTime: String(b['開始時間']).padStart(5, '0').substring(0, 5),
+            duration: parseInt(b['所要時間(分)']),
+            staff: b['担当スタッフ'],
+            name: b['お客様名'],
+            phone: b['電話番号'],
+            email: b['メールアドレス'],
+            menu: b['メニュー名'],
+            type: b['予約状況']
+          }));
+          
+          // バックグラウンドで最新データに差し替えて画面を更新
+          renderTimeline();
+        }
+      })
+      .catch(e => console.error('Auto-refresh failed:', e));
+  }, 60000);
 
   function updateDateDisplay() {
     dateInput.value = formatDate(currentDate);
