@@ -612,6 +612,9 @@ a {
   .header {
     justify-content: center;
   }
+  .timeline-container {
+    margin: 0 8px;
+  }
 }
 
 /* 検索サジェスト (Autocomplete) */
