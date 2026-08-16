@@ -55,6 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
           phone: b['電話番号'],
           email: b['メールアドレス'],
           menu: b['メニュー名'],
+          memo: b['メモ'],
           type: b['予約状況']
         }));
         
