@@ -1,5 +1,5 @@
 // admin.js
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwMr-SrP8DFhYEDjKG9UUNSwcKYTZuUvM5Ty8iPke4Kb4zehV6il03YHTUEKjOmGv1F/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbz5JqxPwbO2X46nAMS503ufwz7FDiFAd50uq9Jfb-7FQynEn-y0-dea0V6N3oJOcHgE/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
   // State
@@ -96,6 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
             phone: b['電話番号'],
             email: b['メールアドレス'],
             menu: b['メニュー名'],
+            memo: b['メモ'],
             type: b['予約状況']
           }));
           
@@ -466,6 +467,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (b.type === 'booked' && b.menu) {
           contentHtml += `<br><span style="font-size: 0.75rem;">${b.menu}</span>`;
         }
+        if (b.type === 'booked' && b.memo) {
+          contentHtml += `<br><span style="color: #ffcccc; font-size: 0.75rem; font-weight: bold; background: rgba(200,0,0,0.5); padding: 0 4px; border-radius: 4px; display: inline-block; margin-top: 2px;">要望あり</span>`;
+        }
         block.innerHTML = contentHtml;
         
         block.style.cursor = 'pointer';
@@ -517,6 +521,12 @@ document.addEventListener('DOMContentLoaded', () => {
               document.getElementById('detail-email').innerText = b.email;
             } else {
               document.getElementById('detail-email-container').classList.add('d-none');
+            }
+            if (b.memo) {
+              document.getElementById('detail-memo-container').classList.remove('d-none');
+              document.getElementById('detail-memo').innerText = b.memo;
+            } else {
+              document.getElementById('detail-memo-container').classList.add('d-none');
             }
           }
           
