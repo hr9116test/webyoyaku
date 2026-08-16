@@ -30,6 +30,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const contentBooking = document.getElementById('tab-content-booking');
   const contentBlock = document.getElementById('tab-content-block');
   
+  // Menu Dropdown elements
+  const menuDropdownToggle = document.getElementById('menu-dropdown-toggle');
+  const menuDropdownText = document.getElementById('menu-dropdown-text');
+  const menuDropdownIcon = document.getElementById('menu-dropdown-icon');
+  
   // Customer Management elements
   const customerMgmtModal = document.getElementById('customer-mgmt-modal');
   const btnCloseMgmt = document.getElementById('btn-close-mgmt');
@@ -158,23 +163,20 @@ document.addEventListener('DOMContentLoaded', () => {
           btn.classList.add('btn-outline');
           selectedMenuDuration = 0;
           selectedMenuName = '';
+          menuDropdownText.innerText = 'メニューを選択してください';
+          menuDropdownToggle.classList.add('btn-outline');
         } else {
           allBtns.forEach(b => b.classList.add('btn-outline'));
           btn.classList.remove('btn-outline');
           selectedMenuDuration = menu.duration;
           selectedMenuName = menu.name;
           selectedMenuType = 'booked';
-        }
-        
-        if (window.innerWidth < 768 && mobileMenuToggle) {
-          menuButtonsContainer.classList.remove('show');
-          if (selectedMenuName) {
-            mobileMenuToggle.innerText = `${selectedMenuName} (${selectedMenuDuration}分) ▼`;
-            mobileMenuToggle.classList.remove('btn-outline');
-          } else {
-            mobileMenuToggle.innerText = 'メニューを選択 ▼';
-            mobileMenuToggle.classList.add('btn-outline');
-          }
+          menuDropdownText.innerText = `${menu.name} (${menu.duration}分)`;
+          menuDropdownToggle.classList.remove('btn-outline');
+          
+          // メニューを選択したらアコーディオンを閉じる
+          menuButtonsContainer.style.display = 'none';
+          menuDropdownIcon.innerText = '▼';
         }
         
         renderTimeline();
@@ -227,9 +229,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     selectedMenuDuration = 0;
     selectedMenuName = '';
+    menuDropdownText.innerText = 'メニューを選択してください';
+    menuDropdownToggle.classList.add('btn-outline');
+    menuButtonsContainer.style.display = 'none';
+    menuDropdownIcon.innerText = '▼';
+
     const allBtns = menuButtonsContainer.querySelectorAll('.menu-btn');
     allBtns.forEach(b => b.classList.add('btn-outline'));
   }
+
+  // Menu Dropdown Logic
+  menuDropdownToggle.addEventListener('click', () => {
+    const isClosed = menuButtonsContainer.style.display === 'none';
+    if (isClosed) {
+      menuButtonsContainer.style.display = 'block';
+      menuDropdownIcon.innerText = '▲';
+    } else {
+      menuButtonsContainer.style.display = 'none';
+      menuDropdownIcon.innerText = '▼';
+    }
+  });
 
   tabBooking.addEventListener('click', () => {
     resetTabs();
@@ -477,6 +496,8 @@ document.addEventListener('DOMContentLoaded', () => {
         selectedMenuDuration = 0;
         selectedMenuName = '';
         selectedMenuType = '予約済';
+        menuDropdownText.innerText = 'メニューを選択してください';
+        menuDropdownToggle.classList.add('btn-outline');
         
         renderTimeline();
         alert('予約を登録しました。');
