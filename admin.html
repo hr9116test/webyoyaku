@@ -161,55 +161,53 @@
 
   <!-- Customer Data Modal -->
   <div id="customer-modal" class="d-none" style="position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.5); z-index: 200; display: flex; align-items: center; justify-content: center;">
-    <div class="card" style="width: 100%; max-width: 400px; margin: 1rem; position: relative; max-height: 90vh; overflow-y: auto;">
-      <h3 class="mb-4 text-center">顧客データ</h3>
+    <div class="card" style="width: 100%; max-width: 420px; margin: 1rem; position: relative; max-height: 90vh; overflow-y: auto; padding: 1.25rem;">
+      <h3 class="mb-3 text-center" style="font-size: 1.1rem; color: var(--color-primary); margin-top: 0;">顧客データ</h3>
       
-      <div class="form-group">
-        <label class="form-label">お客様名</label>
-        <div id="customer-name" style="font-size: 1.1rem; font-weight: bold;"></div>
-      </div>
-      
-      <div class="form-group">
-        <label class="form-label">ふりがな</label>
-        <div id="customer-kana" style="font-size: 1.1rem;"></div>
-      </div>
-      
-      <div class="form-group">
-        <label class="form-label">住所（市町村）</label>
-        <div id="customer-address" style="font-size: 1.1rem;"></div>
-      </div>
-      
-      <div class="form-group">
-        <label class="form-label">職業</label>
-        <div id="customer-occupation" style="font-size: 1.1rem;"></div>
-      </div>
-      
-      <div class="form-group">
-        <label class="form-label">電話番号</label>
-        <div id="customer-phone" style="font-size: 1.1rem; font-weight: bold;"></div>
-      </div>
-      
-      <div class="form-group">
-        <label class="form-label">メールアドレス</label>
-        <div id="customer-email" style="font-size: 1.1rem; font-weight: bold;"></div>
+      <div style="background: var(--color-base); border-radius: var(--radius-sm); border: 1px solid var(--color-border); overflow: hidden; margin-bottom: 1.25rem;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0;">
+          <tbody>
+            <tr style="border-bottom: 1px solid var(--color-border);">
+              <th style="padding: 0.5rem; text-align: left; background: rgba(0,0,0,0.02); width: 35%; color: var(--color-text-sub); font-weight: normal;">お客様名</th>
+              <td style="padding: 0.5rem; font-weight: bold; color: var(--color-text-main);"><div id="customer-name"></div></td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border);">
+              <th style="padding: 0.5rem; text-align: left; background: rgba(0,0,0,0.02); color: var(--color-text-sub); font-weight: normal;">ふりがな</th>
+              <td style="padding: 0.5rem;"><div id="customer-kana"></div></td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border);">
+              <th style="padding: 0.5rem; text-align: left; background: rgba(0,0,0,0.02); color: var(--color-text-sub); font-weight: normal;">住所(市町村)</th>
+              <td style="padding: 0.5rem;"><div id="customer-address"></div></td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border);">
+              <th style="padding: 0.5rem; text-align: left; background: rgba(0,0,0,0.02); color: var(--color-text-sub); font-weight: normal;">職業</th>
+              <td style="padding: 0.5rem;"><div id="customer-occupation"></div></td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border);">
+              <th style="padding: 0.5rem; text-align: left; background: rgba(0,0,0,0.02); color: var(--color-text-sub); font-weight: normal;">電話番号</th>
+              <td style="padding: 0.5rem; font-weight: bold;"><div id="customer-phone"></div></td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border);">
+              <th style="padding: 0.5rem; text-align: left; background: rgba(0,0,0,0.02); color: var(--color-text-sub); font-weight: normal;">メール</th>
+              <td style="padding: 0.5rem; font-weight: bold; word-break: break-all;"><div id="customer-email"></div></td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border);">
+              <th style="padding: 0.5rem; text-align: left; background: rgba(0,0,0,0.02); color: var(--color-text-sub); font-weight: normal;">初回予約日</th>
+              <td style="padding: 0.5rem;"><div id="customer-first-visit"></div></td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border);">
+              <th style="padding: 0.5rem; text-align: left; background: rgba(0,0,0,0.02); color: var(--color-text-sub); font-weight: normal;">最終来店日</th>
+              <td style="padding: 0.5rem;"><div id="customer-last-visit"></div></td>
+            </tr>
+            <tr>
+              <th style="padding: 0.5rem; text-align: left; background: rgba(0,0,0,0.02); color: var(--color-text-sub); font-weight: normal; vertical-align: top;">メモ</th>
+              <td style="padding: 0.5rem;"><div id="customer-notes" style="white-space: pre-wrap; font-size: 0.85rem; line-height: 1.4;"></div></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">初回予約日</label>
-        <div id="customer-first-visit" style="font-size: 1rem;"></div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">最終来店日</label>
-        <div id="customer-last-visit" style="font-size: 1rem;"></div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">メモ</label>
-        <div id="customer-notes" style="font-size: 1rem; white-space: pre-wrap;"></div>
-      </div>
-
-      <div style="margin-top: 2rem;">
+      <div>
         <button type="button" class="btn btn-outline btn-full" id="btn-close-customer">閉じる</button>
       </div>
     </div>
