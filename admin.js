@@ -318,6 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('btn-close-customer').addEventListener('click', () => {
     customerModal.classList.add('d-none');
+    detailsModal.classList.remove('d-none'); // 元の予約詳細画面を再表示
   });
 
   function showCustomerModal(name, phone) {
@@ -345,6 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('customer-notes').innerText = "なし";
     }
     
+    detailsModal.classList.add('d-none'); // 予約詳細画面を隠して二重枠を防ぐ
     customerModal.classList.remove('d-none');
   }
 
