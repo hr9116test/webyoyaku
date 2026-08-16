@@ -1,5 +1,5 @@
 // app.js
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbz7Yn-gNLDIN7GcY2Ymxx0oa-iiHMQPc943HkMuwHJgGmPT3B2Junx6JwDlsqQ3EGAn/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbx-b6WOncIt4M8nPkncMZfLDYc1MoV55tOvtL-cCT3ARdTSsZcMFUyk4d_J9Ur51cWi/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
   // State
@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // 裏側で最新データを取得（初めての場合ここで初めて表示される）
+  // 裏側で最新データを取得（初めての場合はここで初めて表示される）
   fetchAndRefreshData();
 
   // 1分ごとにデータをバックグラウンドで自動更新（ダブルブッキング防止用）
