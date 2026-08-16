@@ -1,5 +1,5 @@
 // admin.js
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbz7Yn-gNLDIN7GcY2Ymxx0oa-iiHMQPc943HkMuwHJgGmPT3B2Junx6JwDlsqQ3EGAn/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbx-b6WOncIt4M8nPkncMZfLDYc1MoV55tOvtL-cCT3ARdTSsZcMFUyk4d_J9Ur51cWi/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
   // State
@@ -21,8 +21,26 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnBlockConfirm = document.getElementById('btn-block-confirm');
   const btnBlockCancel = document.getElementById('btn-block-cancel');
   
-  const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
   const menuButtonsContainer = document.getElementById('menu-buttons');
+  
+  // Accordion elements
+  const accBooking = document.getElementById('btn-accordion-booking');
+  const accBlock = document.getElementById('btn-accordion-block');
+  const accCustomer = document.getElementById('btn-accordion-customer');
+  const contentBooking = document.getElementById('accordion-content-booking');
+  const contentBlock = document.getElementById('accordion-content-block');
+  
+  // Customer Management elements
+  const customerMgmtModal = document.getElementById('customer-mgmt-modal');
+  const btnCloseMgmt = document.getElementById('btn-close-mgmt');
+  const btnNewCustomer = document.getElementById('btn-new-customer');
+  const customerSearchInput = document.getElementById('customer-search-input');
+  const customerTbody = document.getElementById('customer-tbody');
+  const customerListView = document.getElementById('customer-list-view');
+  const customerFormView = document.getElementById('customer-form-view');
+  const customerEditForm = document.getElementById('customer-edit-form');
+  const btnCancelEdit = document.getElementById('btn-cancel-edit');
+  const customerFormTitle = document.getElementById('customer-form-title');
 
   let selectedMenuDuration = 0;
   let selectedMenuName = '';
@@ -189,14 +207,46 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  if (mobileMenuToggle) {
-    mobileMenuToggle.addEventListener('click', () => {
-      menuButtonsContainer.classList.toggle('show');
-      mobileMenuToggle.innerText = menuButtonsContainer.classList.contains('show') 
-        ? 'メニューを閉じる ▲' 
-        : (selectedMenuName ? `${selectedMenuName} (${selectedMenuDuration}分) ▼` : 'メニューを選択 ▼');
-    });
+  // Accordion Logic
+  function closeAllAccordions() {
+    contentBooking.style.display = 'none';
+    contentBlock.style.display = 'none';
+    accBooking.querySelector('.accordion-icon').innerText = '▼';
+    accBlock.querySelector('.accordion-icon').innerText = '▼';
+    
+    // Reset states
+    if (isBlockMode) {
+      exitBlockMode();
+      renderTimeline();
+    }
+    selectedMenuDuration = 0;
+    selectedMenuName = '';
+    const allBtns = menuButtonsContainer.querySelectorAll('.menu-btn');
+    allBtns.forEach(b => b.classList.add('btn-outline'));
   }
+
+  accBooking.addEventListener('click', () => {
+    const isClosed = contentBooking.style.display === 'none';
+    closeAllAccordions();
+    if (isClosed) {
+      contentBooking.style.display = 'block';
+      accBooking.querySelector('.accordion-icon').innerText = '▲';
+    }
+  });
+
+  accBlock.addEventListener('click', () => {
+    const isClosed = contentBlock.style.display === 'none';
+    closeAllAccordions();
+    if (isClosed) {
+      contentBlock.style.display = 'block';
+      accBlock.querySelector('.accordion-icon').innerText = '▲';
+    }
+  });
+
+  accCustomer.addEventListener('click', () => {
+    closeAllAccordions();
+    openCustomerMgmtModal();
+  });
 
   // Block Mode Logic
   btnBlockMode.addEventListener('click', () => {
@@ -214,16 +264,6 @@ document.addEventListener('DOMContentLoaded', () => {
     btnBlockMode.classList.add('btn');
     btnBlockConfirm.classList.remove('d-none');
     btnBlockCancel.classList.remove('d-none');
-    
-    const allBtns = menuButtonsContainer.querySelectorAll('.menu-btn');
-    allBtns.forEach(b => b.classList.add('btn-outline'));
-    selectedMenuDuration = 0;
-    selectedMenuName = '';
-    
-    if (window.innerWidth < 768 && mobileMenuToggle) {
-      mobileMenuToggle.innerText = 'メニューを選択 ▼';
-      mobileMenuToggle.classList.add('btn-outline');
-    }
     
     renderTimeline();
   });
@@ -695,10 +735,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- Autocomplete Logic ---
-  const mockCustomers = [
-    { name: '小布施 太郎', kana: 'おぶせ たろう', phone: '090-1234-5678' }
-  ];
-
   const nameInput = document.getElementById('proxy-name');
   const phoneInput = document.getElementById('proxy-phone');
   const autocompleteList = document.getElementById('autocomplete-list');
@@ -714,10 +750,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const searchVal = val.replace(/[\s　]/g, '');
     
-    const matches = mockCustomers.filter(c => {
-      const nameMatch = c.name.replace(/[\s　]/g, '').includes(searchVal);
-      const kanaMatch = c.kana.replace(/[\s　]/g, '').includes(searchVal);
-      const phoneMatch = c.phone.replace(/-/g, '').includes(searchVal);
+    // customers配列から候補を探す
+    const matches = customers.filter(c => {
+      const nameMatch = (c['お客様名'] || "").replace(/[\s　]/g, '').includes(searchVal);
+      const kanaMatch = (c['ふりがな'] || "").replace(/[\s　]/g, '').includes(searchVal);
+      const phoneMatch = String(c['電話番号']||"").replace(/-/g, '').replace(/'/g, '').includes(searchVal);
       return nameMatch || kanaMatch || phoneMatch;
     });
     
@@ -743,6 +780,141 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!nameInput.contains(e.target) && !autocompleteList.contains(e.target)) {
       autocompleteList.classList.add('d-none');
     }
+  });
+
+  // --- Customer Management Logic ---
+  
+  function openCustomerMgmtModal() {
+    customerMgmtModal.classList.remove('d-none');
+    showCustomerListView();
+  }
+  
+  btnCloseMgmt.addEventListener('click', () => {
+    customerMgmtModal.classList.add('d-none');
+  });
+
+  function showCustomerListView() {
+    customerFormView.classList.add('d-none');
+    customerListView.classList.remove('d-none');
+    renderCustomerList();
+  }
+
+  function showCustomerFormView(customer = null) {
+    customerListView.classList.add('d-none');
+    customerFormView.classList.remove('d-none');
+    
+    if (customer) {
+      customerFormTitle.innerText = "顧客データの編集";
+      document.getElementById('edit-customer-id').value = customer['顧客ID'];
+      document.getElementById('edit-name').value = customer['お客様名'] || '';
+      document.getElementById('edit-kana').value = customer['ふりがな'] || '';
+      document.getElementById('edit-phone').value = String(customer['電話番号']||'').replace(/'/g, "");
+      document.getElementById('edit-address').value = customer['住所（市町村）'] || '';
+      document.getElementById('edit-occupation').value = customer['職業'] || '';
+      document.getElementById('edit-email').value = customer['メールアドレス'] || '';
+      document.getElementById('edit-memo').value = customer['メモ'] || '';
+    } else {
+      customerFormTitle.innerText = "新規顧客の登録";
+      document.getElementById('edit-customer-id').value = '';
+      customerEditForm.reset();
+    }
+  }
+
+  btnNewCustomer.addEventListener('click', () => {
+    showCustomerFormView(null);
+  });
+
+  btnCancelEdit.addEventListener('click', () => {
+    showCustomerListView();
+  });
+
+  function renderCustomerList() {
+    const searchVal = customerSearchInput.value.trim().replace(/[\s　]/g, '');
+    customerTbody.innerHTML = '';
+    
+    const filtered = customers.filter(c => {
+      if (!searchVal) return true;
+      const nameMatch = (c['お客様名'] || "").replace(/[\s　]/g, '').includes(searchVal);
+      const kanaMatch = (c['ふりがな'] || "").replace(/[\s　]/g, '').includes(searchVal);
+      const phoneMatch = String(c['電話番号']||"").replace(/-/g, '').replace(/'/g, '').includes(searchVal);
+      return nameMatch || kanaMatch || phoneMatch;
+    });
+
+    if (filtered.length === 0) {
+      customerTbody.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 1rem; color: #777;">見つかりませんでした</td></tr>`;
+      return;
+    }
+
+    // 登録日時で新しい順に並び替え
+    filtered.sort((a, b) => {
+      const dateA = new Date(a['登録日時'] || 0).getTime();
+      const dateB = new Date(b['登録日時'] || 0).getTime();
+      return dateB - dateA;
+    });
+
+    filtered.forEach(c => {
+      const tr = document.createElement('tr');
+      tr.style.cursor = 'pointer';
+      tr.addEventListener('click', () => {
+        showCustomerFormView(c);
+      });
+      tr.addEventListener('mouseenter', () => { tr.style.backgroundColor = 'rgba(0,0,0,0.02)'; });
+      tr.addEventListener('mouseleave', () => { tr.style.backgroundColor = 'transparent'; });
+      
+      const phone = String(c['電話番号']||"").replace(/'/g, "") || "-";
+      tr.innerHTML = `
+        <td style="padding: 0.75rem; border-bottom: 1px solid var(--color-border); font-weight: bold; color: var(--color-primary);">${c['お客様名']}</td>
+        <td style="padding: 0.75rem; border-bottom: 1px solid var(--color-border);">${phone}</td>
+        <td style="padding: 0.75rem; border-bottom: 1px solid var(--color-border); text-align: right; color: var(--color-text-sub);">編集 &gt;</td>
+      `;
+      customerTbody.appendChild(tr);
+    });
+  }
+
+  customerSearchInput.addEventListener('input', renderCustomerList);
+
+  customerEditForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const submitBtn = document.getElementById('btn-save-customer');
+    const originalText = submitBtn.innerText;
+    submitBtn.innerText = '保存中...';
+    submitBtn.disabled = true;
+
+    const payload = {
+      '顧客ID': document.getElementById('edit-customer-id').value,
+      'お客様名': document.getElementById('edit-name').value,
+      'ふりがな': document.getElementById('edit-kana').value,
+      '電話番号': document.getElementById('edit-phone').value,
+      '住所（市町村）': document.getElementById('edit-address').value,
+      '職業': document.getElementById('edit-occupation').value,
+      'メールアドレス': document.getElementById('edit-email').value,
+      'メモ': document.getElementById('edit-memo').value
+    };
+
+    fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'saveCustomer', payload: payload })
+    })
+    .then(res => res.json())
+    .then(result => {
+      if(result.success) {
+        // UI上で即座にデータを反映させるため、再度フェッチするかローカルを更新する
+        // 今回はシンプルに再取得を行う
+        fetchAndRefreshData();
+        showCustomerListView();
+      } else {
+        alert('保存に失敗しました: ' + result.error);
+      }
+    })
+    .catch(err => {
+      alert('通信エラー: ' + err.message);
+    })
+    .finally(() => {
+      submitBtn.innerText = originalText;
+      submitBtn.disabled = false;
+    });
   });
 
 });
