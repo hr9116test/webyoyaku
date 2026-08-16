@@ -182,6 +182,11 @@ document.addEventListener('DOMContentLoaded', () => {
         state.duration = menu.duration;
         btnNext1.classList.remove('btn-disabled');
         btnNext1.disabled = false;
+        
+        // 次へ進むボタンまで自動スクロール
+        setTimeout(() => {
+          btnNext1.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
       });
       
       grid.appendChild(card);
@@ -225,6 +230,11 @@ document.addEventListener('DOMContentLoaded', () => {
     state.staffName = staffName;
     btnNext2.classList.remove('btn-disabled');
     btnNext2.disabled = false;
+    
+    // 次へ進むボタンまで自動スクロール
+    setTimeout(() => {
+      btnNext2.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
   };
 
   btnNext2.addEventListener('click', () => goToStep(3));
