@@ -1,5 +1,5 @@
 // app.js
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbyJe_x9XSxWTUEHkrp_O2mc_h_-0QeRF8S8gjbSCXsf7aeM4oDvt9ierAwsryzB4saR/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbz7Yn-gNLDIN7GcY2Ymxx0oa-iiHMQPc943HkMuwHJgGmPT3B2Junx6JwDlsqQ3EGAn/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
   // State
