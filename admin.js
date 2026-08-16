@@ -6,9 +6,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Mock Data (In real app, fetch from GAS)
   // startTime is 'HH:MM', duration is in minutes
   let mockBookings = [
-    { id: 1, date: formatDate(new Date()), startTime: '09:00', duration: 60, staff: 'staffA', name: '小布施 太郎', type: 'booked' },
+    { id: 1, date: formatDate(new Date()), startTime: '09:00', duration: 60, staff: 'staffA', name: '小布施 太郎', menu: 'カット', phone: '090-1234-5678', email: 'taro@example.com', type: 'booked' },
     { id: 2, date: formatDate(new Date()), startTime: '10:00', duration: 120, staff: 'staffB', name: '休み', type: 'blocked' },
-    { id: 3, date: formatDate(new Date()), startTime: '14:30', duration: 90, staff: 'staffA', name: '長野 花子', type: 'booked' },
+    { id: 3, date: formatDate(new Date()), startTime: '14:30', duration: 90, staff: 'staffA', name: '長野 花子', menu: 'カラー', phone: '080-9876-5432', type: 'booked' },
   ];
 
   const staffs = [
@@ -215,6 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('proxy-booking-form').addEventListener('submit', (e) => {
     e.preventDefault();
     const name = document.getElementById('proxy-name').value;
+    const phone = document.getElementById('proxy-phone').value;
     
     // Add to mock data
     mockBookings.push({
@@ -224,6 +225,8 @@ document.addEventListener('DOMContentLoaded', () => {
       duration: pendingBooking.duration,
       staff: pendingBooking.staff,
       name: name,
+      phone: phone,
+      menu: selectedMenuName,
       type: pendingBooking.type
     });
     
@@ -337,7 +340,12 @@ document.addEventListener('DOMContentLoaded', () => {
         block.className = `booking-block ${b.type === 'blocked' ? 'booking-blocked' : 'booking-booked'}`;
         block.style.top = `${startIndex * 40}px`;
         block.style.height = `${slotsNeeded * 40}px`;
-        block.innerHTML = `<strong>${b.startTime}</strong><br>${b.name}`;
+        
+        let contentHtml = `<strong>${b.startTime}</strong><br>${b.name}`;
+        if (b.type === 'booked' && b.menu) {
+          contentHtml += `<br><span style="font-size: 0.75rem;">${b.menu}</span>`;
+        }
+        block.innerHTML = contentHtml;
         
         block.style.cursor = 'pointer';
         block.addEventListener('click', (e) => {
@@ -372,9 +380,25 @@ document.addEventListener('DOMContentLoaded', () => {
           if (b.type === 'blocked') {
             document.getElementById('detail-menu').innerText = 'お休み・予定ブロック\n※ブロックの解除は上部の「ブロック編集」モードから行ってください。';
             cancelBtn.classList.add('d-none');
+            document.getElementById('detail-phone-container').classList.add('d-none');
+            document.getElementById('detail-email-container').classList.add('d-none');
           } else {
-            document.getElementById('detail-menu').innerText = `所要時間: ${b.duration}分`;
+            document.getElementById('detail-menu').innerText = `${b.menu ? b.menu + ' ' : ''}(所要時間: ${b.duration}分)`;
             cancelBtn.classList.remove('d-none');
+            
+            if (b.phone) {
+              document.getElementById('detail-phone-container').classList.remove('d-none');
+              document.getElementById('detail-phone').innerText = b.phone;
+            } else {
+              document.getElementById('detail-phone-container').classList.add('d-none');
+            }
+            
+            if (b.email) {
+              document.getElementById('detail-email-container').classList.remove('d-none');
+              document.getElementById('detail-email').innerText = b.email;
+            } else {
+              document.getElementById('detail-email-container').classList.add('d-none');
+            }
           }
           
           document.getElementById('detail-staff').innerText = `担当: ${staffs.find(s => s.id === b.staff).name}`;
