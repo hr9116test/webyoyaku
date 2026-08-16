@@ -41,17 +41,8 @@
         <div class="card">
           <h2 class="mb-4 text-center">メニューを選択</h2>
           <div class="selection-grid" id="menu-grid">
-            <div class="selection-card" data-menu="cut" data-time="60">
-              <div class="selection-title">カット</div>
-              <div class="selection-desc">約60分 / ￥3,780</div>
-            </div>
-            <div class="selection-card" data-menu="color" data-time="90">
-              <div class="selection-title">カラー</div>
-              <div class="selection-desc">約90分</div>
-            </div>
-            <div class="selection-card" data-menu="perm" data-time="120">
-              <div class="selection-title">パーマ</div>
-              <div class="selection-desc">約120分</div>
+            <div id="loading-indicator" style="text-align: center; padding: 2rem; color: var(--color-text-sub); grid-column: 1 / -1;">
+              データを読み込んでいます...
             </div>
           </div>
           <button class="btn btn-full btn-disabled" id="btn-next-1" disabled>次へ進む</button>
@@ -63,18 +54,7 @@
         <div class="card">
           <h2 class="mb-4 text-center">スタッフを選択</h2>
           <div class="selection-grid" id="staff-grid">
-            <div class="selection-card" data-staff="none">
-              <div class="selection-title">指名なし</div>
-              <div class="selection-desc">どのスタッフでもOK</div>
-            </div>
-            <div class="selection-card" data-staff="staffA">
-              <div class="selection-title">スタッフA</div>
-              <div class="selection-desc">オーナースタイリスト</div>
-            </div>
-            <div class="selection-card" data-staff="staffB">
-              <div class="selection-title">スタッフB</div>
-              <div class="selection-desc">スタイリスト</div>
-            </div>
+            <!-- Dynamically generated -->
           </div>
           <div class="step-actions" style="margin-bottom: 0;">
             <button class="btn btn-outline" id="btn-prev-2">戻る</button>
