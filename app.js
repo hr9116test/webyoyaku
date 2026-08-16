@@ -202,9 +202,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('booking-form');
 
   const updateConfirmation = () => {
+    const daysOfWeek = ['日', '月', '火', '水', '木', '金', '土'];
+    const d = new Date(state.date);
+    const dow = daysOfWeek[d.getDay()];
+    const formattedDate = state.date.replace(/-/g, '/') + `（${dow}）`;
+
     document.getElementById('confirm-menu').innerText = state.menuName;
     document.getElementById('confirm-staff').innerText = state.staffName;
-    document.getElementById('confirm-datetime').innerText = `${state.date} ${state.time}`;
+    document.getElementById('confirm-datetime').innerText = `${formattedDate} ${state.time}～`;
   };
 
   btnPrev4.addEventListener('click', () => goToStep(3));
