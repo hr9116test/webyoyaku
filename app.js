@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // 裏側で最新データを取得（初めての場合はここで初めて表示される）
+  // 裏側で最新データを取得（初めての場合ここで初めて表示される）
   fetchAndRefreshData();
 
   // 1分ごとにデータをバックグラウンドで自動更新（ダブルブッキング防止用）
