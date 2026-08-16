@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }));
         mockBookings = result.data.bookings.map(b => ({
           id: b['予約ID'],
-          date: b['予約日'].split('T')[0],
+          date: String(b['予約日']).substring(0, 10),
           startTime: String(b['開始時間']).padStart(5, '0').substring(0, 5), // '9:00' -> '09:00'
           duration: parseInt(b['所要時間(分)']),
           staff: b['担当スタッフ'],
