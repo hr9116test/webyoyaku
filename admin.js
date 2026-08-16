@@ -1,5 +1,5 @@
 // admin.js
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbxO8k3CdZGzYyCpO4m0WRQ804Rt8jtgIutPYSR8Hwx01O8v7zl6Q-74Fv2P8K3Lncm7/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxwHodHyyDHI-zfjV-ANJl3SCQ7Di9756o9dFCgpqsnuSUR0w_p-6dkvL8rp_VCBiVo/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
   // State
@@ -579,12 +579,6 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
               document.getElementById('detail-phone-container').classList.add('d-none');
             }
-            if (b.email) {
-              document.getElementById('detail-email-container').classList.remove('d-none');
-              document.getElementById('detail-email').innerText = b.email;
-            } else {
-              document.getElementById('detail-email-container').classList.add('d-none');
-            }
             if (b.memo) {
               document.getElementById('detail-memo-container').classList.remove('d-none');
               document.getElementById('detail-memo').innerText = b.memo;
@@ -595,6 +589,12 @@ document.addEventListener('DOMContentLoaded', () => {
           
           document.getElementById('detail-staff').innerText = `担当: ${staffs.find(s => s.id === b.staff).name}`;
           document.getElementById('detail-name').innerText = b.name;
+          
+          document.getElementById('detail-name').onclick = () => {
+            if (b.type === '休み') return;
+            showCustomerModal(b.name, String(b.phone || "").replace(/'/g, ""));
+          };
+          
           detailsModal.classList.remove('d-none');
         });
 
