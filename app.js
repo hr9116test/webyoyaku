@@ -1,5 +1,5 @@
 // app.js
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbxVxFU3mUiyiVXEfk3_WY3RmKf-HMzxGuLHqXP28UxVeJOUIJFUjbLmrtCU4IQnPpUL/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwMr-SrP8DFhYEDjKG9UUNSwcKYTZuUvM5Ty8iPke4Kb4zehV6il03YHTUEKjOmGv1F/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
   // State
@@ -76,10 +76,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const cachedMenus = localStorage.getItem('hr_menus');
   const cachedStaffs = localStorage.getItem('hr_staffs');
   if (cachedMenus && cachedStaffs) {
-    menus = JSON.parse(cachedMenus);
-    staffs = JSON.parse(cachedStaffs);
-    renderMenus();
-    renderStaffs();
+    try {
+      menus = JSON.parse(cachedMenus);
+      staffs = JSON.parse(cachedStaffs);
+      // キャッシュが空配列などでなければ表示する
+      if (menus.length > 0 && staffs.length > 0) {
+        renderMenus();
+        renderStaffs();
+      }
+    } catch (e) {
+      console.warn('キャッシュの読み込みに失敗しました', e);
+    }
   }
 
   // 裏側で最新データを取得（初めての場合はここで初めて表示される）
