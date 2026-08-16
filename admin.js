@@ -296,6 +296,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const payload = {
         date: formatDate(currentDate),
         startTime: timeStr,
+        duration: 30, // ブロックのデフォルト時間
+        staff: staffId, // 追加: スタッフIDがないとGAS側で紐付けられず消えてしまう
         name: '休み',
         phone: '',
         menu: '',
@@ -322,7 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: 30,
             staff: staffId,
             name: '休み',
-            type: 'blocked'
+            type: '休み' // ローカル反映時も '休み' に統一する
           });
         }
       });
