@@ -1,5 +1,5 @@
 // admin.js
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbzYk_4eBWMIVSE3Q7Z8JvtTfdnUkAiGm57MTbW9k7Tuy0fskPohyaMnfjZxXiVtDjvE/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxO8k3CdZGzYyCpO4m0WRQ804Rt8jtgIutPYSR8Hwx01O8v7zl6Q-74Fv2P8K3Lncm7/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
   // State
@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let mockBookings = [];
   let staffs = [];
   let menus = [];
+  let customers = [];
 
   // DOM Elements
   const dateInput = document.getElementById('current-date');
@@ -15,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const timeline = document.getElementById('timeline');
   const modal = document.getElementById('booking-modal');
   const detailsModal = document.getElementById('details-modal');
+  const customerModal = document.getElementById('customer-modal');
   const btnBlockMode = document.getElementById('btn-block-mode');
   const btnBlockConfirm = document.getElementById('btn-block-confirm');
   const btnBlockCancel = document.getElementById('btn-block-cancel');
@@ -58,6 +60,9 @@ document.addEventListener('DOMContentLoaded', () => {
           memo: b['メモ'],
           type: b['予約状況']
         }));
+        if (result.data.customers) {
+          customers = result.data.customers;
+        }
         
         renderMenuButtons();
         renderTimeline();
@@ -100,6 +105,10 @@ document.addEventListener('DOMContentLoaded', () => {
             memo: b['メモ'],
             type: b['予約状況']
           }));
+          
+          if (result.data.customers) {
+            customers = result.data.customers;
+          }
           
           // バックグラウンドで最新データに差し替えて画面を更新
           renderTimeline();
@@ -304,7 +313,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('btn-close-details').addEventListener('click', () => {
     detailsModal.classList.add('d-none');
+    currentDetailId = null;
   });
+
+  document.getElementById('btn-close-customer').addEventListener('click', () => {
+    customerModal.classList.add('d-none');
+  });
+
+  function showCustomerModal(name, phone) {
+    const customer = customers.find(c => c['お客様名'] === name && (String(c['電話番号']||"").replace(/'/g, "") === phone));
+    
+    document.getElementById('customer-name').innerText = name;
+    
+    if (customer) {
+      document.getElementById('customer-phone').innerText = String(customer['電話番号']||"").replace(/'/g, "") || "未登録";
+      document.getElementById('customer-email').innerText = customer['メールアドレス'] || "未登録";
+      document.getElementById('customer-first-visit').innerText = customer['初回予約日'] || "-";
+      document.getElementById('customer-last-visit').innerText = customer['最終来店日'] || "-";
+      document.getElementById('customer-notes').innerText = customer['メモ'] || "なし";
+    } else {
+      document.getElementById('customer-phone').innerText = phone || "未登録";
+      document.getElementById('customer-email').innerText = "未登録";
+      document.getElementById('customer-first-visit').innerText = "-";
+      document.getElementById('customer-last-visit').innerText = "-";
+      document.getElementById('customer-notes').innerText = "なし";
+    }
+    
+    customerModal.classList.remove('d-none');
+  }
 
   document.getElementById('btn-cancel-booking').addEventListener('click', () => {
     if (confirm('本当にこの予約をキャンセル（削除）しますか？\n（※本番環境ではお客様にもキャンセル通知が送信されます）')) {
