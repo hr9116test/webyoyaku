@@ -1,5 +1,5 @@
 // admin.js
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbz5JqxPwbO2X46nAMS503ufwz7FDiFAd50uq9Jfb-7FQynEn-y0-dea0V6N3oJOcHgE/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxwHodHyyDHI-zfjV-ANJl3SCQ7Di9756o9dFCgpqsnuSUR0w_p-6dkvL8rp_VCBiVo/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
   // State
@@ -247,10 +247,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const payload = {
         date: formatDate(currentDate),
         startTime: timeStr,
-        duration: 30,
-        staff: staffId,
         name: '休み',
-        type: 'blocked'
+        phone: '',
+        menu: '',
+        type: '休み'
       };
       
       return fetch(GAS_URL, {
@@ -308,10 +308,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('btn-cancel-booking').addEventListener('click', () => {
     if (confirm('本当にこの予約をキャンセル（削除）しますか？\n（※本番環境ではお客様にもキャンセル通知が送信されます）')) {
-      // 本来はGASに削除リクエストを送る
-      mockBookings = mockBookings.filter(b => b.id !== currentDetailId);
-      detailsModal.classList.add('d-none');
-      renderTimeline();
+      
+      const submitBtn = document.getElementById('btn-cancel-booking');
+      const originalText = submitBtn.innerText;
+      submitBtn.innerText = '処理中...';
+      submitBtn.disabled = true;
+
+      fetch(GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'cancelBooking', payload: { bookingId: currentDetailId } })
+      })
+      .then(res => res.json())
+      .then(result => {
+        if(result.success) {
+          // ローカルのデータも更新
+          const b = mockBookings.find(bk => bk.id === currentDetailId);
+          if (b) b.type = 'キャンセル済';
+          
+          detailsModal.classList.add('d-none');
+          renderTimeline();
+          alert('予約をキャンセルしました。');
+        } else {
+          alert('キャンセルエラー: ' + result.error);
+        }
+      })
+      .catch(err => alert('通信エラー: ' + err.message))
+      .finally(() => {
+        submitBtn.innerText = originalText;
+        submitBtn.disabled = false;
+      });
     }
   });
 
@@ -361,7 +387,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         selectedMenuDuration = 0;
         selectedMenuName = '';
-        selectedMenuType = 'booked';
+        selectedMenuType = '予約済';
         
         renderTimeline();
         alert('予約を登録しました。');
@@ -451,7 +477,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const numSlots = (endMins - startMins) / slotMins;
       const isFree = new Array(numSlots).fill(true);
 
-      bookingsToday.filter(b => b.staff === staff.id).forEach(b => {
+      bookingsToday.filter(b => b.staff === staff.id && b.type !== 'キャンセル済').forEach(b => {
         const bStart = timeToMinutes(b.startTime);
         const startIndex = (bStart - startMins) / slotMins;
         const slotsNeeded = b.duration / slotMins;
@@ -460,15 +486,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         const block = document.createElement('div');
-        block.className = `booking-block ${b.type === 'blocked' ? 'booking-blocked' : 'booking-booked'}`;
+        block.className = `booking-block ${b.type === '休み' ? 'booking-blocked' : 'booking-booked'}`;
         block.style.top = `${startIndex * 40}px`;
         block.style.height = `${slotsNeeded * 40}px`;
         
         let contentHtml = `<strong>${b.startTime}</strong><br>${b.name}`;
-        if (b.type === 'booked' && b.menu) {
+        if (b.type === '予約済' && b.menu) {
           contentHtml += `<br><span style="font-size: 0.75rem;">${b.menu}</span>`;
         }
-        if (b.type === 'booked' && b.memo) {
+        if (b.type === '予約済' && b.memo) {
           contentHtml += `<br><span style="color: #ffcccc; font-size: 0.75rem; font-weight: bold; background: rgba(200,0,0,0.5); padding: 0 4px; border-radius: 4px; display: inline-block; margin-top: 2px;">要望あり</span>`;
         }
         block.innerHTML = contentHtml;
@@ -477,7 +503,7 @@ document.addEventListener('DOMContentLoaded', () => {
         block.addEventListener('click', (e) => {
           e.stopPropagation();
           
-          if (isBlockMode && b.type === 'blocked') {
+          if (isBlockMode && b.type === '休み') {
             if (selectedExistingBlocks.includes(b.id)) {
               selectedExistingBlocks = selectedExistingBlocks.filter(id => id !== b.id);
             } else {
@@ -489,7 +515,7 @@ document.addEventListener('DOMContentLoaded', () => {
           
           if (isBlockMode) return;
           
-          if (b.type === 'blocked') {
+          if (b.type === '休み') {
             const newName = prompt('ブロックの名称を編集:', b.name);
             if (newName !== null) {
               b.name = newName.trim() || '休み';
@@ -503,7 +529,7 @@ document.addEventListener('DOMContentLoaded', () => {
           document.getElementById('detail-datetime').innerText = `${formatDisplayDate(new Date(b.date))} ${b.startTime} 〜`;
           
           const cancelBtn = document.getElementById('btn-cancel-booking');
-          if (b.type === 'blocked') {
+          if (b.type === '休み') {
             document.getElementById('detail-menu').innerText = 'お休み・予定ブロック';
             cancelBtn.classList.add('d-none');
             document.getElementById('detail-phone-container').classList.add('d-none');
@@ -536,7 +562,7 @@ document.addEventListener('DOMContentLoaded', () => {
           detailsModal.classList.remove('d-none');
         });
 
-        if (isBlockMode && b.type === 'blocked' && selectedExistingBlocks.includes(b.id)) {
+        if (isBlockMode && b.type === '休み' && selectedExistingBlocks.includes(b.id)) {
           block.style.backgroundColor = 'rgba(114, 28, 36, 0.7)';
           block.style.color = 'white';
         }
@@ -597,7 +623,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('modal-menu').innerText = `${selectedMenuName} (${requiredDuration}分)`;
             document.getElementById('modal-staff').innerText = `担当: ${staff.name}`;
             
-            if (selectedMenuType === 'blocked') {
+            if (selectedMenuType === '休み') {
               document.getElementById('proxy-name').value = 'お休み (用事)';
               document.getElementById('proxy-name').required = false;
               document.getElementById('proxy-phone').required = false;
