@@ -62,27 +62,36 @@
           </div>
         </div>
         
-        <!-- Accordion Menus -->
+        <!-- Action Tabs -->
         <div class="admin-sidebar-section" style="margin-top: 1rem;">
           
-          <!-- 1. Phone Booking -->
-          <button class="btn btn-outline btn-full accordion-toggle" id="btn-accordion-booking" style="text-align: left; font-weight: bold; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
-            <span>📞 電話予約</span>
-            <span class="accordion-icon">▼</span>
-          </button>
-          <div id="accordion-content-booking" class="accordion-content" style="display: none; margin-bottom: 1rem; padding-left: 0.5rem; border-left: 2px solid var(--color-primary);">
+          <div style="display: flex; gap: 0.25rem; margin-bottom: 1rem;">
+            <button class="btn btn-full tab-toggle" id="btn-tab-booking" style="flex: 1; padding: 0.5rem 0; font-size: 0.8rem; display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
+              <span style="font-size: 1.2rem;">📞</span>
+              <span>電話予約</span>
+            </button>
+            <button class="btn btn-outline btn-full tab-toggle" id="btn-tab-block" style="flex: 1; padding: 0.5rem 0; font-size: 0.8rem; display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
+              <span style="font-size: 1.2rem;">🚫</span>
+              <span>枠ブロック</span>
+            </button>
+            <button class="btn btn-outline btn-full tab-toggle" id="btn-tab-customer" style="flex: 1; padding: 0.5rem 0; font-size: 0.8rem; display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
+              <span style="font-size: 1.2rem;">👥</span>
+              <span>顧客データ</span>
+            </button>
+          </div>
+
+          <!-- Tab Contents -->
+          
+          <!-- 1. Phone Booking Content -->
+          <div id="tab-content-booking" class="tab-content" style="display: block; margin-bottom: 1rem; padding-top: 0.5rem; border-top: 2px solid var(--color-primary);">
             <div class="meta-info mb-2">メニューを選択して空き枠をクリックしてください。</div>
             <div id="menu-buttons" class="menu-buttons-container">
               <!-- Dynamically generated from GAS -->
             </div>
           </div>
 
-          <!-- 2. Block Slots -->
-          <button class="btn btn-outline btn-full accordion-toggle" id="btn-accordion-block" style="text-align: left; font-weight: bold; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
-            <span>🚫 枠ブロック設定</span>
-            <span class="accordion-icon">▼</span>
-          </button>
-          <div id="accordion-content-block" class="accordion-content" style="display: none; margin-bottom: 1rem; padding-left: 0.5rem; border-left: 2px solid var(--color-primary);">
+          <!-- 2. Block Slots Content -->
+          <div id="tab-content-block" class="tab-content" style="display: none; margin-bottom: 1rem; padding-top: 0.5rem; border-top: 2px solid var(--color-primary);">
             <div class="meta-info mb-2">ブロックしたい枠をクリックして選択し、確定を押してください。</div>
             <button class="btn btn-outline btn-block-action btn-full" id="btn-block-mode">ブロック選択を開始</button>
             <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
@@ -90,12 +99,6 @@
               <button class="btn btn-outline btn-block-action d-none btn-full" id="btn-block-cancel" style="flex: 1;">キャンセル</button>
             </div>
           </div>
-
-          <!-- 3. Customer Management -->
-          <button class="btn btn-outline btn-full accordion-toggle" id="btn-accordion-customer" style="text-align: left; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
-            <span>👥 顧客データ管理</span>
-            <span class="accordion-icon">▶</span>
-          </button>
           
         </div>
 
