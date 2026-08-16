@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const renderCalendar = () => {
     const calendarGrid = document.querySelector('.calendar-grid');
     // Remove old days
-    const oldDays = calendarGrid.querySelectorAll('.calendar-day');
+    const oldDays = calendarGrid.querySelectorAll('.calendar-day, .calendar-empty');
     oldDays.forEach(day => day.remove());
 
     const firstDay = new Date(currentYear, currentMonth, 1).getDay();
@@ -108,6 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Empty spots for first row
     for (let i = 0; i < firstDay; i++) {
       const empty = document.createElement('div');
+      empty.className = 'calendar-empty';
       calendarGrid.appendChild(empty);
     }
 
