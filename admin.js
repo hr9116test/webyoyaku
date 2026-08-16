@@ -489,7 +489,7 @@ document.addEventListener('DOMContentLoaded', () => {
               modal.classList.remove('d-none');
             });
             
-          } else {
+          } else if (requiredDuration > 0 || isBlockMode) {
             slot.classList.add('unavailable');
           }
           
