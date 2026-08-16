@@ -226,6 +226,13 @@ a {
   z-index: 0;
 }
 
+/* ボタン行 */
+.step-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
 .step {
   display: flex;
   flex-direction: column;
