@@ -1,5 +1,5 @@
 // app.js
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwebp5RaGMoIOT7bVFXVV1q3YBa-ObsjKsHQ7-bPYALUWEfL6qduiWbYQxz4AuWqLWm/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyb7qWw21YJIkg_eykRYVvguXqlOesx1YeVFacGr5RrgpdJE0RAFrcqM2prg2m4S9yn/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
   // State
@@ -36,7 +36,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('booking-form');
 
   // Fetch Data
-  fetch(`${GAS_URL}?action=getInitialData`)
+  const fetchAndRefreshData = () => {
+    fetch(`${GAS_URL}?action=getInitialData`)
     .then(res => res.json())
     .then(result => {
       if(result.success) {
@@ -66,6 +67,40 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('通信エラー: ' + e.message);
       document.getElementById('menu-grid').innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: red;">通信エラーが発生しました。</div>';
     });
+  };
+
+  // 最初のデータ取得を実行
+  fetchAndRefreshData();
+
+  // 1分ごとにデータをバックグラウンドで自動更新（ダブルブッキング防止用）
+  setInterval(() => {
+    fetch(`${GAS_URL}?action=getInitialData`)
+      .then(res => res.json())
+      .then(result => {
+        if(result.success) {
+          menus = result.data.menus.map(m => ({
+            id: m['メニューID'], name: m['メニュー名'], duration: parseInt(m['所要時間(分)']), price: m['金額']
+          }));
+          staffs = result.data.staffs.map(s => ({
+            id: s['スタッフID'], name: s['スタッフ名']
+          }));
+          bookings = result.data.bookings.map(b => ({
+            id: b['予約ID'],
+            date: String(b['予約日']).substring(0, 10),
+            startTime: String(b['開始時間']).padStart(5, '0').substring(0, 5),
+            duration: parseInt(b['所要時間(分)']),
+            staff: b['担当スタッフ'],
+            type: b['予約状況']
+          }));
+
+          // 時間選択画面にいる場合のみ、空き枠の表示を最新情報で再描画
+          if (state.step === 3 && state.date) {
+            renderTimeSlots(new Date(state.date));
+          }
+        }
+      })
+      .catch(e => console.error('Auto-refresh failed:', e));
+  }, 60000);
 
   // Navigation
   const goToStep = (newStep) => {
