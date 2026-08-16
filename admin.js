@@ -1,5 +1,5 @@
 // admin.js
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbxVxFU3mUiyiVXEfk3_WY3RmKf-HMzxGuLHqXP28UxVeJOUIJFUjbLmrtCU4IQnPpUL/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwMr-SrP8DFhYEDjKG9UUNSwcKYTZuUvM5Ty8iPke4Kb4zehV6il03YHTUEKjOmGv1F/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
   // State
