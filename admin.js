@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function attemptLogin() {
     if (adminPassword.value === DEMO_PASSWORD) {
-      sessionStorage.setItem('hr_admin_logged_in', 'true');
+      localStorage.setItem('hr_admin_logged_in', 'true');
       showMainContent();
     } else {
       loginError.style.display = 'block';
@@ -168,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ページ読み込み時にログイン状態をチェック
-  if (sessionStorage.getItem('hr_admin_logged_in') === 'true') {
+  if (localStorage.getItem('hr_admin_logged_in') === 'true') {
     showMainContent();
   } else {
     if (btnLogin) {
