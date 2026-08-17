@@ -786,12 +786,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (matches.length > 0) {
       autocompleteList.classList.remove('d-none');
       matches.forEach(match => {
+        const cName = match['お客様名'] || '';
+        const cPhone = String(match['電話番号'] || '').replace(/'/g, "");
         const item = document.createElement('div');
         item.className = 'autocomplete-item';
-        item.innerHTML = `<strong>${match.name}</strong> <span class="meta-info">(${match.phone})</span>`;
+        item.innerHTML = `<strong>${cName}</strong> <span class="meta-info">(${cPhone})</span>`;
         item.addEventListener('click', () => {
-          nameInput.value = match.name;
-          phoneInput.value = match.phone;
+          nameInput.value = cName;
+          phoneInput.value = cPhone;
           autocompleteList.classList.add('d-none');
         });
         autocompleteList.appendChild(item);
