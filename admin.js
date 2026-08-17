@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
           btn.classList.add('btn-outline');
           selectedMenuDuration = 0;
           selectedMenuName = '';
-          menuDropdownText.innerText = 'メニューを選択してください';
+          menuDropdownText.innerText = 'メニューを選択';
           menuDropdownToggle.classList.add('btn-outline');
         } else {
           allBtns.forEach(b => b.classList.add('btn-outline'));
@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     selectedMenuDuration = 0;
     selectedMenuName = '';
-    menuDropdownText.innerText = 'メニューを選択してください';
+    menuDropdownText.innerText = 'メニューを選択';
     menuDropdownToggle.classList.add('btn-outline');
     menuButtonsContainer.style.display = 'none';
     menuDropdownIcon.innerText = '▼';
@@ -349,14 +349,14 @@ document.addEventListener('DOMContentLoaded', () => {
           });
         }
       });
-      submitBtn.innerText = '確定';
+      submitBtn.innerText = '設定';
       submitBtn.disabled = false;
       exitBlockMode();
       renderTimeline();
       alert('ブロックを登録しました。');
     }).catch(e => {
       alert('エラーが発生しました: ' + e.message);
-      submitBtn.innerText = '確定';
+      submitBtn.innerText = '設定';
       submitBtn.disabled = false;
     });
   });
@@ -495,7 +495,7 @@ document.addEventListener('DOMContentLoaded', () => {
         selectedMenuDuration = 0;
         selectedMenuName = '';
         selectedMenuType = '予約済';
-        menuDropdownText.innerText = 'メニューを選択してください';
+        menuDropdownText.innerText = 'メニューを選択';
         menuDropdownToggle.classList.add('btn-outline');
         
         renderTimeline();
