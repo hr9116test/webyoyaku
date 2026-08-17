@@ -154,21 +154,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function attemptLogin() {
     if (adminPassword.value === DEMO_PASSWORD) {
-      loginOverlay.style.display = 'none';
-      mainAdminContent.classList.remove('d-none');
-      startApp();
+      sessionStorage.setItem('hr_admin_logged_in', 'true');
+      showMainContent();
     } else {
       loginError.style.display = 'block';
     }
   }
 
-  if (btnLogin) {
-    btnLogin.addEventListener('click', attemptLogin);
+  function showMainContent() {
+    loginOverlay.style.display = 'none';
+    mainAdminContent.classList.remove('d-none');
+    startApp();
   }
-  if (adminPassword) {
-    adminPassword.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') attemptLogin();
-    });
+
+  // ページ読み込み時にログイン状態をチェック
+  if (sessionStorage.getItem('hr_admin_logged_in') === 'true') {
+    showMainContent();
+  } else {
+    if (btnLogin) {
+      btnLogin.addEventListener('click', attemptLogin);
+    }
+    if (adminPassword) {
+      adminPassword.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') attemptLogin();
+      });
+    }
   }
 
   function updateDateDisplay() {
