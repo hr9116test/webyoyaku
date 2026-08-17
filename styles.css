@@ -610,6 +610,9 @@ a {
   .mobile-menu-toggle {
     display: none !important;
   }
+  #menu-dropdown-toggle {
+    display: none !important;
+  }
 }
 
 /* モバイル用アコーディオン・微調整 */
