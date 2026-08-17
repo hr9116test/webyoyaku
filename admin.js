@@ -100,45 +100,76 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
-  // 最初のデータ取得を実行
-  fetchAndRefreshData();
+  function startApp() {
+    // 最初のデータ取得を実行
+    fetchAndRefreshData();
 
-  // 1分ごとにデータをバックグラウンドで自動更新（ダブルブッキング防止用）
-  setInterval(() => {
-    fetch(`${GAS_URL}?action=getInitialData`)
-      .then(res => res.json())
-      .then(result => {
-        if(result.success) {
-          menus = result.data.menus.map(m => ({
-            id: m['メニューID'], name: m['メニュー名'], duration: parseInt(m['所要時間(分)']), price: m['金額']
-          }));
-          staffs = result.data.staffs.map(s => ({
-            id: s['スタッフID'], name: s['スタッフ名']
-          }));
-          mockBookings = result.data.bookings.map(b => ({
-            id: b['予約ID'],
-            date: String(b['予約日']).substring(0, 10),
-            startTime: String(b['開始時間']).padStart(5, '0').substring(0, 5),
-            duration: parseInt(b['所要時間(分)']),
-            staff: b['担当スタッフ'],
-            name: b['お客様名'],
-            phone: b['電話番号'],
-            email: b['メールアドレス'],
-            menu: b['メニュー名'],
-            memo: b['メモ'],
-            type: b['予約状況']
-          }));
-          
-          if (result.data.customers) {
-            customers = result.data.customers;
+    // 1分ごとにデータをバックグラウンドで自動更新（ダブルブッキング防止用）
+    setInterval(() => {
+      fetch(`${GAS_URL}?action=getInitialData`)
+        .then(res => res.json())
+        .then(result => {
+          if(result.success) {
+            menus = result.data.menus.map(m => ({
+              id: m['メニューID'], name: m['メニュー名'], duration: parseInt(m['所要時間(分)']), price: m['金額']
+            }));
+            staffs = result.data.staffs.map(s => ({
+              id: s['スタッフID'], name: s['スタッフ名']
+            }));
+            mockBookings = result.data.bookings.map(b => ({
+              id: b['予約ID'],
+              date: String(b['予約日']).substring(0, 10),
+              startTime: String(b['開始時間']).padStart(5, '0').substring(0, 5),
+              duration: parseInt(b['所要時間(分)']),
+              staff: b['担当スタッフ'],
+              name: b['お客様名'],
+              phone: b['電話番号'],
+              email: b['メールアドレス'],
+              menu: b['メニュー名'],
+              memo: b['メモ'],
+              type: b['予約状況']
+            }));
+            
+            if (result.data.customers) {
+              customers = result.data.customers;
+            }
+            
+            // バックグラウンドで最新データに差し替えて画面を更新
+            renderTimeline();
           }
-          
-          // バックグラウンドで最新データに差し替えて画面を更新
-          renderTimeline();
-        }
-      })
-      .catch(e => console.error('Auto-refresh failed:', e));
-  }, 60000);
+        })
+        .catch(e => console.error('Auto-refresh failed:', e));
+    }, 60000);
+  }
+
+  // --- Login Logic ---
+  const loginOverlay = document.getElementById('login-overlay');
+  const mainAdminContent = document.getElementById('main-admin-content');
+  const btnLogin = document.getElementById('btn-login');
+  const adminPassword = document.getElementById('admin-password');
+  const loginError = document.getElementById('login-error');
+
+  // 仮のパスワード（後でより安全な方法に変更可能）
+  const DEMO_PASSWORD = "admin";
+
+  function attemptLogin() {
+    if (adminPassword.value === DEMO_PASSWORD) {
+      loginOverlay.style.display = 'none';
+      mainAdminContent.classList.remove('d-none');
+      startApp();
+    } else {
+      loginError.style.display = 'block';
+    }
+  }
+
+  if (btnLogin) {
+    btnLogin.addEventListener('click', attemptLogin);
+  }
+  if (adminPassword) {
+    adminPassword.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') attemptLogin();
+    });
+  }
 
   function updateDateDisplay() {
     dateInput.value = formatDate(currentDate);
