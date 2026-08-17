@@ -41,7 +41,18 @@
     <h1>HR 予約管理システム</h1>
   </header>
 
-  <div class="admin-container">
+  <div id="login-overlay" style="display: flex; align-items: center; justify-content: center; flex: 1; background: var(--color-base); z-index: 9999;">
+    <div class="card" style="width: 100%; max-width: 400px; text-align: center;">
+      <h2 style="margin-bottom: 1.5rem; color: var(--color-primary);">管理画面ログイン</h2>
+      <div class="form-group">
+        <input type="password" id="admin-password" class="form-input" placeholder="パスワードを入力" style="text-align: center;">
+      </div>
+      <button class="btn btn-full" id="btn-login">ログイン</button>
+      <div id="login-error" style="color: #d32f2f; margin-top: 1rem; font-size: 0.9rem; display: none;">パスワードが間違っています。</div>
+    </div>
+  </div>
+
+  <div class="admin-container d-none" id="main-admin-content">
     
     <div class="admin-layout">
       <!-- Sidebar Controls -->
