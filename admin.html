@@ -49,7 +49,6 @@
         
         <!-- Date -->
         <div class="admin-sidebar-section">
-          <div class="admin-sidebar-section-title">日付選択</div>
           <div style="display: flex; gap: 0.5rem; align-items: center; justify-content: space-between;">
             <button class="btn btn-outline" id="prev-day" style="padding: 0.5rem 1rem;">&lt;</button>
             <div style="position: relative; width: 100%;">
@@ -84,9 +83,8 @@
           
           <!-- 1. Phone Booking Content -->
           <div id="tab-content-booking" class="tab-content" style="display: block; margin-bottom: 1rem; padding-top: 0.5rem; border-top: 2px solid var(--color-primary);">
-            <div class="meta-info mb-2">メニューを選択して空き枠をクリックしてください。</div>
             
-            <button class="btn btn-outline btn-full" id="menu-dropdown-toggle" style="text-align: left; display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <button type="button" class="btn btn-outline btn-full" id="menu-dropdown-toggle" style="text-align: left; display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
               <strong id="menu-dropdown-text">メニューを選択してください</strong>
               <span id="menu-dropdown-icon">▼</span>
             </button>
@@ -98,8 +96,7 @@
 
           <!-- 2. Block Slots Content -->
           <div id="tab-content-block" class="tab-content" style="display: none; margin-bottom: 1rem; padding-top: 0.5rem; border-top: 2px solid var(--color-primary);">
-            <div class="meta-info mb-2">ブロックしたい枠をクリックして選択し、確定を押してください。</div>
-            <button class="btn btn-outline btn-block-action btn-full" id="btn-block-mode">ブロック選択を開始</button>
+            <button type="button" class="btn btn-outline btn-block-action btn-full" id="btn-block-mode">ブロック選択を開始</button>
             <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
               <button class="btn btn-block-action d-none btn-full" id="btn-block-confirm" style="flex: 1;">確定</button>
               <button class="btn btn-outline btn-block-action d-none btn-full" id="btn-block-cancel" style="flex: 1;">キャンセル</button>
