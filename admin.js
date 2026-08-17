@@ -240,8 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Menu Dropdown Logic
   menuDropdownToggle.addEventListener('click', () => {
-    const isClosed = menuButtonsContainer.style.display === 'none';
-    if (isClosed) {
+    if (menuButtonsContainer.style.display !== 'block') {
       menuButtonsContainer.style.display = 'block';
       menuDropdownIcon.innerText = '▲';
     } else {
