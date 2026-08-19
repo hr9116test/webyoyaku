@@ -1,4 +1,11 @@
 ﻿// admin.js
+
+function formatGasTime(isoString) {
+  if (!isoString) return "";
+  if (!isoString.includes("T")) return isoString.substring(0,5);
+  const d = new Date(isoString);
+  return d.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Tokyo" });
+}
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwcQIx5rmTuZ60bihVUvvGLdnaco5XgT60qN-mQO6QDAZIXdgIVZ-d5mkjODq-QTlzb/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -13,6 +20,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const dateInput = document.getElementById('current-date');
   const dateDisplay = document.getElementById('date-display');
   const timeline = document.getElementById('timeline');
+    const menuDropdownToggle = document.getElementById('menu-dropdown-toggle');
+    const menuDropdownText = document.getElementById('menu-dropdown-text');
+    const menuDropdownIcon = document.getElementById('menu-dropdown-icon');
   const modal = document.getElementById('booking-modal');
   const detailsModal = document.getElementById('details-modal');
   const btnBlockMode = document.getElementById('btn-block-mode');
@@ -42,7 +52,16 @@ document.addEventListener('DOMContentLoaded', () => {
       if(result.success) {
         menus = result.data.menus.map(m => { const v = Object.values(m); return { id: v[0], name: v[1], duration: parseInt(v[2]), price: v[3] }; });
         staffs = result.data.staffs.map(s => { const v = Object.values(s); return { id: v[0], name: v[1] }; });
-        mockBookings = result.data.bookings.map(b => { const v = Object.values(b); return { id: v[0], date: String(v[1]).substring(0,10), startTime: String(v[2]).padStart(5,"0").substring(0,5), duration: parseInt(v[3]), staff: v[4], type: v[10], name: v[5], phone: v[6], menu: v[8], memo: v[9] }; });
+        mockBookings = result.data.bookings.map(b => { 
+  const v = Object.values(b); 
+  let rawType = String(v[9]);
+  let mappedType = rawType;
+  if(rawType.includes("予約") || rawType === "booked") mappedType = "booked";
+  if(rawType.includes("休み") || rawType === "blocked") mappedType = "blocked";
+  if(rawType.includes("キャンセル")) mappedType = "cancelled";
+  
+  return { id: v[0], date: String(v[1]).substring(0,10), startTime: formatGasTime(String(v[2])), duration: parseInt(v[3]), staff: v[4], type: mappedType, name: v[5], phone: v[6], menu: v[8], memo: v[11] }; 
+}).filter(b => b.type !== "cancelled");
         
         renderMenuButtons();
         renderTimeline();
@@ -150,7 +169,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  if (mobileMenuToggle) {
+  if (menuDropdownToggle) {
+      menuDropdownToggle.addEventListener('click', () => {
+        const isClosed = menuButtonsContainer.style.display === 'none';
+        if (isClosed) {
+          menuButtonsContainer.style.display = 'block';
+          if(menuDropdownIcon) menuDropdownIcon.innerText = ''; // Up arrow
+        } else {
+          menuButtonsContainer.style.display = 'none';
+          if(menuDropdownIcon) menuDropdownIcon.innerText = ''; // Down arrow
+        }
+      });
+    }
+    if (mobileMenuToggle) {
     mobileMenuToggle.addEventListener('click', () => {
       menuButtonsContainer.classList.toggle('show');
       mobileMenuToggle.innerText = menuButtonsContainer.classList.contains('show') 
@@ -492,7 +523,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
           }
           
-          document.getElementById('detail-staff').innerText = `担当: ${staffs.find(s => s.id === b.staff).name}`;
+          document.getElementById('detail-staff').innerText = `担当: ${staffs.find(s => String(s.id) === String(b.staff)).name}`;
           document.getElementById('detail-name').innerText = b.name;
           detailsModal.classList.remove('d-none');
         });
@@ -605,7 +636,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const searchVal = val.replace(/[\s　]/g, '');
     
-    const matches = mockCustomers.filter(c => {
+    const matches = customers.filter(c => {
       const nameMatch = c.name.replace(/[\s　]/g, '').includes(searchVal);
       const kanaMatch = c.kana.replace(/[\s　]/g, '').includes(searchVal);
       const phoneMatch = c.phone.replace(/-/g, '').includes(searchVal);
@@ -650,10 +681,174 @@ document.addEventListener('DOMContentLoaded', () => {
       tabContents.forEach(c => c.style.display = 'none');
       btn.classList.add('btn-primary');
       btn.classList.remove('btn-outline');
-      const targetId = btn.id.replace('btn-tab-', 'tab-content-');
-      const targetContent = document.getElementById(targetId);
-      if (targetContent) targetContent.style.display = 'block';
+      if (btn.id === "btn-tab-customer") {
+        const customerModal = document.getElementById("customer-mgmt-modal");
+        if (customerModal) customerModal.classList.remove("d-none");
+        
+        btn.classList.remove("btn-primary");
+        btn.classList.add("btn-outline");
+      } else {
+        const targetId = btn.id.replace("btn-tab-", "tab-content-");
+        const targetContent = document.getElementById(targetId);
+        if (targetContent) targetContent.style.display = "block";
+      }
     });
   });
 
+
+
+
+
+
+
+
+
+  let customers = [];
+  
+  const customerMgmtModal = document.getElementById('customer-mgmt-modal');
+  const btnCloseMgmt = document.getElementById('btn-close-mgmt');
+  const btnNewCustomer = document.getElementById('btn-new-customer');
+  const customerSearchInput = document.getElementById('customer-search-input');
+  const customerTbody = document.getElementById('customer-tbody');
+  const customerListView = document.getElementById('customer-list-view');
+  const customerFormView = document.getElementById('customer-form-view');
+  const customerEditForm = document.getElementById('customer-edit-form');
+  const btnCancelEdit = document.getElementById('btn-cancel-edit');
+  const customerFormTitle = document.getElementById('customer-form-title');
+
+  function fetchCustomers() {
+    fetch(GAS_URL + '?action=getCustomers')
+      .then(res => res.json())
+      .then(result => {
+        if(result.success) {
+          // Fix for mojibake data
+          customers = result.data.map(c => {
+             const v = Object.values(c);
+             return { id: v[0], name: v[1], kana: v[2], phone: v[3], address: v[4], occupation: v[5], email: v[6], memo: v[8] };
+          });
+          renderCustomerList();
+        }
+      });
+  }
+  
+  if (customerMgmtModal) {
+      fetchCustomers();
+      
+      btnCloseMgmt.addEventListener('click', () => {
+        customerMgmtModal.classList.add('d-none');
+      });
+
+      function showCustomerListView() {
+        customerFormView.classList.add('d-none');
+        customerListView.classList.remove('d-none');
+        renderCustomerList();
+      }
+
+      function showCustomerFormView(customer = null) {
+        customerListView.classList.add('d-none');
+        customerFormView.classList.remove('d-none');
+        
+        if (customer) {
+          customerFormTitle.innerText = "顧客データの編集";
+          document.getElementById('edit-customer-id').value = customer.id;
+          document.getElementById('edit-name').value = customer.name || '';
+          document.getElementById('edit-kana').value = customer.kana || '';
+          document.getElementById('edit-phone').value = customer.phone || '';
+          document.getElementById('edit-address').value = customer.address || '';
+          document.getElementById('edit-occupation').value = customer.occupation || '';
+          document.getElementById('edit-email').value = customer.email || '';
+          document.getElementById('edit-memo').value = customer.memo || '';
+        } else {
+          customerFormTitle.innerText = "新規顧客の登録";
+          document.getElementById('edit-customer-id').value = '';
+          customerEditForm.reset();
+        }
+      }
+
+      btnNewCustomer.addEventListener('click', () => {
+        showCustomerFormView(null);
+      });
+
+      btnCancelEdit.addEventListener('click', () => {
+        showCustomerListView();
+      });
+
+      function renderCustomerList() {
+        const searchVal = customerSearchInput.value.trim().replace(/[\s　]/g, '');
+        customerTbody.innerHTML = '';
+        
+        const filtered = customers.filter(c => {
+          if (!searchVal) return true;
+          const nameMatch = (c.name || "").replace(/[\s　]/g, '').includes(searchVal);
+          const kanaMatch = (c.kana || "").replace(/[\s　]/g, '').includes(searchVal);
+          const phoneMatch = String(c.phone||"").replace(/-/g, '').includes(searchVal);
+          return nameMatch || kanaMatch || phoneMatch;
+        });
+
+        if (filtered.length === 0) {
+          customerTbody.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 1rem; color: #777;">見つかりませんでした</td></tr>';
+          return;
+        }
+
+        filtered.forEach(c => {
+          const tr = document.createElement('tr');
+          tr.style.cursor = 'pointer';
+          tr.addEventListener('click', () => {
+            showCustomerFormView(c);
+          });
+          
+          const phone = String(c.phone||"") || "-";
+          tr.innerHTML = 
+            <td style="padding: 0.75rem; border-bottom: 1px solid var(--color-border); font-weight: bold; color: var(--color-primary);">+c.name+</td>
+            <td style="padding: 0.75rem; border-bottom: 1px solid var(--color-border);">+phone+</td>
+            <td style="padding: 0.75rem; border-bottom: 1px solid var(--color-border); text-align: right; color: var(--color-text-sub);">編集 &gt;</td>
+          ;
+          customerTbody.appendChild(tr);
+        });
+      }
+
+      customerSearchInput.addEventListener('input', renderCustomerList);
+
+      customerEditForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const submitBtn = document.getElementById('btn-save-customer');
+        const originalText = submitBtn.innerText;
+        submitBtn.innerText = '保存中...';
+        submitBtn.disabled = true;
+
+        const payload = {
+          id: document.getElementById('edit-customer-id').value,
+          name: document.getElementById('edit-name').value,
+          kana: document.getElementById('edit-kana').value,
+          phone: document.getElementById('edit-phone').value,
+          address: document.getElementById('edit-address').value,
+          occupation: document.getElementById('edit-occupation').value,
+          email: document.getElementById('edit-email').value,
+          memo: document.getElementById('edit-memo').value
+        };
+
+        fetch(GAS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'saveCustomer', payload: payload })
+        })
+        .then(res => res.json())
+        .then(result => {
+          if(result.success) {
+            fetchCustomers();
+            showCustomerListView();
+          } else {
+            alert('保存に失敗しました: ' + result.error);
+          }
+        })
+        .catch(err => {
+          alert('通信エラー: ' + err.message);
+        })
+        .finally(() => {
+          submitBtn.innerText = originalText;
+          submitBtn.disabled = false;
+        });
+      });
+  }
 

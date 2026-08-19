@@ -1,4 +1,11 @@
 ﻿// app.js
+
+function formatGasTime(isoString) {
+  if (!isoString) return "";
+  if (!isoString.includes("T")) return isoString.substring(0,5);
+  const d = new Date(isoString);
+  return d.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Tokyo" });
+}
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbx-b6WOncIt4M8nPkncMZfLDYc1MoV55tOvtL-cCT3ARdTSsZcMFUyk4d_J9Ur51cWi/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -42,7 +49,15 @@ document.addEventListener('DOMContentLoaded', () => {
       if(result.success) {
         menus = result.data.menus.map(m => { const v = Object.values(m); return { id: v[0], name: v[1], duration: parseInt(v[2]), price: v[3] }; });
         staffs = result.data.staffs.map(s => { const v = Object.values(s); return { id: v[0], name: v[1] }; });
-        bookings = result.data.bookings.map(b => { const v = Object.values(b); return { id: v[0], date: String(v[1]).substring(0,10), startTime: String(v[2]).padStart(5,"0").substring(0,5), duration: parseInt(v[3]), staff: v[4], type: v[10] }; });
+        bookings = result.data.bookings.map(b => { 
+  const v = Object.values(b); 
+  let rawType = String(v[9]);
+  let mappedType = rawType;
+  if(rawType.includes("予約") || rawType === "booked") mappedType = "booked";
+  if(rawType.includes("休み") || rawType === "blocked") mappedType = "blocked";
+  if(rawType.includes("キャンセル")) mappedType = "cancelled";
+  return { id: v[0], date: String(v[1]).substring(0,10), startTime: formatGasTime(String(v[2])), duration: parseInt(v[3]), staff: v[4], type: mappedType }; 
+}).filter(b => b.type !== "cancelled");
 
         localStorage.setItem('hr_menus', JSON.stringify(menus));
         localStorage.setItem('hr_staffs', JSON.stringify(staffs));
@@ -428,6 +443,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+
 
 
 
