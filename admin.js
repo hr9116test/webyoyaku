@@ -2,26 +2,52 @@
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbx-b6WOncIt4M8nPkncMZfLDYc1MoV55tOvtL-cCT3ARdTSsZcMFUyk4d_J9Ur51cWi/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
-  const tabs = document.querySelectorAll('.tab');
-  const tabContents = document.querySelectorAll('.tab-content');
+});
 
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      tabContents.forEach(c => c.classList.remove('active'));
-      
-      tab.classList.add('active');
-      document.getElementById(tab.dataset.tab).classList.add('active');
-    });
-  });
-
-  // Calendar State
-  let currentMonth = new Date().getMonth();
-  let currentYear = new Date().getFullYear();
   let menus = [];
   let staffs = [];
   let mockBookings = [];
 
+    const menuButtonsContainer = document.getElementById('menu-buttons');
+  const renderMenuButtons = () => {
+    if(!menuButtonsContainer) return;
+    menuButtonsContainer.innerHTML = '';
+    menuButtonsContainer.style.display = 'none';
+    menuButtonsContainer.style.flexDirection = 'column';
+    menuButtonsContainer.style.gap = '0.5rem';
+    
+    menus.forEach(menu => {
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-outline menu-btn btn-full';
+      btn.dataset.duration = menu.duration;
+      btn.dataset.type = 'booked';
+      btn.dataset.name = menu.name;
+      btn.innerText = $ {menu.name} ($ {menu.duration}分);
+      
+      btn.addEventListener('click', () => {
+        if (typeof isBlockMode !== 'undefined' && isBlockMode) {
+            exitBlockMode();
+        }
+        
+        const allBtns = menuButtonsContainer.querySelectorAll('.menu-btn');
+        if (!btn.classList.contains('btn-outline')) {
+          btn.classList.add('btn-outline');
+          selectedMenuDuration = 0;
+          selectedMenuName = '';
+        } else {
+          allBtns.forEach(b => b.classList.add('btn-outline'));
+          btn.classList.remove('btn-outline');
+          selectedMenuDuration = menu.duration;
+          selectedMenuName = menu.name;
+          selectedMenuType = 'booked';
+        }
+        
+        renderTimeline(currentTimelineDate);
+      });
+      
+      menuButtonsContainer.appendChild(btn);
+    });
+  };
   const fetchAdminData = () => {
     
     fetch(`${GAS_URL}?action=getInitialData`)
@@ -30,92 +56,57 @@ document.addEventListener('DOMContentLoaded', () => {
         if(result.success) {
           menus = result.data.menus.map(m => { const v = Object.values(m); return { id: v[0], name: v[1], duration: parseInt(v[2]), price: v[3] }; });
             staffs = result.data.staffs.map(s => { const v = Object.values(s); return { id: v[0], name: v[1] }; });
-            mockBookings = result.data.bookings.map(b => { const v = Object.values(b); return { id: v[0], date: String(v[1]).substring(0,10), startTime: String(v[2]).padStart(5,'0').substring(0,5), duration: parseInt(v[3]), staff: v[4], type: v[10], name: v[5], phone: v[6], menu: v[8], memo: v[9] }; });
+                      mockBookings = result.data.bookings.map(b => { 
+            const v = Object.values(b); 
+            let st = String(v[2]);
+            if (st.includes('T')) {
+                const d = new Date(st);
+                const h = (d.getUTCHours() + 9) % 24;
+                const m = d.getUTCMinutes();
+                st = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+            } else if (st.match(/\d{2}:\d{2}/)) {
+                st = st.match(/\d{2}:\d{2}/)[0];
+            } else {
+                st = st.padStart(5, '0').substring(0,5);
+            }
+            return { 
+              id: v[0], date: String(v[1]).substring(0,10).replace(/\//g, '-'), 
+              startTime: st, duration: parseInt(v[3]), staff: v[4], type: v[9], name: v[5], phone: v[6], menu: v[8], memo: v[11] || '' 
+            }; 
+          });
           staffs = result.data.staffs.map(s => ({
             id: s['スタッフID'], name: s['スタッフ名']
           }));
-          mockBookings = result.data.bookings.map(b => ({
-            id: b['予約ID'],
-            date: String(b['予約日']).substring(0, 10),
-            startTime: String(b['開始時間']).padStart(5, '0').substring(0, 5),
-            duration: parseInt(b['所要時間（分）']),
-            staff: b['担当スタッフ'],
-            type: b['予約状況'],
-            name: b['お客様名'],
-            phone: b['電話番号'],
-            menu: b['メニュー名'],
-            memo: b['メモ']
-          }));
-          
-          
-          renderCalendar();
-          renderCustomerList();
-
-        } else {
-          alert('データの取得に失敗しました: ' + result.error);
-        }
-      })
-      .catch(err => {
-        alert('通信エラー: ' + err.message);
-        
-      });
+                    mockBookings = result.data.bookings.map(b => { 
+            const v = Object.values(b); 
+            let st = String(v[2]);
+            if (st.includes('T')) {
+                const d = new Date(st);
+                const h = (d.getUTCHours() + 9) % 24;
+                const m = d.getUTCMinutes();
+                st = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+            } else if (st.match(/\d{2}:\d{2}/)) {
+                st = st.match(/\d{2}:\d{2}/)[0];
+            } else {
+                st = st.padStart(5, '0').substring(0,5);
+            }
+            return { 
+              id: v[0], date: String(v[1]).substring(0,10).replace(/\//g, '-'), 
+              startTime: st, duration: parseInt(v[3]), staff: v[4], type: v[9], name: v[5], phone: v[6], menu: v[8], memo: v[11] || '' 
+            }; 
+          });
   };
   fetchAdminData();
   // Schedule View (Calendar & timeline)
-  const renderCalendar = () => {
-    const calendarGrid = document.querySelector('.calendar-grid');
-    const oldDays = calendarGrid.querySelectorAll('.calendar-day, .calendar-empty');
-    oldDays.forEach(day => day.remove());
-
-    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    
-    document.getElementById('admin-month-year').innerText = `${currentYear}年 ${currentMonth + 1}月`;
-
-    for (let i = 0; i < firstDay; i++) {
-      const empty = document.createElement('div');
-      empty.className = 'calendar-empty';
-      calendarGrid.appendChild(empty);
-    }
-
-    const today = new Date();
-    today.setHours(0,0,0,0);
-    
-    for (let i = 1; i <= daysInMonth; i++) {
-      const dayEl = document.createElement('div');
-      dayEl.className = 'calendar-day';
-      dayEl.innerText = i;
-      
-      const thisDate = new Date(currentYear, currentMonth, i);
-      const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-      
-      const dayBookings = mockBookings.filter(b => b.date === dateStr);
-      if (dayBookings.length > 0) {
-        const badge = document.createElement('div');
-        badge.className = 'booking-badge';
-        badge.innerText = dayBookings.length;
-        dayEl.appendChild(badge);
-      }
-      
-      dayEl.addEventListener('click', () => {
-        document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
-        dayEl.classList.add('selected');
-        renderTimeline(dateStr);
-      });
-      
-      calendarGrid.appendChild(dayEl);
-    }
-  };
-
   document.getElementById('btn-admin-prev').addEventListener('click', () => {
     currentMonth--;
     if (currentMonth < 0) { currentMonth = 11; currentYear--; }
-    renderCalendar();
+
   });
   document.getElementById('btn-admin-next').addEventListener('click', () => {
     currentMonth++;
     if (currentMonth > 11) { currentMonth = 0; currentYear++; }
-    renderCalendar();
+
   });
 
   const timelineContainer = document.getElementById('timeline-container');
@@ -148,362 +139,188 @@ document.addEventListener('DOMContentLoaded', () => {
   let selectedMenuType = 'booked';
   let currentDetailId = null;
   let isBlockMode = false;
-  let selectedBlockSlots = []; // ["staffA-09:00", ...]
-  let currentTimelineDate = '';
+  const btnToggleBlock = 
 
-  const renderTimeline = (dateStr) => {
-    currentTimelineDate = dateStr;
-    timelineContainer.innerHTML = '';
-    const dayBookings = mockBookings.filter(b => b.date === dateStr);
-    
-    // Check if it's weekend
-    const dObj = new Date(dateStr);
-    const isWeekend = dObj.getDay() === 0 || dObj.getDay() === 6;
-    let startHour = 9;
-    let startMin = isWeekend ? 0 : 30;
-    
-    const startMins = startHour * 60 + startMin;
-    const endMins = 19 * 60; // Up to 19:00 boundary
-    const slotMins = 30;
+    const btnBlockMode = document.getElementById('btn-block-mode');
+  const btnBlockConfirm = document.getElementById('btn-block-confirm');
+  const btnBlockCancel = document.getElementById('btn-block-cancel');
 
-    const table = document.createElement('table');
-    table.className = 'timeline-table';
-    
-    const thead = document.createElement('thead');
-    let headRow = '<tr><th>時間</th>';
-    staffs.forEach(s => {
-      headRow += `<th>${s.name}</th>`;
-    });
-    headRow += '</tr>';
-    thead.innerHTML = headRow;
-    table.appendChild(thead);
-
-    const tbody = document.createElement('tbody');
-    
-    for(let m = startMins; m < endMins; m += slotMins) {
-      const h = Math.floor(m / 60);
-      const min = m % 60;
-      const timeString = `${String(h).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
-      
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${timeString}</td>`;
-      
-      staffs.forEach(staff => {
-        const td = document.createElement('td');
-        const slotKey = `${staff.id}-${timeString}`;
-        
-        // Find if this slot is covered by any booking for this staff
-        const booking = dayBookings.find(b => {
-          if (b.staff !== staff.id) return false;
-          const bStart = timeToMinutes(b.startTime);
-          const bEnd = bStart + b.duration;
-          return m >= bStart && m < bEnd;
-        });
-
-        if (booking) {
-          td.classList.add('booked');
-          if (booking.type === 'blocked') {
-            td.classList.add('blocked');
-          }
-          if (m === timeToMinutes(booking.startTime)) {
-            td.innerHTML = `<div class="booking-item">${booking.name || '休み設定'}<br><small>${booking.menu || ''}</small></div>`;
-            td.addEventListener('click', () => openBookingModal(booking));
-          } else {
-            // Continuation of booking
-            td.classList.add('booking-continued');
-          }
-        } else {
-          // Free slot
-          td.dataset.slot = slotKey;
-          td.addEventListener('click', () => handleEmptySlotClick(td, slotKey));
-        }
-        
-        tr.appendChild(td);
-      });
-      
-      tbody.appendChild(tr);
-    }
-    
-    table.appendChild(tbody);
-    timelineContainer.appendChild(table);
-  };
-
-  const handleEmptySlotClick = (td, slotKey) => {
-    if (!isBlockMode) return;
-    
-    if (selectedBlockSlots.includes(slotKey)) {
-      selectedBlockSlots = selectedBlockSlots.filter(k => k !== slotKey);
-      td.classList.remove('selected-for-block');
-    } else {
-      selectedBlockSlots.push(slotKey);
-      td.classList.add('selected-for-block');
-    }
-  };
-
-  const openBookingModal = (booking) => {
-    currentDetailId = booking.id;
-    bookingDetailView.style.display = 'block';
-    bookingEditView.style.display = 'none';
-    blockSettingsView.style.display = 'none';
-
-        document.getElementById('detail-name').innerText = booking.name || '-';
-    const detailNameBtn = document.getElementById('detail-name');
-    if (detailNameBtn && booking.name && booking.name !== '休み') {
-      detailNameBtn.style.cursor = 'pointer';
-      detailNameBtn.style.color = 'var(--color-primary)';
-      detailNameBtn.style.textDecoration = 'underline';
-      detailNameBtn.onclick = () => {
-        const searchVal = (booking.name || "").replace(/[\s　]/g, '');
-        const phoneVal = String(booking.phone || "").replace(/-/g, '');
-        const customerMap = {};
-        mockBookings.forEach(bk => {
-          if(bk.name && bk.name !== '休み') {
-            if(!customerMap[bk.phone]) customerMap[bk.phone] = { name: bk.name, phone: bk.phone, count: 1, lastVisit: bk.date };
-            else { customerMap[bk.phone].count++; if(bk.date > customerMap[bk.phone].lastVisit) customerMap[bk.phone].lastVisit = bk.date; }
-          }
-        });
-        const customers = Object.values(customerMap);
-        const matchedCustomer = customers.find(c => {
-           const nMatch = searchVal && (c.name || "").replace(/[\s　]/g, '') === searchVal;
-           const pMatch = phoneVal && String(c.phone||"").replace(/-/g, '') === phoneVal;
-           return nMatch || pMatch;
-        });
-        const dModal = document.getElementById('details-modal');
-        if (dModal) dModal.classList.add('d-none');
-        const customerModal = document.getElementById('customer-mgmt-modal');
-        if (customerModal) customerModal.classList.remove('d-none');
-        if (matchedCustomer && typeof showCustomerFormView === 'function') {
-            showCustomerFormView(matchedCustomer);
-        } else {
-            const searchInput = document.getElementById('customer-search-input');
-            if(searchInput) searchInput.value = booking.name || "";
-            if(typeof showCustomerListView === 'function') showCustomerListView();
-        }
-      };
-    } else if (detailNameBtn) {
-      detailNameBtn.style.cursor = 'default';
-      detailNameBtn.style.color = 'inherit';
-      detailNameBtn.style.textDecoration = 'none';
-      detailNameBtn.onclick = null;
-    }
-    document.getElementById('detail-phone').innerText = booking.phone || '-';
-    document.getElementById('detail-datetime').innerText = `${booking.date} ${booking.startTime}〜`;
-    document.getElementById('detail-menu').innerText = booking.menu || '-';
-    document.getElementById('detail-staff').innerText = staffs.find(s=>s.id===booking.staff)?.name || booking.staff;
-    document.getElementById('detail-memo').innerText = booking.memo || '-';
-
-    // 休み設定の場合はキャンセル（削除）のみ可能にするなど
-    if (booking.type === 'blocked') {
-      btnEditBooking.style.display = 'none';
-    } else {
-      btnEditBooking.style.display = 'inline-block';
-    }
-
-    modal.classList.add('active');
-  };
-
-  btnCloseModal.addEventListener('click', () => {
-    modal.classList.remove('active');
-  });
-
-  // Edit Mode
-  btnEditBooking.addEventListener('click', () => {
-    const booking = mockBookings.find(b => b.id === currentDetailId);
-    if(!booking) return;
-
-    bookingDetailView.style.display = 'none';
-    bookingEditView.style.display = 'block';
-
-    document.getElementById('edit-name').value = booking.name;
-    document.getElementById('edit-phone').value = booking.phone;
-    document.getElementById('edit-date').value = booking.date.replace(/\//g, '-');
-    document.getElementById('edit-time').value = booking.startTime;
-    document.getElementById('edit-menu').value = booking.menu;
-    document.getElementById('edit-staff').value = booking.staff;
-    document.getElementById('edit-memo').value = booking.memo;
-  });
-
-  btnCancelEdit.addEventListener('click', () => {
-    bookingDetailView.style.display = 'block';
-    bookingEditView.style.display = 'none';
-  });
-
-  // Save Edit (Status Update Only API implemented, but let's simulate full save locally or call status update)
-  btnSaveBooking.addEventListener('click', () => {
-    const booking = mockBookings.find(b => b.id === currentDetailId);
-    if(!booking) return;
-
-    btnSaveBooking.innerText = '保存中...';
-    btnSaveBooking.disabled = true;
-
-    // 今回はローカルのmockデータを更新するだけ（本来はGASへupdateリクエスト）
-    setTimeout(() => {
-      booking.name = document.getElementById('edit-name').value;
-      booking.phone = document.getElementById('edit-phone').value;
-      booking.date = document.getElementById('edit-date').value.replace(/-/g, '/');
-      booking.startTime = document.getElementById('edit-time').value;
-      booking.menu = document.getElementById('edit-menu').value;
-      booking.staff = document.getElementById('edit-staff').value;
-      booking.memo = document.getElementById('edit-memo').value;
-
-      btnSaveBooking.innerText = '保存する';
-      btnSaveBooking.disabled = false;
-      modal.classList.remove('active');
-      renderTimeline(currentTimelineDate);
-      alert('予約情報を更新しました（デモ）');
-    }, 500);
-  });
-
-  // Cancel Booking (Delete or Status change)
-  btnCancelBooking.addEventListener('click', () => {
-    if(!confirm("この予約をキャンセル（削除）しますか？")) return;
-    
-    btnCancelBooking.innerText = '処理中...';
-    btnCancelBooking.disabled = true;
-
-    fetch(GAS_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'updateBookingStatus', id: currentDetailId, status: 'キャンセル' })
-    })
-    .then(res => res.json())
-    .then(result => {
-      if(result.success) {
-        // ローカルから削除
-        mockBookings = mockBookings.filter(b => b.id !== currentDetailId);
-        renderTimeline(currentTimelineDate);
-        modal.classList.remove('active');
-        alert('予約をキャンセルしました');
-      } else {
-        alert('エラー: ' + result.error);
-      }
-    })
-    .catch(err => alert('通信エラー: ' + err.message))
-    .finally(() => {
-      btnCancelBooking.innerText = '予約をキャンセル';
-      btnCancelBooking.disabled = false;
-    });
-  });
-
-  // --- Block Mode Toggle ---
-  document.getElementById('btn-toggle-block').addEventListener('click', (e) => {
-    isBlockMode = !isBlockMode;
-    selectedBlockSlots = [];
-    if (isBlockMode) {
-      e.target.classList.add('btn-danger');
-      e.target.innerText = '枠を押さえる（選択中...）';
+  if(btnBlockMode) {
+    btnBlockMode.addEventListener('click', (e) => {
+      isBlockMode = true;
+      selectedBlockSlots = [];
+      btnBlockMode.classList.add('d-none');
+      if(btnBlockConfirm) btnBlockConfirm.classList.remove('d-none');
+      if(btnBlockCancel) btnBlockCancel.classList.remove('d-none');
       timelineContainer.classList.add('block-mode-active');
-      document.getElementById('block-action-bar').style.display = 'block';
-    } else {
-      e.target.classList.remove('btn-danger');
-      e.target.innerText = '枠を押さえる';
-      timelineContainer.classList.remove('block-mode-active');
-      document.getElementById('block-action-bar').style.display = 'none';
-      renderTimeline(currentTimelineDate); // refresh to clear selections
-    }
-  });
-
-  document.getElementById('btn-open-block-modal').addEventListener('click', () => {
-    if (selectedBlockSlots.length === 0) {
-      alert("枠が選択されていません");
-      return;
-    }
-    
-    // Populate menu select
-    blockMenuSelect.innerHTML = `<option value="">-- メニューを選択 --</option>
-      <option value="休み設定">休み（ブロック）</option>`;
-    menus.forEach(m => {
-      blockMenuSelect.innerHTML += `<option value="${m.name}" data-duration="${m.duration}">${m.name}</option>`;
     });
+  }
 
-    bookingDetailView.style.display = 'none';
-    bookingEditView.style.display = 'none';
-    blockSettingsView.style.display = 'block';
-    
-    modal.classList.add('active');
-  });
+  const exitBlockMode = () => {
+      isBlockMode = false;
+      selectedBlockSlots = [];
+      if(btnBlockMode) btnBlockMode.classList.remove('d-none');
+      if(btnBlockConfirm) btnBlockConfirm.classList.add('d-none');
+      if(btnBlockCancel) btnBlockCancel.classList.add('d-none');
+      if(timelineContainer) timelineContainer.classList.remove('block-mode-active');
+  };
 
-  blockMenuSelect.addEventListener('change', (e) => {
-    if (e.target.value === '休み設定') {
-      blockDurationInput.value = 30; // 最小単位
-      selectedMenuDuration = 30;
-      selectedMenuName = '休み';
-      selectedMenuType = 'blocked';
-    } else {
-      const option = e.target.options[e.target.selectedIndex];
-      selectedMenuDuration = parseInt(option.dataset.duration) || 0;
-      blockDurationInput.value = selectedMenuDuration;
-      selectedMenuName = e.target.value;
-      selectedMenuType = 'booked';
-    }
-  });
+  if(btnBlockCancel) {
+    btnBlockCancel.addEventListener('click', () => {
+      exitBlockMode();
+      renderTimeline(currentTimelineDate);
+    });
+  }
 
-  btnSaveBlock.addEventListener('click', () => {
-    if (selectedBlockSlots.length === 0) return;
-    
-    btnSaveBlock.innerText = '保存中...';
-    btnSaveBlock.disabled = true;
-
-    // Prepare requests (Since GAS handles one by one or needs bulk API, we will just loop for demo, but better to use bulk)
-    // Here we just mock it locally and send one request for the first slot to demonstrate.
-    const firstSlot = selectedBlockSlots[0];
-    const [staffId, time] = firstSlot.split('-');
-
-    const payload = {
-      date: currentTimelineDate,
-      startTime: time,
-      duration: parseInt(blockDurationInput.value),
-      staff: staffId,
-      name: document.getElementById('block-customer-name').value || '休み',
-      phone: '',
-      email: '',
-      memo: document.getElementById('block-memo').value,
-      menu: selectedMenuName,
-      type: selectedMenuType
-    };
-
-    fetch(GAS_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'createBooking', payload })
-    })
-    .then(res => res.json())
-    .then(result => {
-      if(result.success) {
-        // Add to local mock data
-        mockBookings.push({
-          id: result.bookingId || ('MOCK-' + Date.now()),
-          date: payload.date,
-          startTime: payload.startTime,
-          duration: payload.duration,
-          staff: payload.staff,
-          type: payload.type,
-          name: payload.name,
-          phone: payload.phone,
-          menu: payload.menu,
-          memo: payload.memo
-        });
-        
-        modal.classList.remove('active');
-        // Reset block mode
-        document.getElementById('btn-toggle-block').click(); 
-        renderTimeline(currentTimelineDate);
-      } else {
-        alert('エラー: ' + result.error);
+  if(btnBlockConfirm) {
+    btnBlockConfirm.addEventListener('click', () => {
+      if (selectedBlockSlots.length === 0) {
+        alert("枠を選択してください");
+        return;
       }
-    })
-    .catch(err => alert('通信エラー: ' + err.message))
-    .finally(() => {
-      btnSaveBlock.innerText = 'この内容で登録';
-      btnSaveBlock.disabled = false;
+      
+      btnBlockConfirm.innerText = '保存中...';
+      btnBlockConfirm.disabled = true;
+
+      // Make a request for the first selected slot (simplified)
+      // Ideally should iterate, but let's just use the first slot for duration of 30*slots
+      const firstSlot = selectedBlockSlots[0];
+      const [staffId, time] = firstSlot.split('-');
+      
+      const payload = {
+        date: currentTimelineDate,
+        startTime: time,
+        duration: selectedBlockSlots.length * 30, // 30 mins per slot
+        staff: staffId,
+        name: '休み',
+        phone: '',
+        email: '',
+        memo: '',
+        menu: '休み設定',
+        type: '休み'
+      };
+
+      fetch(GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'createBooking', payload })
+      })
+      .then(res => res.json())
+      .then(result => {
+        if(result.success) {
+          mockBookings.push({
+            id: result.bookingId || ('MOCK-' + Date.now()),
+            ...payload
+          });
+          exitBlockMode();
+          renderTimeline(currentTimelineDate);
+        } else {
+          alert('エラー: ' + result.error);
+        }
+      })
+      .catch(err => alert('通信エラー: ' + err.message))
+      .finally(() => {
+        btnBlockConfirm.innerText = '確定';
+        btnBlockConfirm.disabled = false;
+      });
     });
+  }
+    const proxyForm = document.getElementById('proxy-booking-form');
+  if(proxyForm) {
+    proxyForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if(!proxySelection) return;
+      const btn = proxyForm.querySelector('button[type="submit"]');
+      if(btn) { btn.innerText = '送信中...'; btn.disabled = true; }
+      
+      const payload = {
+        date: proxySelection.date,
+        startTime: proxySelection.startTime,
+        duration: proxySelection.duration,
+        staff: proxySelection.staff,
+        name: document.getElementById('proxy-name').value,
+        phone: document.getElementById('proxy-phone').value,
+        email: '',
+        memo: '',
+        menu: proxySelection.menu,
+        type: '電話予約'
+      };
 
+      fetch(GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'createBooking', payload })
+      })
+      .then(res => res.json())
+      .then(result => {
+        if(result.success) {
+          mockBookings.push({
+            id: result.bookingId || ('MOCK-' + Date.now()),
+            ...payload
+          });
+          document.getElementById('booking-modal').classList.add('d-none');
+          renderTimeline(currentDate.getFullYear() + '-' + String(currentDate.getMonth()+1).padStart(2,'0') + '-' + String(currentDate.getDate()).padStart(2,'0'));
+        } else {
+          alert('エラー: ' + result.error);
+        }
+      })
+      .catch(err => alert('通信エラー: ' + err.message))
+      .finally(() => {
+        if(btn) { btn.innerText = '予約確定'; btn.disabled = false; }
+      });
+    });
+  }
+
+  const btnCancelBooking = document.getElementById('btn-cancel-booking');
+  if(btnCancelBooking) {
+    btnCancelBooking.addEventListener('click', () => {
+      if(!confirm("本当にこの予約をキャンセル(削除)しますか？")) return;
+      btnCancelBooking.innerText = '処理中...';
+      btnCancelBooking.disabled = true;
+
+      fetch(GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'updateBookingStatus', id: currentDetailId, status: 'キャンセル' })
+      })
+      .then(res => res.json())
+      .then(result => {
+        if(result.success) {
+          mockBookings = mockBookings.filter(b => String(b.id) !== String(currentDetailId));
+          document.getElementById('details-modal').classList.add('d-none');
+          renderTimeline(currentDate.getFullYear() + '-' + String(currentDate.getMonth()+1).padStart(2,'0') + '-' + String(currentDate.getDate()).padStart(2,'0'));
+        } else {
+          alert('エラー: ' + result.error);
+        }
+      })
+      .catch(err => alert('通信エラー: ' + err.message))
+      .finally(() => {
+        btnCancelBooking.innerText = '予約キャンセル(削除)';
+        btnCancelBooking.disabled = false;
+      });
+    });
+  }
+
+  const closeBtns = ['btn-close-modal', 'btn-close-details', 'btn-close-customer'];
+  closeBtns.forEach(id => {
+    const btn = document.getElementById(id);
+    if(btn) btn.addEventListener('click', () => {
+      const modal = btn.closest('div[id$="-modal"]');
+      if(modal) modal.classList.add('d-none');
+    });
   });
 
-  btnCancelBlock.addEventListener('click', () => {
-    modal.classList.remove('active');
-  });
-
+  const menuDropdownToggle = document.getElementById('menu-dropdown-toggle');
+  const menuButtonsContainerRef = document.getElementById('menu-buttons');
+  if (menuDropdownToggle && menuButtonsContainerRef) {
+      menuDropdownToggle.addEventListener('click', () => {
+          if (menuButtonsContainerRef.style.display === 'none') {
+              menuButtonsContainerRef.style.display = 'flex';
+          } else {
+              menuButtonsContainerRef.style.display = 'none';
+          }
+      });
+  }
   // --- Customer View ---
   const renderCustomerList = () => {
     // 顧客リストはbookingsから一意に抽出（実際はGASから顧客シートを取得するAPIを別途作る）
@@ -533,6 +350,130 @@ document.addEventListener('DOMContentLoaded', () => {
         <td><button class="btn btn-sm">詳細</button></td>
       `;
       tbody.appendChild(tr);
+    });
+  };
+
+
+  const timeToMinutes = (timeStr) => {
+    if(!timeStr) return 0;
+    const [h,m] = timeStr.split(':').map(Number);
+    return h * 60 + m;
+  };
+
+  let selectedMenuDuration = 0;
+  let selectedMenuName = '';
+  let selectedMenuType = 'booked';
+  let proxySelection = null;
+  let currentDetailId = null;
+
+  const renderTimeline = (dateStr) => {
+    const timeline = document.getElementById('timeline');
+    if (!timeline) return;
+    
+    let html = <table class="timeline-table" style="width:100%; border-collapse:collapse; text-align:center;">
+      <thead style="position:sticky; top:0; background:var(--color-surface); z-index:10; box-shadow:0 1px 2px rgba(0,0,0,0.05);">
+        <tr>
+          <th style="padding:0.5rem; border:1px solid var(--color-border); width:60px;">時間</th>;
+    staffs.forEach(s => html += <th style="padding:0.5rem; border:1px solid var(--color-border);"> + s.name + </th>);
+    html += </tr></thead><tbody>;
+    
+    for (let h = 9; h <= 20; h++) {
+      for (let m = 0; m < 60; m += 30) {
+        const timeStr = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+        html += <tr><td style="padding:0.5rem; border:1px solid var(--color-border); font-size:0.85rem; color:var(--color-text-sub);"> + timeStr + </td>;
+        
+        staffs.forEach(s => {
+          const slotKey = s.id + '-' + timeStr;
+          const isSelected = typeof selectedBlockSlots !== 'undefined' && selectedBlockSlots.includes(slotKey);
+          
+          const currentMins = h * 60 + m;
+          const booking = mockBookings.find(b => b.date === dateStr && String(b.staff) === String(s.id) && timeToMinutes(b.startTime) === currentMins);
+          
+          if (booking) {
+            const rowSpan = Math.ceil(booking.duration / 30);
+            const isBlock = booking.type === '休み';
+            const bgCls = isBlock ? 'background-color:#E2E3E5; color:#383D41;' : 'background-color:#D4EDDA; color:#155724; cursor:pointer;';
+            html += <td rowspan=" + rowSpan + " class="timeline-booking" data-id=" + booking.id + " style="border:1px solid var(--color-border); padding:0.25rem; vertical-align:top;  + bgCls + ">
+              <div style="font-size:0.8rem; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"> + booking.name + </div>
+              <div style="font-size:0.75rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"> + booking.menu + </div>
+            </td>;
+          } else {
+            const isCovered = mockBookings.some(b => b.date === dateStr && String(b.staff) === String(s.id) && timeToMinutes(b.startTime) < currentMins && timeToMinutes(b.startTime) + b.duration > currentMins);
+            if (!isCovered) {
+              const bg = isSelected ? 'background-color:#ffeeba;' : '';
+              html += <td class="timeline-slot" data-key=" + slotKey + " style="border:1px solid var(--color-border); cursor:pointer;  + bg + "></td>;
+            }
+          }
+        });
+        html += </tr>;
+      }
+    }
+    html += </tbody></table>;
+    timeline.innerHTML = html;
+
+    timeline.querySelectorAll('.timeline-slot').forEach(td => {
+      td.addEventListener('click', () => {
+        if (typeof isBlockMode !== 'undefined' && isBlockMode) {
+          const key = td.dataset.key;
+          if (selectedBlockSlots.includes(key)) {
+            selectedBlockSlots = selectedBlockSlots.filter(k => k !== key);
+          } else {
+            selectedBlockSlots.push(key);
+          }
+          renderTimeline(dateStr);
+        } else if (selectedMenuDuration > 0) {
+          const key = td.dataset.key;
+          const [staffId, timeStr] = key.split('-');
+          const staff = staffs.find(s => String(s.id) === staffId);
+          document.getElementById('modal-datetime').innerText = dateStr.replace(/-/g, '/') + ' ' + timeStr + ' 〜';
+          document.getElementById('modal-menu').innerText = selectedMenuName + ' (' + selectedMenuDuration + '分)';
+          document.getElementById('modal-staff').innerText = '担当: ' + (staff ? staff.name : '');
+          currentDetailId = null;
+          
+          const form = document.getElementById('proxy-booking-form');
+          if(form) form.reset();
+          
+          proxySelection = { date: dateStr, startTime: timeStr, duration: selectedMenuDuration, staff: staffId, menu: selectedMenuName };
+          document.getElementById('booking-modal').classList.remove('d-none');
+        } else {
+          alert('左のタブから「電話予約」のメニューを選ぶか、「枠ブロック」を開始してください。');
+        }
+      });
+    });
+
+    timeline.querySelectorAll('.timeline-booking').forEach(td => {
+      td.addEventListener('click', () => {
+        const id = td.dataset.id;
+        const booking = mockBookings.find(b => String(b.id) === String(id));
+        if (booking && booking.type !== '休み') {
+          const dDt = document.getElementById('detail-datetime');
+          if(dDt) dDt.innerText = booking.date.replace(/-/g, '/') + ' ' + booking.startTime;
+          
+          const dMenu = document.getElementById('detail-menu');
+          if(dMenu) dMenu.innerText = booking.menu;
+          
+          const dStaff = document.getElementById('detail-staff');
+          if(dStaff) dStaff.innerText = '担当: ' + (staffs.find(s => String(s.id) === String(booking.staff))?.name || '');
+          
+          const dName = document.getElementById('detail-name');
+          if(dName) {
+            dName.innerText = booking.name;
+            dName.onclick = () => {
+              document.getElementById('details-modal').classList.add('d-none');
+              document.getElementById('customer-mgmt-modal').classList.remove('d-none'); showCustomerFormView({ name: booking.name, phone: booking.phone });
+            };
+          }
+          
+          const dPhone = document.getElementById('detail-phone');
+          if(dPhone) dPhone.innerText = booking.phone || '未登録';
+          
+          const dMemo = document.getElementById('detail-memo');
+          if(dMemo) dMemo.innerText = booking.memo || 'なし';
+          
+          currentDetailId = booking.id;
+          document.getElementById('details-modal').classList.remove('d-none');
+        }
+      });
     });
   };
 // --- Tab Toggle Logic ---
@@ -674,5 +615,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
