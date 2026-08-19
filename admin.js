@@ -28,9 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(res => res.json())
       .then(result => {
         if(result.success) {
-          menus = result.data.menus.map(m => ({
-            id: m['メニューID'], name: m['メニュー名'], duration: parseInt(m['所要時間（分）']), price: m['金額']
-          }));
+          menus = result.data.menus.map(m => { const v = Object.values(m); return { id: v[0], name: v[1], duration: parseInt(v[2]), price: v[3] }; });
+            staffs = result.data.staffs.map(s => { const v = Object.values(s); return { id: v[0], name: v[1] }; });
+            mockBookings = result.data.bookings.map(b => { const v = Object.values(b); return { id: v[0], date: String(v[1]).substring(0,10), startTime: String(v[2]).padStart(5,'0').substring(0,5), duration: parseInt(v[3]), staff: v[4], type: v[10], name: v[5], phone: v[6], menu: v[8], memo: v[9] }; });
           staffs = result.data.staffs.map(s => ({
             id: s['スタッフID'], name: s['スタッフ名']
           }));
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
           
           renderCalendar();
           renderCustomerList();
-          renderSettings();
+
         } else {
           alert('データの取得に失敗しました: ' + result.error);
         }
@@ -60,9 +60,25 @@ document.addEventListener('DOMContentLoaded', () => {
         
       });
   };
+  const loginOverlay = document.getElementById("login-overlay");
+  const mainContent = document.getElementById("main-admin-content");
+  const btnLogin = document.getElementById("btn-login");
+  const loginError = document.getElementById("login-error");
+  const pwdInput = document.getElementById("admin-password");
 
-  fetchAdminData();
-
+  if (btnLogin) {
+    btnLogin.addEventListener("click", () => {
+      if (pwdInput.value === "admin") {
+        loginOverlay.style.display = "none";
+        mainContent.classList.remove("d-none");
+        fetchAdminData();
+      } else {
+        loginError.style.display = "block";
+      }
+    });
+  } else {
+    fetchAdminData();
+  }
   // Schedule View (Calendar & timeline)
   const renderCalendar = () => {
     const calendarGrid = document.querySelector('.calendar-grid');
@@ -537,14 +553,7 @@ document.addEventListener('DOMContentLoaded', () => {
       tbody.appendChild(tr);
     });
   };
-
-  // --- Settings View ---
-  const renderSettings = () => {
-    document.getElementById('setting-menus').innerText = menus.map(m => m.name).join(', ');
-    document.getElementById('setting-staffs').innerText = staffs.map(s => s.name).join(', ');
-  };
-
-  // --- Tab Toggle Logic ---
+// --- Tab Toggle Logic ---
   const tabToggles = document.querySelectorAll('.tab-toggle');
   const tabContents = document.querySelectorAll('.tab-content');
   tabToggles.forEach(btn => {
@@ -680,5 +689,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   if (customerSearchInput) customerSearchInput.addEventListener('input', renderCustomerMgmtList);
+
+
 });
 
