@@ -505,7 +505,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('detail-menu').innerText = 'お休み・予定ブロック';
             cancelBtn.classList.add('d-none');
             document.getElementById('detail-phone-container').classList.add('d-none');
-            document.getElementById('detail-email-container').classList.add('d-none');
+            const dec = document.getElementById("detail-email-container"); if (dec) dec.classList.add("d-none");
           } else {
             document.getElementById('detail-menu').innerText = `${b.menu ? b.menu + ' ' : ''}(所要時間: ${b.duration}分)`;
             cancelBtn.classList.remove('d-none');
@@ -516,10 +516,10 @@ document.addEventListener('DOMContentLoaded', () => {
               document.getElementById('detail-phone-container').classList.add('d-none');
             }
             if (b.email) {
-              document.getElementById('detail-email-container').classList.remove('d-none');
-              document.getElementById('detail-email').innerText = b.email;
+              const dec2 = document.getElementById("detail-email-container"); if (dec2) dec2.classList.remove("d-none");
+              const de = document.getElementById("detail-email"); if (de) de.innerText = b.email;
             } else {
-              document.getElementById('detail-email-container').classList.add('d-none');
+              const dec = document.getElementById("detail-email-container"); if (dec) dec.classList.add("d-none");
             }
           }
           
@@ -849,5 +849,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       });
   }
+
 
 
