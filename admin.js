@@ -693,17 +693,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (targetContent) targetContent.style.display = "block";
       }
     });
-  });
-
-
-
-
-
-
-
-
-
-  let customers = [];
+  
+let customers = [];
   
   const customerMgmtModal = document.getElementById('customer-mgmt-modal');
   const btnCloseMgmt = document.getElementById('btn-close-mgmt');
@@ -845,11 +836,38 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .finally(() => {
           submitBtn.innerText = originalText;
-          submitBtn.disabled = false;
+          
+      const detailNameBtn = document.getElementById('detail-name');
+      if (detailNameBtn) {
+        detailNameBtn.addEventListener('click', () => {
+          if (!currentDetailId) return;
+          const b = mockBookings.find(bk => bk.id === currentDetailId);
+          if (!b) return;
+
+          const searchVal = (b.name || "").replace(/[\s　]/g, '');
+          const phoneVal = String(b.phone || "").replace(/-/g, '');
+          
+          const matchedCustomer = customers.find(c => {
+             const nMatch = searchVal && (c.name || "").replace(/[\s　]/g, '') === searchVal;
+             const pMatch = phoneVal && String(c.phone||"").replace(/-/g, '') === phoneVal;
+             return nMatch || pMatch;
+          });
+
+          const dModal = document.getElementById('details-modal');
+          if (dModal) dModal.classList.add('d-none');
+          
+          customerMgmtModal.classList.remove('d-none');
+          
+          if (matchedCustomer) {
+              showCustomerFormView(matchedCustomer);
+          } else {
+              customerSearchInput.value = b.name || "";
+              showCustomerListView();
+          }
+        });
+      }
         });
       });
   }
-
-
-
+});
 
