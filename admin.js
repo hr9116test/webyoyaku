@@ -674,13 +674,27 @@ document.addEventListener('DOMContentLoaded', () => {
   const tabContents = document.querySelectorAll('.tab-content');
   tabToggles.forEach(btn => {
     btn.addEventListener('click', () => {
+      const isActive = btn.classList.contains('btn-primary');
+      
+      // If we are leaving or toggling the block tab, ensure block mode is exited
+      if (typeof isBlockMode !== 'undefined' && isBlockMode) {
+        exitBlockMode();
+        renderTimeline();
+      }
+      
       tabToggles.forEach(b => {
         b.classList.remove('btn-primary');
         b.classList.add('btn-outline');
       });
       tabContents.forEach(c => c.style.display = 'none');
+      
+      if (isActive && btn.id !== "btn-tab-customer") {
+        return;
+      }
+      
       btn.classList.add('btn-primary');
       btn.classList.remove('btn-outline');
+      
       if (btn.id === "btn-tab-customer") {
         const customerModal = document.getElementById("customer-mgmt-modal");
         if (customerModal) customerModal.classList.remove("d-none");
@@ -693,8 +707,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (targetContent) targetContent.style.display = "block";
       }
     });
-  
-let customers = [];
+  });
+
+  let customers = [];
   
   const customerMgmtModal = document.getElementById('customer-mgmt-modal');
   const btnCloseMgmt = document.getElementById('btn-close-mgmt');
@@ -870,4 +885,7 @@ let customers = [];
       });
   }
 });
+
+
+
 
