@@ -55,14 +55,19 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const loadLocalData = () => {
-    const localMenus = localStorage.getItem('hr_menus');
-    const localStaffs = localStorage.getItem('hr_staffs');
-    const localBookings = localStorage.getItem('hr_bookings');
-    if (localMenus && localStaffs && localBookings) {
-      menus = JSON.parse(localMenus);
-      staffs = JSON.parse(localStaffs);
-      bookings = JSON.parse(localBookings);
-      renderMenus();
+    try {
+      const localMenus = localStorage.getItem("hr_menus");
+      const localStaffs = localStorage.getItem("hr_staffs");
+      const localBookings = localStorage.getItem("hr_bookings");
+      if (localMenus && localStaffs && localBookings) {
+        menus = JSON.parse(localMenus);
+        staffs = JSON.parse(localStaffs);
+        bookings = JSON.parse(localBookings);
+        renderMenus();
+      }
+    } catch(e) {
+      console.error("Local data parse error", e);
+      localStorage.clear();
     }
   };
 
@@ -111,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
       card.dataset.id = m.id;
       card.innerHTML = `
         <div class="name">${m.name}</div>
-        <div class="price">¥${m.price.toLocaleString()}</div>
+        <div class="price">¥${(m.price || "")}</div>
         <div class="duration">目安: ${m.duration}分</div>
       `;
       card.addEventListener('click', () => {
@@ -423,4 +428,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+
+
 
