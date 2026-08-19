@@ -65,6 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
     menuButtonsContainer.style.display = 'none';
     menuButtonsContainer.style.flexDirection = 'column';
     menuButtonsContainer.style.gap = '0.5rem';
+    menuButtonsContainer.style.overflowX = 'hidden';
     
     menus.forEach(menu => {
       const btn = document.createElement('button');
@@ -207,9 +208,8 @@ document.addEventListener('DOMContentLoaded', () => {
           renderTimeline(dateStr);
         } else if (selectedMenuDuration > 0) {
           const key = td.dataset.key;
-          const parts = key.split('-');
-          const staffId = parts[0];
-          const timeStr = parts[1] + ':' + parts[2];
+          const timeStr = key.slice(-5);
+          const staffId = key.slice(0, -6);
           const staff = staffs.find(s => String(s.id) === staffId);
           document.getElementById('modal-datetime').innerText = dateStr.replace(/-/g, '/') + ' ' + timeStr + ' 〜';
           document.getElementById('modal-menu').innerText = selectedMenuName + ' (' + selectedMenuDuration + '分)';
@@ -306,9 +306,8 @@ document.addEventListener('DOMContentLoaded', () => {
       btnBlockConfirm.disabled = true;
 
       const firstSlot = selectedBlockSlots[0];
-      const parts = firstSlot.split('-');
-      const staffId = parts[0];
-      const timeStr = parts[1] + ':' + parts[2];
+      const timeStr = firstSlot.slice(-5);
+      const staffId = firstSlot.slice(0, -6);
       
       const payload = {
         date: currentTimelineDate,
@@ -584,3 +583,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // START
   fetchAdminData();
 });
+
+
+
+
