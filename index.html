@@ -3,152 +3,152 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HairSalon HR | ご予約</title>
+  <title>WEB予約 | HAIR SALON HR</title>
+  
+  <!-- Google Fonts: Noto Serif JP & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;700&family=Shippori+Mincho:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Serif+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  
+  <!-- Header -->
   <header class="header">
-    <h1>HairSalon HR</h1>
+    <div class="header-container">
+      <a href="../hp/index.html" class="logo">HAIR SALON HR</a>
+      <h1 class="page-title">WEB予約</h1>
+    </div>
   </header>
 
-  <div class="container">
-    <div id="booking-app">
+  <!-- Main Booking App -->
+  <main class="container">
+    <div class="booking-wrapper">
+      
       <!-- Stepper -->
-      <div class="stepper" id="stepper">
+      <div class="stepper">
         <div class="step active" data-step="1">
-          <div class="step-circle">1</div>
+          <div class="step-number">1</div>
           <span>メニュー</span>
         </div>
         <div class="step" data-step="2">
-          <div class="step-circle">2</div>
+          <div class="step-number">2</div>
           <span>スタッフ</span>
         </div>
         <div class="step" data-step="3">
-          <div class="step-circle">3</div>
+          <div class="step-number">3</div>
           <span>日時</span>
         </div>
         <div class="step" data-step="4">
-          <div class="step-circle">4</div>
+          <div class="step-number">4</div>
           <span>確認</span>
         </div>
       </div>
 
       <!-- Step 1: Menu Selection -->
-      <div id="step-1" class="step-content">
-        <div class="card">
-          <h2 class="mb-4 text-center">メニューを選択</h2>
-          <div class="selection-grid" id="menu-grid">
-            <div id="loading-indicator" style="text-align: center; padding: 2rem; color: var(--color-text-sub); grid-column: 1 / -1;">
-              データを読み込んでいます...
-            </div>
+      <section id="step-1" class="step-content">
+        <h2 class="mb-4 text-center">メニューを選択</h2>
+        <div class="selection-grid" id="menu-grid">
+          <div id="loading-indicator" style="text-align: center; padding: 2rem; color: var(--color-text-sub); grid-column: 1 / -1;">
+            データを読み込んでいます...
           </div>
-          <button class="btn btn-full btn-disabled" id="btn-next-1" disabled>次へ進む</button>
+          <!-- Menu items injected via JS -->
         </div>
-      </div>
+        <div class="step-actions">
+          <button class="btn btn-disabled" id="btn-next-1" disabled>次へ進む</button>
+        </div>
+      </section>
 
       <!-- Step 2: Staff Selection -->
-      <div id="step-2" class="step-content d-none">
-        <div class="card">
-          <h2 class="mb-4 text-center">スタッフを選択</h2>
-          <div class="selection-grid" id="staff-grid">
-            <!-- Dynamically generated -->
-          </div>
-          <div class="step-actions" style="margin-bottom: 0;">
-            <button class="btn btn-outline" id="btn-prev-2">戻る</button>
-            <button class="btn btn-disabled" id="btn-next-2" disabled>次へ進む</button>
-          </div>
+      <section id="step-2" class="step-content d-none">
+        <h2 class="mb-4 text-center">担当スタッフを選択</h2>
+        <div class="selection-grid" id="staff-grid">
+          <!-- Staff items injected via JS -->
         </div>
-      </div>
+        <div class="step-actions mt-4" style="margin-bottom: 0;">
+          <button class="btn btn-outline" id="btn-prev-2">戻る</button>
+          <button class="btn btn-disabled" id="btn-next-2" disabled>次へ進む</button>
+        </div>
+      </section>
 
       <!-- Step 3: Date & Time Selection -->
-      <div id="step-3" class="step-content d-none">
-        <div class="card">
-          <h2 class="mb-4 text-center">ご希望の日時を選択</h2>
-          
-          <div class="calendar-wrapper">
-            <div class="calendar-header">
-              <button class="btn btn-outline" id="btn-prev-month">&lt;</button>
-              <h3 id="current-month-year">2026年 8月</h3>
-              <button class="btn btn-outline" id="btn-next-month">&gt;</button>
-            </div>
-            <div class="calendar-grid">
-              <div class="calendar-day-header">日</div>
-              <div class="calendar-day-header">月</div>
-              <div class="calendar-day-header">火</div>
-              <div class="calendar-day-header">水</div>
-              <div class="calendar-day-header">木</div>
-              <div class="calendar-day-header">金</div>
-              <div class="calendar-day-header">土</div>
-              <!-- Calendar days will be generated by JS -->
-            </div>
+      <section id="step-3" class="step-content d-none">
+        <h2 class="mb-4 text-center">来店日時を選択</h2>
+        
+        <div class="calendar-wrapper">
+          <div class="calendar-header">
+            <button class="btn-icon" id="btn-prev-month">&lt;</button>
+            <h3 id="calendar-month-year">2026年 8月</h3>
+            <button class="btn-icon" id="btn-next-month">&gt;</button>
           </div>
+          <div class="calendar-weekdays">
+            <div>日</div><div>月</div><div>火</div><div>水</div><div>木</div><div>金</div><div>土</div>
+          </div>
+          <div class="calendar-grid">
+            <!-- Days injected via JS -->
+          </div>
+        </div>
 
-          <div id="time-selection" class="d-none">
-            <h3 class="mb-2 text-center" id="selected-date-display"></h3>
-            <div class="time-slots" id="time-slots-container">
-              <!-- Time slots will be generated by JS -->
-            </div>
+        <div id="time-selection" class="d-none mt-4">
+          <h3 class="mb-2 text-center" id="selected-date-display" style="font-size: 1.1rem;"></h3>
+          <div class="time-slots" id="time-slots-container">
+            <!-- Time slots injected via JS -->
+          </div>
+        </div>
+
+        <div class="step-actions mt-4" style="margin-bottom: 0;">
+          <button class="btn btn-outline" id="btn-prev-3">戻る</button>
+          <button class="btn btn-disabled" id="btn-next-3" disabled>次へ進む</button>
+        </div>
+      </section>
+
+      <!-- Step 4: Confirmation & Info -->
+      <section id="step-4" class="step-content d-none">
+        <h2 class="mb-4 text-center">予約内容の確認</h2>
+        
+        <div style="background-color: var(--color-base); padding: 1.5rem; border-radius: var(--radius-sm); margin-bottom: 2rem;">
+          <p><strong>メニュー:</strong> <span id="confirm-menu"></span></p>
+          <p><strong>担当スタッフ:</strong> <span id="confirm-staff"></span></p>
+          <p><strong>日時:</strong> <span id="confirm-datetime"></span></p>
+        </div>
+
+        <form id="booking-form">
+          <div class="form-group">
+            <label for="user-name">お名前 <span class="required">必須</span></label>
+            <input type="text" id="user-name" class="form-control" placeholder="山田 花子" required>
+          </div>
+          <div class="form-group">
+            <label for="user-phone">電話番号 <span class="required">必須</span></label>
+            <input type="tel" id="user-phone" class="form-control" placeholder="090-1234-5678" required>
+          </div>
+          <div class="form-group">
+            <label for="user-email">メールアドレス</label>
+            <input type="email" id="user-email" class="form-control" placeholder="info@example.com">
+            <div style="font-size: 0.75rem; color: var(--color-text-sub); margin-top: 0.4rem; letter-spacing: -0.02em;">※予約確定メールをお送りします</div>
+          </div>
+          <div class="form-group">
+            <label for="user-memo">ご要望・メモ</label>
+            <textarea id="user-memo" class="form-control" rows="3" placeholder="アレルギーやご要望があればご記入ください"></textarea>
           </div>
 
           <div class="step-actions mt-4" style="margin-bottom: 0;">
-            <button class="btn btn-outline" id="btn-prev-3">戻る</button>
-            <button class="btn btn-disabled" id="btn-next-3" disabled>次へ進む</button>
+            <button type="button" class="btn btn-outline" id="btn-prev-4">戻る</button>
+            <button type="submit" class="btn">予約を確定する</button>
           </div>
-        </div>
-      </div>
+        </form>
+      </section>
 
-      <!-- Step 4: Confirmation & Info Input -->
-      <div id="step-4" class="step-content d-none">
-        <div class="card">
-          <h2 class="mb-4 text-center">ご予約内容の確認</h2>
-          
-          <div style="background-color: var(--color-base); padding: 1.5rem; border-radius: var(--radius-sm); margin-bottom: 2rem;">
-            <p><strong>メニュー:</strong> <span id="confirm-menu"></span></p>
-            <p><strong>スタッフ:</strong> <span id="confirm-staff"></span></p>
-            <p><strong>日時:</strong> <span id="confirm-datetime"></span></p>
-          </div>
-
-          <form id="booking-form">
-            <div class="form-group">
-              <label class="form-label" for="user-name">お名前 (必須)</label>
-              <input type="text" id="user-name" class="form-input" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="user-phone">電話番号 (必須)</label>
-              <input type="tel" id="user-phone" class="form-input" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="user-email">メールアドレス</label>
-              <input type="email" id="user-email" class="form-input">
-              <div style="font-size: 0.75rem; color: var(--color-text-sub); margin-top: 0.4rem; letter-spacing: -0.02em;">※ご登録で予約完了メールが届きます</div>
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="user-memo">ご要望など</label>
-              <textarea id="user-memo" class="form-input" rows="3"></textarea>
-            </div>
-            
-            <div class="step-actions mt-4" style="margin-bottom: 0;">
-              <button type="button" class="btn btn-outline" id="btn-prev-4">戻る</button>
-              <button type="submit" class="btn">予約を確定</button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <!-- Success State -->
-      <div id="step-success" class="step-content d-none">
-        <div class="card text-center">
-          <h2 class="mb-4" style="color: var(--color-success);">ご予約が完了しました</h2>
-          <p class="mb-4">ご来店を心よりお待ちしております。<br>ご入力いただいたメールアドレスへ、予約内容の詳細をお送りしました。</p>
-          <a href="index.html" class="btn btn-outline">トップへ戻る</a>
-        </div>
-      </div>
+      <!-- Success Step -->
+      <section id="step-success" class="step-content d-none" style="text-align: center; padding: 3rem 1rem;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 1.5rem;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        <h2 class="mb-4" style="color: var(--color-text-main);">予約が完了しました</h2>
+        <p class="mb-4" style="color: var(--color-text-sub);">スタッフ一同、心よりお待ちしております。<br>ご入力いただいたメールアドレスへ、予約内容の詳細をお送りしました。</p>
+        <a href="../hp/index.html" class="btn btn-outline">トップへ戻る</a>
+      </section>
 
     </div>
-  </div>
+  </main>
 
   <script src="app.js"></script>
 </body>
