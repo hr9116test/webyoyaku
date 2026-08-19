@@ -798,11 +798,9 @@ document.addEventListener('DOMContentLoaded', () => {
           });
           
           const phone = String(c.phone||"") || "-";
-          tr.innerHTML = 
-            <td style="padding: 0.75rem; border-bottom: 1px solid var(--color-border); font-weight: bold; color: var(--color-primary);">+c.name+</td>
-            <td style="padding: 0.75rem; border-bottom: 1px solid var(--color-border);">+phone+</td>
-            <td style="padding: 0.75rem; border-bottom: 1px solid var(--color-border); text-align: right; color: var(--color-text-sub);">編集 &gt;</td>
-          ;
+          tr.innerHTML = '<td style="padding: 0.75rem; border-bottom: 1px solid var(--color-border); font-weight: bold; color: var(--color-primary);">' + c.name + '</td>' +
+'<td style="padding: 0.75rem; border-bottom: 1px solid var(--color-border);">' + phone + '</td>' +
+'<td style="padding: 0.75rem; border-bottom: 1px solid var(--color-border); text-align: right; color: var(--color-text-sub);">編集 &gt;</td>';
           customerTbody.appendChild(tr);
         });
       }
@@ -851,4 +849,5 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       });
   }
+
 
