@@ -1,4 +1,5 @@
-﻿const GAS_URL = 'https://script.google.com/macros/s/AKfycbwcQIx5rmTuZ60bihVUvvGLdnaco5XgT60qN-mQO6QDAZIXdgIVZ-d5mkjODq-QTlzb/exec';
+﻿let returnToDetailsModal = false;
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwcQIx5rmTuZ60bihVUvvGLdnaco5XgT60qN-mQO6QDAZIXdgIVZ-d5mkjODq-QTlzb/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -118,6 +119,16 @@ document.addEventListener('DOMContentLoaded', () => {
           
           mockBookings = result.data.bookings.map(b => { 
             const v = Object.values(b); 
+                        let dateStr = String(v[1]);
+            if (dateStr.includes('T')) {
+                const dt = new Date(dateStr);
+                const y = dt.getFullYear();
+                const m = String(dt.getMonth() + 1).padStart(2, '0');
+                const d = String(dt.getDate()).padStart(2, '0');
+                dateStr = y + '-' + m + '-' + d;
+            } else {
+                dateStr = dateStr.substring(0,10).replace(/\//g, '-');
+            }
             let st = String(v[2]);
             if (st.includes('T')) {
                 const dt = new Date(st);
@@ -130,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 st = st.padStart(5, '0').substring(0,5);
             }
             return { 
-              id: v[0], date: String(v[1]).substring(0,10).replace(/\//g, '-'), 
+              id: v[0], date: dateStr, 
               startTime: st, duration: parseInt(v[3]), staff: v[4], type: v[9], name: v[5], phone: v[6], menu: v[8], memo: v[11] || '' 
             }; 
           });
@@ -176,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
           
           if (booking) {
             const rowSpan = Math.ceil(booking.duration / 30);
-            const isBlock = booking.type === '休み';
+            const isBlock = booking.type === '休み' || booking.type === 'x' || booking.name === '休み' || booking.name === 'x';
             const bgCls = isBlock ? 'background-color:#E2E3E5; color:#383D41;' : 'background-color:#D4EDDA; color:#155724; cursor:pointer;';
             html += '<td rowspan="' + rowSpan + '" class="timeline-booking" data-id="' + booking.id + '" style="border:1px solid var(--color-border); padding:0.25rem; vertical-align:top; ' + bgCls + '">';
             html += '<div style="font-size:0.8rem; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + booking.name + '</div>';
@@ -231,7 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
       td.addEventListener('click', () => {
         const id = td.dataset.id;
         const booking = mockBookings.find(b => String(b.id) === String(id));
-        if (booking && booking.type !== '休み') {
+        if (booking && booking.type !== '休み' && booking.type !== 'x' && booking.name !== '休み' && booking.name !== 'x') {
           const dDt = document.getElementById('detail-datetime');
           if(dDt) dDt.innerText = booking.date.replace(/-/g, '/') + ' ' + booking.startTime;
           
@@ -247,6 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
             dName.onclick = () => {
               document.getElementById('details-modal').classList.add('d-none');
               document.getElementById('customer-mgmt-modal').classList.remove('d-none');
+              returnToDetailsModal = true;
               showCustomerFormView({ name: booking.name, phone: booking.phone });
             };
           }
@@ -477,6 +489,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (btn.id === "btn-tab-customer") {
         const customerModal = document.getElementById("customer-mgmt-modal");
         if (customerModal) {
+            returnToDetailsModal = false;
             customerModal.classList.remove("d-none");
             showCustomerListView();
         }
@@ -568,6 +581,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (btnCloseMgmt) btnCloseMgmt.addEventListener('click', () => {
     customerMgmtModal.classList.add('d-none');
+    if (returnToDetailsModal) {
+      document.getElementById('details-modal').classList.remove('d-none');
+      returnToDetailsModal = false;
+    }
   });
 
   if (btnNewCustomer) btnNewCustomer.addEventListener('click', () => {
@@ -575,7 +592,13 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   if (btnCancelEdit) btnCancelEdit.addEventListener('click', () => {
-    showCustomerListView();
+    if (returnToDetailsModal) {
+      document.getElementById('customer-mgmt-modal').classList.add('d-none');
+      document.getElementById('details-modal').classList.remove('d-none');
+      returnToDetailsModal = false;
+    } else {
+      showCustomerListView();
+    }
   });
 
   if (customerSearchInput) customerSearchInput.addEventListener('input', renderCustomerMgmtList);
@@ -583,6 +606,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // START
   fetchAdminData();
 });
+
+
+
 
 
 
