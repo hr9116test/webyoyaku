@@ -46,7 +46,25 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   };
 
-  fetchAdminData();
+  const loginOverlay = document.getElementById("login-overlay");
+  const mainContent = document.getElementById("main-admin-content");
+  const btnLogin = document.getElementById("btn-login");
+  const loginError = document.getElementById("login-error");
+  const pwdInput = document.getElementById("admin-password");
+
+  if (btnLogin) {
+    btnLogin.addEventListener("click", () => {
+      if (pwdInput.value === "admin") {
+        loginOverlay.style.display = "none";
+        mainContent.classList.remove("d-none");
+        fetchAdminData();
+      } else {
+        loginError.style.display = "block";
+      }
+    });
+  } else {
+    fetchAdminData();
+  }
 
   // Schedule View (Calendar & timeline)
   const renderCalendar = () => {
@@ -490,4 +508,5 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('setting-staffs').innerText = staffs.map(s => s.name).join(', ');
   };
 });
+
 
