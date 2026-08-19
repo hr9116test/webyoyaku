@@ -1,4 +1,4 @@
-// app.js
+﻿// app.js
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbx-b6WOncIt4M8nPkncMZfLDYc1MoV55tOvtL-cCT3ARdTSsZcMFUyk4d_J9Ur51cWi/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -40,20 +40,9 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(res => res.json())
     .then(result => {
       if(result.success) {
-        menus = result.data.menus.map(m => ({
-          id: m['メニューID'], name: m['メニュー名'], duration: parseInt(m['所要時間（分）']), price: m['金額']
-        }));
-        staffs = result.data.staffs.map(s => ({
-          id: s['スタッフID'], name: s['スタッフ名']
-        }));
-        bookings = result.data.bookings.map(b => ({
-          id: b['予約ID'],
-          date: String(b['予約日']).substring(0, 10),
-          startTime: String(b['開始時間']).padStart(5, '0').substring(0, 5),
-          duration: parseInt(b['所要時間（分）']),
-          staff: b['担当スタッフ'],
-          type: b['予約状況']
-        }));
+        menus = result.data.menus.map(m => { const v = Object.values(m); return { id: v[0], name: v[1], duration: parseInt(v[2]), price: v[3] }; });
+        staffs = result.data.staffs.map(s => { const v = Object.values(s); return { id: v[0], name: v[1] }; });
+        bookings = result.data.bookings.map(b => { const v = Object.values(b); return { id: v[0], date: String(v[1]).substring(0,10), startTime: String(v[2]).padStart(5,"0").substring(0,5), duration: parseInt(v[3]), staff: v[4], type: v[10] }; });
 
         localStorage.setItem('hr_menus', JSON.stringify(menus));
         localStorage.setItem('hr_staffs', JSON.stringify(staffs));
@@ -434,3 +423,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+
