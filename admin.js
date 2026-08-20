@@ -8,6 +8,15 @@ function formatDateWithDay(dateStr) {
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwcQIx5rmTuZ60bihVUvvGLdnaco5XgT60qN-mQO6QDAZIXdgIVZ-d5mkjODq-QTlzb/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Normalize string for search (Kana conversion)
+  const normalizeForSearch = (str) => {
+    if (!str) return '';
+    return str.replace(/[\u30a1-\u30f6]/g, function(match) {
+      return String.fromCharCode(match.charCodeAt(0) - 0x60);
+    }).replace(/[Ａ-Ｚａ-ｚ０-９]/g, function(s) {
+      return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
+    }).toLowerCase().trim();
+  };
 
   let menus = [];
   let staffs = [];
@@ -626,11 +635,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     const customers = Object.values(customerMap);
     
-    const query = (customerSearchInput && customerSearchInput.value) ? customerSearchInput.value.toLowerCase().trim() : '';
-    const filtered = customers.filter(c => 
-      (c.name || '').toLowerCase().includes(query) || 
-      (c.phone || '').includes(query)
-    );
+    const query = (customerSearchInput && customerSearchInput.value) ? normalizeForSearch(customerSearchInput.value) : '';
+    const filtered = customers.filter(c => normalizeForSearch(c.name || '').includes(query) || normalizeForSearch(c.phone || '').includes(query));
 
     customerTbody.innerHTML = '';
     if (filtered.length === 0) {
@@ -681,7 +687,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (proxyNameInput && autocompleteList) {
     proxyNameInput.addEventListener('input', () => {
-      const val = proxyNameInput.value.trim().toLowerCase();
+      const val = normalizeForSearch(proxyNameInput.value);
       autocompleteList.innerHTML = '';
       if (!val) {
         autocompleteList.classList.add('d-none');
@@ -698,7 +704,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       const uniqueCustomers = Object.values(customerMap);
       
-      const matches = uniqueCustomers.filter(c => (c.name || '').toLowerCase().includes(val) || String(c.phone || '').includes(val));
+      const matches = uniqueCustomers.filter(c => normalizeForSearch(c.name || '').includes(val) || normalizeForSearch(c.phone || '').includes(val));
       
       if (matches.length > 0) {
         matches.forEach(match => {
@@ -728,6 +734,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // START
   fetchAdminData();
 });
+
 
 
 
