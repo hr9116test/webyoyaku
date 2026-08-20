@@ -131,7 +131,8 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(result => {
         if(result.success) {
           menus = result.data.menus.map(m => { const v = Object.values(m); return { id: v[0], name: v[1], duration: parseInt(v[2]), price: v[3] }; });
-          staffs = result.data.staffs.map(s => { const v = Object.values(s); 
+          staffs = result.data.staffs.map(s => { const v = Object.values(s); return { id: v[0], name: v[1] }; });
+
           mockCustomers = (result.data.customers || []).map(c => {
             const v = Object.values(c);
             return {
@@ -147,9 +148,8 @@ document.addEventListener('DOMContentLoaded', () => {
               memo: v[10] || ''
             };
           });
-          return { id: v[0], name: v[1] }; });
-          
-          mockBookings = result.data.bookings.map(b => { 
+
+mockBookings = result.data.bookings.map(b => { 
             const v = Object.values(b); 
                         let dateStr = String(v[1]);
             if (dateStr.includes('T')) {
@@ -749,6 +749,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // START
   fetchAdminData();
 });
+
 
 
 
