@@ -1,4 +1,10 @@
 ﻿let returnToDetailsModal = false;
+function formatDateWithDay(dateStr) {
+    const days = ['日', '月', '火', '水', '木', '金', '土'];
+    const dt = new Date(dateStr.replace(/-/g, '/'));
+    return dateStr + '(' + days[dt.getDay()] + ')';
+}
+
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwcQIx5rmTuZ60bihVUvvGLdnaco5XgT60qN-mQO6QDAZIXdgIVZ-d5mkjODq-QTlzb/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -185,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const currentMins = h * 60 + m;
           const booking = mockBookings.find(b => b.date === dateStr && String(b.staff) === String(s.id) && timeToMinutes(b.startTime) === currentMins);
           
-          if (booking) {
+          if (booking && !isCovered) {
             const rowSpan = Math.ceil(booking.duration / 30);
             const isBlock = booking.type === '休み' || booking.type === 'x' || booking.name === '休み' || booking.name === 'x';
             const bgCls = isBlock ? 'background-color:#E2E3E5; color:#383D41;' : 'background-color:#D4EDDA; color:#155724; cursor:pointer;';
@@ -292,7 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
                          body: JSON.stringify({ action: 'updateBookingStatus', id: booking.id, status: 'キャンセル' })
                      }).then(() => {
                          const payload = {
-                             date: booking.date, startTime: booking.startTime, duration: booking.duration,
+                             date: formatDateWithDay(booking.date), startTime: booking.startTime, duration: booking.duration,
                              staff: booking.staff, name: finalName, phone: '', email: '', memo: '',
                              menu: '休み設定', type: '休み'
                          };
@@ -387,7 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const staffId = firstSlot.slice(0, -6);
       
       const payload = {
-        date: currentTimelineDate,
+        date: formatDateWithDay(currentTimelineDate),
         startTime: timeStr,
         duration: selectedBlockSlots.length * 30,
         staff: staffId,
@@ -671,6 +677,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // START
   fetchAdminData();
 });
+
+
+
 
 
 
