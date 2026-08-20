@@ -178,6 +178,44 @@ mockBookings = result.data.bookings.map(b => {
             }; 
           });
           
+
+            const existingPhones = new Set(mockCustomers.filter(c => c.phone).map(c => String(c.phone)));
+            const existingNames = new Set(mockCustomers.filter(c => c.name).map(c => String(c.name)));
+            
+            mockBookings.forEach(b => {
+              if (!b.name || b.name === 'x') return;
+              
+              if (b.phone && !existingPhones.has(String(b.phone))) {
+                existingPhones.add(String(b.phone));
+                existingNames.add(String(b.name));
+                mockCustomers.push({
+                  id: 'b_' + b.id,
+                  name: b.name,
+                  kana: '',
+                  address: '',
+                  occupation: '',
+                  phone: b.phone,
+                  email: '',
+                  firstVisit: '',
+                  lastVisit: b.date,
+                  memo: ''
+                });
+              } else if (!b.phone && !existingNames.has(String(b.name))) {
+                existingNames.add(String(b.name));
+                mockCustomers.push({
+                  id: 'b_' + b.id,
+                  name: b.name,
+                  kana: '',
+                  address: '',
+                  occupation: '',
+                  phone: '',
+                  email: '',
+                  firstVisit: '',
+                  lastVisit: b.date,
+                  memo: ''
+                });
+              }
+            });
           renderCustomerMgmtList();
           renderMenuButtons();
           updateDateDisplay();
@@ -749,6 +787,7 @@ mockBookings = result.data.bookings.map(b => {
   // START
   fetchAdminData();
 });
+
 
 
 
