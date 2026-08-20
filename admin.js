@@ -698,7 +698,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       const uniqueCustomers = Object.values(customerMap);
       
-      const matches = uniqueCustomers.filter(c => c.name.toLowerCase().includes(val) || c.phone.includes(val));
+      const matches = uniqueCustomers.filter(c => (c.name || '').toLowerCase().includes(val) || String(c.phone || '').includes(val));
       
       if (matches.length > 0) {
         matches.forEach(match => {
@@ -728,6 +728,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // START
   fetchAdminData();
 });
+
+
 
 
 
