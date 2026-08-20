@@ -189,8 +189,8 @@ document.addEventListener('DOMContentLoaded', () => {
           const isSelected = selectedBlockSlots.includes(slotKey);
           
           const currentMins = h * 60 + m;
+          const isCovered = mockBookings.some(b => b.date === dateStr && String(b.staff) === String(s.id) && timeToMinutes(b.startTime) < currentMins && timeToMinutes(b.startTime) + b.duration > currentMins);
           const booking = mockBookings.find(b => b.date === dateStr && String(b.staff) === String(s.id) && timeToMinutes(b.startTime) === currentMins);
-          
           if (booking && !isCovered) {
             const rowSpan = Math.ceil(booking.duration / 30);
             const isBlock = booking.type === '休み' || booking.type === 'x' || booking.name === '休み' || booking.name === 'x';
@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
             html += '<div style="font-size:0.75rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + booking.menu + '</div>';
             html += '</td>';
           } else {
-            const isCovered = mockBookings.some(b => b.date === dateStr && String(b.staff) === String(s.id) && timeToMinutes(b.startTime) < currentMins && timeToMinutes(b.startTime) + b.duration > currentMins);
+          
             if (!isCovered) {
               const bg = isSelected ? 'background-color:#ffeeba;' : '';
               html += '<td class="timeline-slot" data-key="' + slotKey + '" style="border:1px solid var(--color-border); cursor:pointer; ' + bg + '"></td>';
@@ -677,6 +677,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // START
   fetchAdminData();
 });
+
+
 
 
 
