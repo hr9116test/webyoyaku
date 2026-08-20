@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const timeline = document.getElementById('timeline');
     if (!timeline) return;
     
-    let html = '<table class="timeline-table" style="width:100%; border-collapse:collapse; text-align:center;">';
+    let html = '<table class="timeline-table" style="width:100%; table-layout: fixed; border-collapse:collapse; text-align:center;">';
     html += '<thead style="position:sticky; top:0; background:var(--color-surface); z-index:10; box-shadow:0 1px 2px rgba(0,0,0,0.05);">';
     html += '<tr><th style="padding:0.5rem; border:1px solid var(--color-border); width:60px;">時間</th>';
     staffs.forEach(s => { html += '<th style="padding:0.5rem; border:1px solid var(--color-border);">' + s.name + '</th>'; });
@@ -242,39 +242,104 @@ document.addEventListener('DOMContentLoaded', () => {
       td.addEventListener('click', () => {
         const id = td.dataset.id;
         const booking = mockBookings.find(b => String(b.id) === String(id));
-        if (booking && booking.type !== '休み' && booking.type !== 'x' && booking.name !== '休み' && booking.name !== 'x') {
+        if (booking) {
+          const isBlock = booking.type === '休み' || booking.type === 'x' || booking.name === '休み' || booking.name === 'x';
+          
+          if (isBlockMode) {
+              if (isBlock) {
+                  if (confirm("【確認】このブロック枠を解除しますか？\n※解除すると、この時間に予約が入るようになります。")) {
+                      fetch(GAS_URL, {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                          body: JSON.stringify({ action: 'updateBookingStatus', id: booking.id, status: 'キャンセル' })
+                      }).then(res => res.json()).then(result => {
+                          if (result.success) {
+                              mockBookings = mockBookings.filter(b => String(b.id) !== String(booking.id));
+                              renderTimeline(currentTimelineDate);
+                          } else {
+                              alert('エラー: ' + result.error);
+                          }
+                      }).catch(err => alert('通信エラー: ' + err.message));
+                  }
+              }
+              return; // In block mode, don't open details modal
+          }
+          
           const dDt = document.getElementById('detail-datetime');
           if(dDt) dDt.innerText = booking.date.replace(/-/g, '/') + ' ' + booking.startTime;
           
           const dMenu = document.getElementById('detail-menu');
-          if(dMenu) dMenu.innerText = booking.menu;
+          if(dMenu) dMenu.innerText = isBlock ? '休み（ブロック枠）' : booking.menu;
           
           const dStaff = document.getElementById('detail-staff');
           if(dStaff) dStaff.innerText = '担当: ' + (staffs.find(s => String(s.id) === String(booking.staff))?.name || '');
           
           const dName = document.getElementById('detail-name');
           if(dName) {
-            dName.innerText = booking.name;
+            dName.innerText = isBlock ? (booking.name === 'x' ? '休み' : booking.name) : booking.name;
             dName.onclick = () => {
-              document.getElementById('details-modal').classList.add('d-none');
-              document.getElementById('customer-mgmt-modal').classList.remove('d-none');
-              returnToDetailsModal = true;
-              showCustomerFormView({ name: booking.name, phone: booking.phone });
+              if (isBlock) {
+                 const newName = prompt('表示テキストを変更:', dName.innerText);
+                 if (newName !== null && newName.trim() !== '' && newName.trim() !== booking.name) {
+                     const finalName = newName.trim();
+                     booking.name = finalName;
+                     dName.innerText = finalName;
+                     renderTimeline(currentTimelineDate);
+                     
+                     fetch(GAS_URL, {
+                         method: 'POST',
+                         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                         body: JSON.stringify({ action: 'updateBookingStatus', id: booking.id, status: 'キャンセル' })
+                     }).then(() => {
+                         const payload = {
+                             date: booking.date, startTime: booking.startTime, duration: booking.duration,
+                             staff: booking.staff, name: finalName, phone: '', email: '', memo: '',
+                             menu: '休み設定', type: '休み'
+                         };
+                         return fetch(GAS_URL, {
+                             method: 'POST',
+                             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                             body: JSON.stringify({ action: 'createBooking', payload })
+                         });
+                     }).then(res => res.json()).then(result => {
+                         if (result.success) { booking.id = result.bookingId; }
+                     }).catch(err => console.error(err));
+                 }
+              } else {
+                document.getElementById('details-modal').classList.add('d-none');
+                document.getElementById('customer-mgmt-modal').classList.remove('d-none');
+                returnToDetailsModal = true;
+                showCustomerFormView({ name: booking.name, phone: booking.phone });
+              }
             };
           }
           
           const dPhone = document.getElementById('detail-phone');
-          if(dPhone) dPhone.innerText = booking.phone || '未登録';
+          if(dPhone) dPhone.innerText = isBlock ? '-' : (booking.phone || '未登録');
           
           const dMemo = document.getElementById('detail-memo');
           if(dMemo) dMemo.innerText = booking.memo || 'なし';
           
           currentDetailId = booking.id;
+          
+          const btnCancel = document.getElementById('btn-cancel-booking');
+          if (btnCancel) {
+              if (isBlock) {
+                  btnCancel.style.display = 'none';
+              } else {
+                  btnCancel.style.display = 'block';
+              }
+          }
+          
           document.getElementById('details-modal').classList.remove('d-none');
         }
       });
     });
   };
+
+
+
+
 
   const btnBlockMode = document.getElementById('btn-block-mode');
   const btnBlockConfirm = document.getElementById('btn-block-confirm');
@@ -606,6 +671,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // START
   fetchAdminData();
 });
+
+
+
+
 
 
 
