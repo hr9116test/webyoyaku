@@ -704,7 +704,7 @@ document.addEventListener('DOMContentLoaded', () => {
         matches.forEach(match => {
           const div = document.createElement('div');
           div.className = 'autocomplete-item';
-          div.innerHTML = <strong> + match.name + </strong> <span style="font-size:0.8rem;color:#777;">( + match.phone + )</span>;
+          div.innerHTML = '<strong>' + match.name + '</strong> <span style="font-size:0.8rem;color:#777;">(' + match.phone + ')</span>';
           div.addEventListener('click', () => {
             proxyNameInput.value = match.name;
             if(proxyPhoneInput) proxyPhoneInput.value = match.phone;
@@ -728,6 +728,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // START
   fetchAdminData();
 });
+
 
 
 
