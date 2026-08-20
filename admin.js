@@ -674,9 +674,61 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (customerSearchInput) customerSearchInput.addEventListener('input', renderCustomerMgmtList);
 
+    // Autocomplete for Proxy Booking
+  const proxyNameInput = document.getElementById('proxy-name');
+  const autocompleteList = document.getElementById('autocomplete-list');
+  const proxyPhoneInput = document.getElementById('proxy-phone');
+
+  if (proxyNameInput && autocompleteList) {
+    proxyNameInput.addEventListener('input', () => {
+      const val = proxyNameInput.value.trim().toLowerCase();
+      autocompleteList.innerHTML = '';
+      if (!val) {
+        autocompleteList.classList.add('d-none');
+        return;
+      }
+      
+      const customerMap = {};
+      mockBookings.forEach(b => {
+        if(b.name && b.name !== '休' && b.name !== '×' && b.name !== '休み' && b.name !== 'x') {
+          if(!customerMap[b.phone]) {
+            customerMap[b.phone] = { name: b.name, phone: b.phone };
+          }
+        }
+      });
+      const uniqueCustomers = Object.values(customerMap);
+      
+      const matches = uniqueCustomers.filter(c => c.name.toLowerCase().includes(val) || c.phone.includes(val));
+      
+      if (matches.length > 0) {
+        matches.forEach(match => {
+          const div = document.createElement('div');
+          div.className = 'autocomplete-item';
+          div.innerHTML = <strong> + match.name + </strong> <span style="font-size:0.8rem;color:#777;">( + match.phone + )</span>;
+          div.addEventListener('click', () => {
+            proxyNameInput.value = match.name;
+            if(proxyPhoneInput) proxyPhoneInput.value = match.phone;
+            autocompleteList.classList.add('d-none');
+          });
+          autocompleteList.appendChild(div);
+        });
+        autocompleteList.classList.remove('d-none');
+      } else {
+        autocompleteList.classList.add('d-none');
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (e.target !== proxyNameInput && e.target !== autocompleteList) {
+        autocompleteList.classList.add('d-none');
+      }
+    });
+  }
+
   // START
   fetchAdminData();
 });
+
 
 
 
