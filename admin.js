@@ -9,14 +9,7 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbwcQIx5rmTuZ60bihVUvvGL
 
 document.addEventListener('DOMContentLoaded', () => {
   // Normalize string for search (Kana conversion)
-  const normalizeForSearch = (str) => {
-    if (!str) return '';
-    return String(str).replace(/[\u30a1-\u30f6]/g, function(match) {
-      return String.fromCharCode(match.charCodeAt(0) - 0x60);
-    }).replace(/[Ａ-Ｚａ-ｚ０-９]/g, function(s) {
-      return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
-    }).toLowerCase().trim();
-  };
+  const normalizeForSearch = (str) => { if (!str) return ''; return String(str).replace(/[\u30a1-\u30f6]/g, function(match) { return String.fromCharCode(match.charCodeAt(0) - 0x60); }).replace(/[\uFF21-\uFF3A\uFF41-\uFF5A\uFF10-\uFF19]/g, function(s) { return String.fromCharCode(s.charCodeAt(0) - 0xFEE0); }).toLowerCase().trim(); };
 
   let menus = [];
   let staffs = [];
