@@ -56,8 +56,17 @@ document.addEventListener('DOMContentLoaded', () => {
   if(rawType.includes("予約") || rawType === "booked") mappedType = "booked";
   if(rawType.includes("休み") || rawType === "blocked") mappedType = "blocked";
   if(rawType.includes("キャンセル")) mappedType = "cancelled";
-  return { id: v[0], date: String(v[1]).substring(0,10), startTime: formatGasTime(String(v[2])), duration: parseInt(v[3]), staff: v[4], type: mappedType }; 
-}).filter(b => b.type !== "cancelled");
+      let dateStr = String(v[1]);
+    if (dateStr.includes('T')) {
+        const dt = new Date(dateStr);
+        const y = dt.getFullYear();
+        const m = String(dt.getMonth() + 1).padStart(2, '0');
+        const d = String(dt.getDate()).padStart(2, '0');
+        dateStr = y + '-' + m + '-' + d;
+    } else {
+        dateStr = dateStr.substring(0, 10).replace(/\//g, '-');
+    }
+    return { id: v[0], date: dateStr, startTime: formatGasTime(String(v[2])), duration: parseInt(v[3]), staff: v[4], type: mappedType }; }).filter(b => b.type !== "cancelled");
 
         localStorage.setItem('hr_menus', JSON.stringify(menus));
         localStorage.setItem('hr_staffs', JSON.stringify(staffs));
@@ -406,8 +415,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
+    const days = ['日', '月', '火', '水', '木', '金', '土'];
+    const dt = new Date(state.date.replace(/-/g, '/'));
+    const dateWithDay = state.date + '(' + days[dt.getDay()] + ')';
+
     const payload = {
-      date: state.date,
+      date: dateWithDay,
       startTime: state.time,
       duration: state.duration,
       staff: finalStaffId,
@@ -443,6 +456,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+
+
 
 
 
