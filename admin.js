@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Normalize string for search (Kana conversion)
   const normalizeForSearch = (str) => {
     if (!str) return '';
-    return str.replace(/[\u30a1-\u30f6]/g, function(match) {
+    return String(str).replace(/[\u30a1-\u30f6]/g, function(match) {
       return String.fromCharCode(match.charCodeAt(0) - 0x60);
     }).replace(/[Ａ-Ｚａ-ｚ０-９]/g, function(s) {
       return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
@@ -749,6 +749,7 @@ mockBookings = result.data.bookings.map(b => {
   // START
   fetchAdminData();
 });
+
 
 
 
