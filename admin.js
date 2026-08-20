@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let menus = [];
   let staffs = [];
   let mockBookings = [];
+  let mockCustomers = [];
   
   let currentTimelineDate = '';
   let currentDate = new Date();
@@ -130,7 +131,23 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(result => {
         if(result.success) {
           menus = result.data.menus.map(m => { const v = Object.values(m); return { id: v[0], name: v[1], duration: parseInt(v[2]), price: v[3] }; });
-          staffs = result.data.staffs.map(s => { const v = Object.values(s); return { id: v[0], name: v[1] }; });
+          staffs = result.data.staffs.map(s => { const v = Object.values(s); 
+          mockCustomers = (result.data.customers || []).map(c => {
+            const v = Object.values(c);
+            return {
+              id: v[0],
+              name: v[1] || '',
+              kana: v[2] || '',
+              address: v[3] || '',
+              occupation: v[4] || '',
+              phone: v[5] || '',
+              email: v[6] || '',
+              firstVisit: v[7] || '',
+              lastVisit: v[8] || '',
+              memo: v[10] || ''
+            };
+          });
+          return { id: v[0], name: v[1] }; });
           
           mockBookings = result.data.bookings.map(b => { 
             const v = Object.values(b); 
@@ -289,7 +306,17 @@ document.addEventListener('DOMContentLoaded', () => {
           const dStaff = document.getElementById('detail-staff');
           if(dStaff) dStaff.innerText = '担当: ' + (staffs.find(s => String(s.id) === String(booking.staff))?.name || '');
           
-          const dName = document.getElementById('detail-name');
+                      const fullCustomer = mockCustomers.find(c => c.phone === booking.phone) || { name: booking.name, phone: booking.phone };
+            if(document.getElementById('customer-name')) document.getElementById('customer-name').innerText = fullCustomer.name || '';
+            if(document.getElementById('customer-kana')) document.getElementById('customer-kana').innerText = fullCustomer.kana || '';
+            if(document.getElementById('customer-address')) document.getElementById('customer-address').innerText = fullCustomer.address || '';
+            if(document.getElementById('customer-occupation')) document.getElementById('customer-occupation').innerText = fullCustomer.occupation || '';
+            if(document.getElementById('customer-phone')) document.getElementById('customer-phone').innerText = fullCustomer.phone || '';
+            if(document.getElementById('customer-email')) document.getElementById('customer-email').innerText = fullCustomer.email || '';
+            if(document.getElementById('customer-first-visit')) document.getElementById('customer-first-visit').innerText = fullCustomer.firstVisit || '';
+            if(document.getElementById('customer-last-visit')) document.getElementById('customer-last-visit').innerText = fullCustomer.lastVisit || '';
+            if(document.getElementById('customer-notes')) document.getElementById('customer-notes').innerText = fullCustomer.memo || '';
+            const dName = document.getElementById('detail-name');
           if(dName) {
             dName.innerText = isBlock ? (booking.name === 'x' ? '休み' : booking.name) : booking.name;
             dName.onclick = () => {
@@ -324,7 +351,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('details-modal').classList.add('d-none');
                 document.getElementById('customer-mgmt-modal').classList.remove('d-none');
                 returnToDetailsModal = true;
-                showCustomerFormView({ name: booking.name, phone: booking.phone });
+                const fullCustomer = mockCustomers.find(c => c.phone === booking.phone) || { name: booking.name, phone: booking.phone };
+                  showCustomerFormView(fullCustomer);
               }
             };
           }
@@ -600,43 +628,36 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCustomerMgmtList();
   };
 
-  const showCustomerFormView = (customer = null) => {
+    const showCustomerFormView = (customer = null) => {
     if(customerListView) customerListView.classList.add('d-none');
     if(customerFormView) customerFormView.classList.remove('d-none');
     if (customer) {
       if(customerFormTitle) customerFormTitle.innerText = '顧客の編集';
-      if(document.getElementById('customer-id')) document.getElementById('customer-id').value = customer.phone;
-      if(document.getElementById('customer-name')) document.getElementById('customer-name').value = customer.name;
-      if(document.getElementById('customer-phone')) document.getElementById('customer-phone').value = customer.phone;
-      if(document.getElementById('customer-email')) document.getElementById('customer-email').value = customer.email || '';
-      if(document.getElementById('customer-memo')) document.getElementById('customer-memo').value = customer.memo || '';
+      if(document.getElementById('edit-customer-id')) document.getElementById('edit-customer-id').value = customer.id;
+      if(document.getElementById('edit-name')) document.getElementById('edit-name').value = customer.name;
+      if(document.getElementById('edit-kana')) document.getElementById('edit-kana').value = customer.kana || '';
+      if(document.getElementById('edit-phone')) document.getElementById('edit-phone').value = customer.phone;
+      if(document.getElementById('edit-address')) document.getElementById('edit-address').value = customer.address || '';
+      if(document.getElementById('edit-occupation')) document.getElementById('edit-occupation').value = customer.occupation || '';
+      if(document.getElementById('edit-email')) document.getElementById('edit-email').value = customer.email || '';
+      if(document.getElementById('edit-memo')) document.getElementById('edit-memo').value = customer.memo || '';
     } else {
       if(customerFormTitle) customerFormTitle.innerText = '新規顧客登録';
       if(customerEditForm) customerEditForm.reset();
-      if(document.getElementById('customer-id')) document.getElementById('customer-id').value = '';
+      if(document.getElementById('edit-customer-id')) document.getElementById('edit-customer-id').value = '';
     }
   };
-
-  const renderCustomerMgmtList = () => {
+    const renderCustomerMgmtList = () => {
     if (!customerTbody) return;
     
-    const customerMap = {};
-    mockBookings.forEach(b => {
-      if(b.name && b.name !== '休み') {
-        if(!customerMap[b.phone]) {
-          customerMap[b.phone] = { name: b.name, phone: b.phone, count: 1, lastVisit: b.date };
-        } else {
-          customerMap[b.phone].count++;
-          if (b.date > customerMap[b.phone].lastVisit) {
-            customerMap[b.phone].lastVisit = b.date;
-          }
-        }
-      }
-    });
-    const customers = Object.values(customerMap);
+    const customers = mockCustomers;
     
     const query = (customerSearchInput && customerSearchInput.value) ? normalizeForSearch(customerSearchInput.value) : '';
-    const filtered = customers.filter(c => normalizeForSearch(c.name || '').includes(query) || normalizeForSearch(c.phone || '').includes(query));
+    const filtered = customers.filter(c => 
+      normalizeForSearch(c.name || '').includes(query) || 
+      normalizeForSearch(c.kana || '').includes(query) || 
+      normalizeForSearch(c.phone || '').includes(query)
+    );
 
     customerTbody.innerHTML = '';
     if (filtered.length === 0) {
@@ -694,23 +715,17 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       
-      const customerMap = {};
-      mockBookings.forEach(b => {
-        if(b.name && b.name !== '休' && b.name !== '×' && b.name !== '休み' && b.name !== 'x') {
-          if(!customerMap[b.phone]) {
-            customerMap[b.phone] = { name: b.name, phone: b.phone };
-          }
-        }
-      });
-      const uniqueCustomers = Object.values(customerMap);
-      
-      const matches = uniqueCustomers.filter(c => normalizeForSearch(c.name || '').includes(val) || normalizeForSearch(c.phone || '').includes(val));
+              const matches = mockCustomers.filter(c => 
+          normalizeForSearch(c.name || '').includes(val) || 
+          normalizeForSearch(c.kana || '').includes(val) || 
+          normalizeForSearch(c.phone || '').includes(val)
+        );
       
       if (matches.length > 0) {
         matches.forEach(match => {
           const div = document.createElement('div');
           div.className = 'autocomplete-item';
-          div.innerHTML = '<strong>' + match.name + '</strong> <span style="font-size:0.8rem;color:#777;">(' + match.phone + ')</span>';
+          div.innerHTML = '<strong>' + match.name + '</strong>' + (match.kana ? ' <span style="font-size:0.8rem;color:#999;">' + match.kana + '</span>' : '') + ' <span style="font-size:0.8rem;color:#777;">(' + match.phone + ')</span>';
           div.addEventListener('click', () => {
             proxyNameInput.value = match.name;
             if(proxyPhoneInput) proxyPhoneInput.value = match.phone;
@@ -734,6 +749,15 @@ document.addEventListener('DOMContentLoaded', () => {
   // START
   fetchAdminData();
 });
+
+
+
+
+
+
+
+
+
 
 
 
