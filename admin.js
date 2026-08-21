@@ -206,13 +206,13 @@ mockBookings = result.data.bookings.map(b => {
             const rowSpan = Math.ceil(booking.duration / 30);
             const isBlock = booking.type === '休み' || booking.type === 'x' || booking.name === '休み' || booking.name === 'x';
             const bgCls = isBlock ? 'background-color:#E2E3E5; color:#383D41;' : 'background-color:#D4EDDA; color:#155724; cursor:pointer;';
-                          html += '<td rowspan="' + rowSpan + '" class="timeline-booking" data-id="' + booking.id + '" style="border:1px solid var(--color-border); padding:0.25rem; vertical-align:top; ' + bgCls + '">';
-              html += '<div style="font-size:0.75rem; opacity:0.8; margin-bottom:2px;">' + booking.startTime + '</div>';
-              html += '<div style="font-size:0.85rem; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + booking.name + '</div>';
-              if (!isBlock) {
-                  html += '<div style="font-size:0.75rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:2px;">' + booking.menu + '</div>';
-              }
-              html += '</td>';
+            html += '<td rowspan="' + rowSpan + '" class="timeline-booking" data-id="' + booking.id + '" style="border:1px solid var(--color-border); padding:0.25rem; vertical-align:top; ' + bgCls + '">';
+            html += '<div style="font-size:0.75rem; opacity:0.8; margin-bottom:2px;">' + booking.startTime + '</div>';
+            html += '<div style="font-size:0.85rem; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + booking.name + '</div>';
+            if (!isBlock) {
+                html += '<div style="font-size:0.75rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:2px;">' + booking.menu + '</div>';
+            }
+            html += '</td>';
           } else {
           
                         if (!isCovered) {
@@ -384,15 +384,7 @@ mockBookings = result.data.bookings.map(b => {
             };
           }
           
-                      const phoneContainer = document.getElementById('detail-phone-container');
-            if (phoneContainer) {
-                if (isBlock) {
-                    phoneContainer.classList.add('d-none');
-                } else {
-                    phoneContainer.classList.remove('d-none');
-                }
-            }
-            const dPhone = document.getElementById('detail-phone');
+          const dPhone = document.getElementById('detail-phone');
           if(dPhone) dPhone.innerText = isBlock ? '-' : (booking.phone || '未登録');
           
           const dMemo = document.getElementById('detail-memo');
