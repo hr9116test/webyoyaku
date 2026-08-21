@@ -756,6 +756,7 @@ mockBookings = result.data.bookings.map(b => {
 
       fetch(GAS_URL, {
         method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({
           action: 'saveCustomer',
           payload: customerData
@@ -768,7 +769,7 @@ mockBookings = result.data.bookings.map(b => {
           fetchAdminData(); // Refresh data
           showCustomerListView(); // Close modal and show list
         } else {
-          alert('エラー: ' + (result.message || '保存に失敗しました。'));
+          alert('エラー: ' + (result.error || result.message || '保存に失敗しました。'));
         }
       })
       .catch(err => {
@@ -787,6 +788,7 @@ mockBookings = result.data.bookings.map(b => {
   // START
   fetchAdminData();
 });
+
 
 
 
