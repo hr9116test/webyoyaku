@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const fetchAdminData = () => {
-    fetch(GAS_URL + '?action=getInitialData')
+    fetch(GAS_URL + '?action=getInitialData&t=' + new Date().getTime())
       .then(res => res.json())
       .then(result => {
         if(result.success) {
