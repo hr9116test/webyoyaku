@@ -127,20 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
           staffs = result.data.staffs.map(s => { const v = Object.values(s); return { id: v[0], name: v[1] }; });
 
           mockCustomers = (result.data.customers || []).map(c => {
-            const v = Object.values(c);
-            return {
-              id: v[0],
-              name: v[1] || '',
-              kana: v[2] || '',
-              address: v[3] || '',
-              occupation: v[4] || '',
-              phone: v[5] || '',
-              email: v[6] || '',
-              firstVisit: v[7] || '',
-              lastVisit: v[8] || '',
-              memo: v[10] || ''
-            };
-          });
+            return { id: c['\u9867\u5BA2ID'] || Object.values(c)[0] || '', name: c['\u304A\u5BA2\u69D8\u540D'] || Object.values(c)[1] || '', kana: c['\u3075\u308A\u304C\u306A'] || Object.values(c)[2] || '', address: c['\u4F4F\u6240\uFF08\u5E02\u753A\u6751\uFF09'] || Object.values(c)[3] || '', occupation: c['\u8077\u696D'] || Object.values(c)[4] || '', phone: c['\u96FB\u8A71\u756A\u53F7'] || Object.values(c)[5] || '', email: c['\u30E1\u30FC\u30EB\u30A2\u30C9\u30EC\u30B9'] || Object.values(c)[6] || '', firstVisit: c['\u521D\u56DE\u4E88\u7D04\u65E5'] || Object.values(c)[7] || '', lastVisit: c['\u6700\u7D42\u6765\u5E97\u65E5'] || Object.values(c)[8] || '', memo: c['\u30E1\u30E2'] || Object.values(c)[10] || '' }; });
 
 mockBookings = result.data.bookings.map(b => { 
             const v = Object.values(b); 
@@ -698,7 +685,7 @@ mockBookings = result.data.bookings.map(b => {
 
     filtered.forEach(c => {
       const tr = document.createElement('tr');
-      tr.innerHTML = '<td>' + c.name + '</td><td>' + c.phone + '</td><td>' + c.lastVisit + '</td><td><button class="btn btn-sm btn-outline edit-btn">編集</button></td>';
+      tr.innerHTML = '<td>' + c.name + (c.kana ? '<br><small style="color:#999;">' + c.kana + '</small>' : '') + '</td><td>' + c.phone + '</td><td>' + c.lastVisit + '</td><td><button class="btn btn-sm btn-outline edit-btn">編集</button></td>';
       
       const editBtn = tr.querySelector('.edit-btn');
       editBtn.addEventListener('click', () => {
@@ -780,6 +767,9 @@ mockBookings = result.data.bookings.map(b => {
   // START
   fetchAdminData();
 });
+
+
+
 
 
 
