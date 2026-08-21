@@ -703,17 +703,7 @@ mockBookings = result.data.bookings.map(b => {
           normalizeForSearch(c.phone || '').includes(val)
         );
       
-      let debugEl = document.getElementById('autocomplete-debug');
-      if (!debugEl) {
-        debugEl = document.createElement('div');
-        debugEl.id = 'autocomplete-debug';
-        debugEl.style = 'font-size: 0.8rem; color: #d9534f; margin-top: 0.25rem; font-weight: bold;';
-        autocompleteList.parentNode.appendChild(debugEl);
-      }
-      debugEl.innerText = '検索中... 顧客数=' + mockCustomers.length + ' / ヒット=' + matches.length + ' / 入力=' + val;
-
-
-      if (matches.length > 0) {
+        if (matches.length > 0) {
         matches.forEach(match => {
           const div = document.createElement('div');
           div.className = 'autocomplete-item';
