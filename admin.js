@@ -1,4 +1,4 @@
-﻿let returnToDetailsModal = false;
+let returnToDetailsModal = false;
 function formatDateWithDay(dateStr) {
     const days = ['日', '月', '火', '水', '木', '金', '土'];
     const dt = new Date(dateStr.replace(/-/g, '/'));
@@ -703,10 +703,15 @@ mockBookings = result.data.bookings.map(b => {
           normalizeForSearch(c.phone || '').includes(val)
         );
       
-      const debugEl = document.getElementById('autocomplete-debug');
-      if (debugEl) {
-        debugEl.innerText = '検索中... 顧客データ総数: ' + mockCustomers.length + '件 / ヒット数: ' + matches.length + '件';
+      let debugEl = document.getElementById('autocomplete-debug');
+      if (!debugEl) {
+        debugEl = document.createElement('div');
+        debugEl.id = 'autocomplete-debug';
+        debugEl.style = 'font-size: 0.8rem; color: #d9534f; margin-top: 0.25rem; font-weight: bold;';
+        autocompleteList.parentNode.appendChild(debugEl);
       }
+      debugEl.innerText = '検索中... 顧客数=' + mockCustomers.length + ' / ヒット=' + matches.length + ' / 入力=' + val;
+
 
       if (matches.length > 0) {
         matches.forEach(match => {
