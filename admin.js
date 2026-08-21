@@ -1,4 +1,4 @@
-﻿let returnToDetailsModal = false;
+let returnToDetailsModal = false;
 function formatDateWithDay(dateStr) {
     const days = ['日', '月', '火', '水', '木', '金', '土'];
     const dt = new Date(dateStr.replace(/-/g, '/'));
@@ -102,10 +102,10 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbx-b6WOncIt4M8nPkncMZfL
         
         selectedMenuDuration = parseInt(menu.duration);
         selectedMenuName = menu.name;
-        
-        document.getElementById('menu-dropdown-text').innerText = menu.name + ' (' + menu.duration + '分)';
-        menuButtonsContainer.style.display = 'none';
-      });
+          document.getElementById('menu-dropdown-text').innerText = menu.name + ' (' + menu.duration + '分)';
+          menuButtonsContainer.style.display = 'none';
+          if (typeof renderTimeline !== 'undefined') renderTimeline(currentTimelineDate);
+        });
       menuButtonsContainer.appendChild(btn);
     });
   };
