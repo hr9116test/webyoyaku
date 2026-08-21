@@ -774,8 +774,13 @@ mockBookings = result.data.bookings.map(b => {
           btnSubmit.innerText = '保存中...';
       }
 
+      let cId = document.getElementById('edit-customer-id').value;
+      if (cId && String(cId).startsWith('b_')) {
+        cId = ''; // Treat as new customer if generated from booking
+      }
+      
       const customerData = {
-        '顧客ID': document.getElementById('edit-customer-id').value,
+        '顧客ID': cId,
         'お客様名': document.getElementById('edit-name').value,
         'ふりがな': document.getElementById('edit-kana').value,
         '電話番号': document.getElementById('edit-phone').value,
@@ -817,6 +822,7 @@ mockBookings = result.data.bookings.map(b => {
   // START
   fetchAdminData();
 });
+
 
 
 
