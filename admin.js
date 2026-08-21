@@ -1,4 +1,4 @@
-﻿let returnToDetailsModal = false;
+let returnToDetailsModal = false;
 function formatDateWithDay(dateStr) {
     const days = ['日', '月', '火', '水', '木', '金', '土'];
     const dt = new Date(dateStr.replace(/-/g, '/'));
@@ -297,7 +297,22 @@ mockBookings = result.data.bookings.map(b => {
               return; // In block mode, don't open details modal
           }
           
-          const dDt = document.getElementById('detail-datetime');
+                      const modalTitle = document.getElementById('details-modal-title');
+            if (modalTitle) {
+                modalTitle.innerText = isBlock ? 'ブロックの詳細' : '予約の詳細';
+            }
+            
+            const nameContainer = document.getElementById('detail-name-container');
+            if (nameContainer) {
+                nameContainer.style.display = isBlock ? 'none' : 'block';
+            }
+
+            const btnCancelTitle = document.getElementById('btn-cancel-booking');
+            if (btnCancelTitle) {
+                btnCancelTitle.innerText = isBlock ? 'ブロック解除(削除)' : '予約キャンセル(削除)';
+            }
+            
+            const dDt = document.getElementById('detail-datetime');
           if(dDt) dDt.innerText = booking.date.replace(/-/g, '/') + ' ' + booking.startTime;
           
           const dMenu = document.getElementById('detail-menu');
