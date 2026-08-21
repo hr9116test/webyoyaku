@@ -7,7 +7,10 @@ function formatDateWithDay(dateStr) {
 
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbx-b6WOncIt4M8nPkncMZfLDYc1MoV55tOvtL-cCT3ARdTSsZcMFUyk4d_J9Ur51cWi/exec';
 
-document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', () => {
+    const initDate = new Date();
+    const dDisplay = document.getElementById('date-display');
+    if (dDisplay) dDisplay.innerText = initDate.getFullYear() + '/' + String(initDate.getMonth()+1).padStart(2,'0') + '/' + String(initDate.getDate()).padStart(2,'0');
   // Normalize string for search (Kana conversion)
   const normalizeForSearch = (str) => { if (!str) return ''; return String(str).replace(/[\u30a1-\u30f6]/g, function(match) { return String.fromCharCode(match.charCodeAt(0) - 0x60); }).replace(/[\uFF21-\uFF3A\uFF41-\uFF5A\uFF10-\uFF19]/g, function(s) { return String.fromCharCode(s.charCodeAt(0) - 0xFEE0); }).toLowerCase().trim(); };
 
@@ -803,6 +806,7 @@ mockBookings = result.data.bookings.map(b => {
   // START
   fetchAdminData();
 });
+
 
 
 
