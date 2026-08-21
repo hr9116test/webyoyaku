@@ -1,4 +1,4 @@
-let returnToDetailsModal = false;
+﻿let returnToDetailsModal = false;
 function formatDateWithDay(dateStr) {
     const days = ['日', '月', '火', '水', '木', '金', '土'];
     const dt = new Date(dateStr.replace(/-/g, '/'));
@@ -802,6 +802,7 @@ mockBookings = result.data.bookings.map(b => {
         if (result.success) {
           alert('顧客データを保存しました。');
           fetchAdminData(); // Refresh data
+          showCustomerListView(); // Close modal and show list
         } else {
           alert('エラー: ' + (result.message || '保存に失敗しました。'));
         }
@@ -822,6 +823,7 @@ mockBookings = result.data.bookings.map(b => {
   // START
   fetchAdminData();
 });
+
 
 
 
