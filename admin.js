@@ -304,7 +304,16 @@ mockBookings = result.data.bookings.map(b => {
             
             const nameContainer = document.getElementById('detail-name-container');
             if (nameContainer) {
-                nameContainer.style.display = isBlock ? 'none' : 'block';
+                nameContainer.style.display = 'block';
+                const nameLabel = nameContainer.querySelector('.form-label');
+                if (nameLabel) {
+                    nameLabel.innerText = isBlock ? 'ブロックタイトル' : 'お客様名';
+                }
+            }
+
+            const dMenu = document.getElementById('detail-menu');
+            if(dMenu) {
+                dMenu.style.display = isBlock ? 'none' : 'block';
             }
 
             const btnCancelTitle = document.getElementById('btn-cancel-booking');
