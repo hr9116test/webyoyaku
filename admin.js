@@ -1,4 +1,4 @@
-let returnToDetailsModal = false;
+﻿let returnToDetailsModal = false;
 function formatDateWithDay(dateStr) {
     const days = ['日', '月', '火', '水', '木', '金', '土'];
     const dt = new Date(dateStr.replace(/-/g, '/'));
@@ -209,9 +209,24 @@ mockBookings = result.data.bookings.map(b => {
             html += '</td>';
           } else {
           
-            if (!isCovered) {
-              const bg = isSelected ? 'background-color:#ffeeba;' : '';
-              html += '<td class="timeline-slot" data-key="' + slotKey + '" style="border:1px solid var(--color-border); cursor:pointer; ' + bg + '"></td>';
+                        if (!isCovered) {
+              let isAvailableForMenu = true;
+              if (!isBlockMode && selectedMenuDuration > 0) {
+                  const endMins = currentMins + selectedMenuDuration;
+                  if (endMins > 20 * 60) {
+                      isAvailableForMenu = false;
+                  } else {
+                      const overlapping = mockBookings.some(b => b.date === dateStr && String(b.staff) === String(s.id) && timeToMinutes(b.startTime) < endMins && (timeToMinutes(b.startTime) + b.duration) > currentMins);
+                      if (overlapping) isAvailableForMenu = false;
+                  }
+              }
+
+              if (!isAvailableForMenu) {
+                  html += '<td style="border:1px solid var(--color-border); background-color: var(--color-disabled, #F0EDE8); cursor:not-allowed; position: relative; overflow: hidden;"><div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom right, transparent calc(50% - 1px), rgba(0, 0, 0, 0.15) calc(50% - 1px), rgba(0, 0, 0, 0.15) calc(50% + 1px), transparent calc(50% + 1px));"></div></td>';
+              } else {
+                  const bg = isSelected ? 'background-color:#ffeeba;' : '';
+                  html += '<td class="timeline-slot" data-key="' + slotKey + '" style="border:1px solid var(--color-border); cursor:pointer; ' + bg + '"></td>';
+              }
             }
           }
         });
@@ -788,6 +803,7 @@ mockBookings = result.data.bookings.map(b => {
   // START
   fetchAdminData();
 });
+
 
 
 
