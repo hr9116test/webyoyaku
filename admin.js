@@ -1,4 +1,4 @@
-let returnToDetailsModal = false;
+﻿let returnToDetailsModal = false;
 function formatDateWithDay(dateStr) {
     const days = ['日', '月', '火', '水', '木', '金', '土'];
     const dt = new Date(dateStr.replace(/-/g, '/'));
@@ -452,7 +452,7 @@ mockBookings = result.data.bookings.map(b => {
         if(result.success) {
           mockBookings.push({
             id: result.bookingId || ('MOCK-' + Date.now()),
-            ...payload
+            ...payload, date: currentTimelineDate
           });
           exitBlockMode();
           renderTimeline(currentTimelineDate);
@@ -499,7 +499,7 @@ mockBookings = result.data.bookings.map(b => {
         if(result.success) {
           mockBookings.push({
             id: result.bookingId || ('MOCK-' + Date.now()),
-            ...payload
+            ...payload, date: currentTimelineDate
           });
           document.getElementById('booking-modal').classList.add('d-none');
           renderTimeline(currentTimelineDate);
@@ -806,6 +806,7 @@ mockBookings = result.data.bookings.map(b => {
   // START
   fetchAdminData();
 });
+
 
 
 
