@@ -703,6 +703,11 @@ mockBookings = result.data.bookings.map(b => {
           normalizeForSearch(c.phone || '').includes(val)
         );
       
+      const debugEl = document.getElementById('autocomplete-debug');
+      if (debugEl) {
+        debugEl.innerText = '検索中... 顧客データ総数: ' + mockCustomers.length + '件 / ヒット数: ' + matches.length + '件';
+      }
+
       if (matches.length > 0) {
         matches.forEach(match => {
           const div = document.createElement('div');
@@ -788,6 +793,7 @@ mockBookings = result.data.bookings.map(b => {
   // START
   fetchAdminData();
 });
+
 
 
 
