@@ -764,9 +764,60 @@ mockBookings = result.data.bookings.map(b => {
     });
   }
 
+  if (customerEditForm) {
+    customerEditForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const btnSubmit = customerEditForm.querySelector('button[type="submit"]');
+      if (btnSubmit) {
+          btnSubmit.disabled = true;
+          btnSubmit.innerText = '保存中...';
+      }
+
+      const customerData = {
+        '顧客ID': document.getElementById('edit-customer-id').value,
+        'お客様名': document.getElementById('edit-name').value,
+        'ふりがな': document.getElementById('edit-kana').value,
+        '電話番号': document.getElementById('edit-phone').value,
+        '住所（市町村）': document.getElementById('edit-address').value,
+        '職業': document.getElementById('edit-occupation').value,
+        'メールアドレス': document.getElementById('edit-email').value,
+        'メモ': document.getElementById('edit-memo').value
+      };
+
+      fetch(GAS_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'saveCustomer',
+          payload: customerData
+        })
+      })
+      .then(res => res.json())
+      .then(result => {
+        if (result.success) {
+          alert('顧客データを保存しました。');
+          fetchAdminData(); // Refresh data
+        } else {
+          alert('エラー: ' + (result.message || '保存に失敗しました。'));
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert('通信エラー: 顧客データの保存に失敗しました。');
+      })
+      .finally(() => {
+        if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.innerText = '保存';
+        }
+      });
+    });
+  }
+
   // START
   fetchAdminData();
 });
+
 
 
 
