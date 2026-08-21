@@ -207,7 +207,7 @@ mockBookings = result.data.bookings.map(b => {
             const isBlock = booking.type === '休み' || booking.type === 'x' || booking.name === '休み' || booking.name === 'x';
             const bgCls = isBlock ? 'background-color:#E2E3E5; color:#383D41;' : 'background-color:#D4EDDA; color:#155724; cursor:pointer;';
             html += '<td rowspan="' + rowSpan + '" class="timeline-booking" data-id="' + booking.id + '" style="border:1px solid var(--color-border); padding:0.25rem; vertical-align:top; ' + bgCls + '">';
-            html += '<div style="font-size:0.8rem; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + booking.name + '</div>';
+            html += '<div style="font-size:0.8rem; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + (isBlock ? booking.name : booking.startTime + ' ' + booking.name) + '</div>';
             html += '<div style="font-size:0.75rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + booking.menu + '</div>';
             html += '</td>';
           } else {
@@ -372,7 +372,15 @@ mockBookings = result.data.bookings.map(b => {
             };
           }
           
-          const dPhone = document.getElementById('detail-phone');
+                      const phoneContainer = document.getElementById('detail-phone-container');
+            if (phoneContainer) {
+                if (isBlock) {
+                    phoneContainer.classList.add('d-none');
+                } else {
+                    phoneContainer.classList.remove('d-none');
+                }
+            }
+            const dPhone = document.getElementById('detail-phone');
           if(dPhone) dPhone.innerText = isBlock ? '-' : (booking.phone || '未登録');
           
           const dMemo = document.getElementById('detail-memo');
