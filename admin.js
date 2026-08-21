@@ -555,35 +555,35 @@ mockBookings = result.data.bookings.map(b => {
 
   const tabToggles = document.querySelectorAll('.tab-toggle');
   const tabContents = document.querySelectorAll('.tab-content');
-  tabToggles.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const isActive = btn.classList.contains('btn-primary');
-      
-      if (isBlockMode) {
-        exitBlockMode();
-        renderTimeline(currentTimelineDate);
-      }
-      
-      if (isActive) {
-        btn.classList.remove('btn-primary');
-        btn.classList.add('btn-outline');
-        if (btn.id === "btn-tab-customer") {
-          const customerModal = document.getElementById("customer-mgmt-modal");
-          if (customerModal) customerModal.classList.add("d-none");
-        } else {
-          const targetId = btn.id.replace("btn-tab-", "tab-content-");
-          const targetContent = document.getElementById(targetId);
-          if (targetContent) targetContent.style.display = "none";
-          
-          if (btn.id === 'btn-tab-booking') {
-            selectedMenuDuration = 0;
-            selectedMenuName = '';
-            document.querySelectorAll('.menu-btn').forEach(b => b.classList.add('btn-outline'));
-            document.getElementById('menu-dropdown-text').innerText = 'メニュー選択';
-          }
+      tabToggles.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const isActive = btn.classList.contains('btn-primary');
+        
+        if (isBlockMode) {
+          exitBlockMode();
         }
-        return;
-      }
+        
+        selectedMenuDuration = 0;
+        selectedMenuName = '';
+        const allMenuBtns = document.querySelectorAll('.menu-btn');
+        if (allMenuBtns.length > 0) allMenuBtns.forEach(b => b.classList.add('btn-outline'));
+        const dropdownText = document.getElementById('menu-dropdown-text');
+        if (dropdownText) dropdownText.innerText = 'メニューを選択';
+        if (typeof renderTimeline !== 'undefined') renderTimeline(currentTimelineDate);
+        
+        if (isActive) {
+          btn.classList.remove('btn-primary');
+          btn.classList.add('btn-outline');
+          if (btn.id === "btn-tab-customer") {
+            const customerModal = document.getElementById("customer-mgmt-modal");
+            if (customerModal) customerModal.classList.add("d-none");
+          } else {
+            const targetId = btn.id.replace("btn-tab-", "tab-content-");
+            const targetContent = document.getElementById(targetId);
+            if (targetContent) targetContent.style.display = "none";
+          }
+          return;
+        }
 
       tabToggles.forEach(b => {
         b.classList.remove('btn-primary');
