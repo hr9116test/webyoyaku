@@ -297,7 +297,7 @@ mockBookings = result.data.bookings.map(b => {
                       }).catch(err => alert('通信エラー: ' + err.message));
                   }
               }
-              return; // In block mode, don't open details modal
+              return; // In block mode, do not open details modal
           }
           
                       const modalTitle = document.getElementById('details-modal-title');
