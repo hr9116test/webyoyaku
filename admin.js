@@ -398,16 +398,14 @@ mockBookings = result.data.bookings.map(b => {
 
   const btnBlockMode = document.getElementById('btn-block-mode');
   const btnBlockConfirm = document.getElementById('btn-block-confirm');
-  const btnBlockCancel = document.getElementById('btn-block-cancel');
-  const btnBlockDelete = document.getElementById('btn-block-delete');
+    const btnBlockDelete = document.getElementById('btn-block-delete');
 
   const exitBlockMode = () => {
       isBlockMode = false;
       selectedBlockSlots = [];
       if(btnBlockMode) btnBlockMode.classList.remove('d-none');
       if(btnBlockConfirm) btnBlockConfirm.classList.add('d-none');
-      if(btnBlockCancel) btnBlockCancel.classList.add('d-none');
-      if(btnBlockDelete) btnBlockDelete.classList.add('d-none');
+            if(btnBlockDelete) btnBlockDelete.classList.add('d-none');
       if(timelineContainer) timelineContainer.classList.remove('block-mode-active');
   };
 
@@ -417,19 +415,12 @@ mockBookings = result.data.bookings.map(b => {
       selectedBlockSlots = [];
       btnBlockMode.classList.add('d-none');
       if(btnBlockConfirm) btnBlockConfirm.classList.remove('d-none');
-      if(btnBlockCancel) btnBlockCancel.classList.remove('d-none');
-      if(btnBlockDelete) btnBlockDelete.classList.remove('d-none');
+            if(btnBlockDelete) btnBlockDelete.classList.remove('d-none');
       if(timelineContainer) timelineContainer.classList.add('block-mode-active');
     });
   }
 
-  if(btnBlockCancel) {
-    btnBlockCancel.addEventListener('click', () => {
-      exitBlockMode();
-      renderTimeline(currentTimelineDate);
-    });
-  }
-
+  
   if(btnBlockConfirm) {
     btnBlockConfirm.addEventListener('click', () => {
       if (selectedBlockSlots.length === 0) {
