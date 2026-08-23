@@ -1,4 +1,4 @@
-let returnToDetailsModal = false;
+﻿let returnToDetailsModal = false;
 function formatDateWithDay(dateStr) {
     const days = ['日', '月', '火', '水', '木', '金', '土'];
     const dt = new Date(dateStr.replace(/-/g, '/'));
@@ -207,11 +207,8 @@ mockBookings = result.data.bookings.map(b => {
             const isBlock = booking.type === '休み' || booking.type === 'x' || booking.name === '休み' || booking.name === 'x';
             const bgCls = isBlock ? 'background-color:#E2E3E5; color:#383D41;' : 'background-color:#D4EDDA; color:#155724; cursor:pointer;';
             html += '<td rowspan="' + rowSpan + '" class="timeline-booking" data-id="' + booking.id + '" style="border:1px solid var(--color-border); padding:0.25rem; vertical-align:top; ' + bgCls + '">';
-            html += '<div style="font-size:0.75rem; opacity:0.8; margin-bottom:2px;">' + booking.startTime + '</div>';
-            html += '<div style="font-size:0.85rem; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + booking.name + '</div>';
-            if (!isBlock) {
-                html += '<div style="font-size:0.75rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:2px;">' + booking.menu + '</div>';
-            }
+            html += '<div style="font-size:0.8rem; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + booking.name + '</div>';
+            html += '<div style="font-size:0.75rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + booking.menu + '</div>';
             html += '</td>';
           } else {
           
@@ -297,34 +294,10 @@ mockBookings = result.data.bookings.map(b => {
                       }).catch(err => alert('通信エラー: ' + err.message));
                   }
               }
-              return; // In block mode, do not open details modal
+              return; // In block mode, don't open details modal
           }
           
-                      const modalTitle = document.getElementById('details-modal-title');
-            if (modalTitle) {
-                modalTitle.innerText = isBlock ? 'ブロックの詳細' : '予約の詳細';
-            }
-            
-            const nameContainer = document.getElementById('detail-name-container');
-            if (nameContainer) {
-                nameContainer.style.display = 'block';
-                const nameLabel = nameContainer.querySelector('.form-label');
-                if (nameLabel) {
-                    nameLabel.innerText = isBlock ? 'ブロックタイトル' : 'お客様名';
-                }
-            }
-
-            const dMenu = document.getElementById('detail-menu');
-            if(dMenu) {
-                dMenu.style.display = isBlock ? 'none' : 'block';
-            }
-
-            const btnCancelTitle = document.getElementById('btn-cancel-booking');
-            if (btnCancelTitle) {
-                btnCancelTitle.innerText = isBlock ? 'ブロック解除(削除)' : '予約キャンセル(削除)';
-            }
-            
-            const dDt = document.getElementById('detail-datetime');
+          const dDt = document.getElementById('detail-datetime');
           if(dDt) dDt.innerText = booking.date.replace(/-/g, '/') + ' ' + booking.startTime;
           
           const dMenu = document.getElementById('detail-menu');
