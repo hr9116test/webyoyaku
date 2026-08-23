@@ -515,7 +515,7 @@ mockBookings = result.data.bookings.map(b => {
           btnBlockDelete.disabled = false;
       });
     });
-  }}
+  }
 
   const proxyForm = document.getElementById('proxy-booking-form');
   if(proxyForm) {
