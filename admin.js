@@ -206,9 +206,14 @@ mockBookings = result.data.bookings.map(b => {
             const rowSpan = Math.ceil(booking.duration / 30);
             const isBlock = booking.type === '休み' || booking.type === 'x' || booking.name === '休み' || booking.name === 'x';
             const bgCls = isBlock ? 'background-color:#E2E3E5; color:#383D41;' : 'background-color:#D4EDDA; color:#155724; cursor:pointer;';
-            html += '<td rowspan="' + rowSpan + '" class="timeline-booking" data-id="' + booking.id + '" style="border:1px solid var(--color-border); padding:0.25rem; vertical-align:top; ' + bgCls + '">';
+                        html += '<td rowspan="' + rowSpan + '" class="timeline-booking" data-id="' + booking.id + '" style="border:1px solid var(--color-border); padding:0.25rem; vertical-align:top; ' + bgCls + '">';
+            if (!isBlock) {
+              html += '<div style="font-size:0.75rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + booking.startTime + '</div>';
+            }
             html += '<div style="font-size:0.8rem; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + booking.name + '</div>';
-            html += '<div style="font-size:0.75rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + booking.menu + '</div>';
+            if (!isBlock || booking.menu !== '休み設定') {
+              html += '<div style="font-size:0.75rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + booking.menu + '</div>';
+            }
             html += '</td>';
           } else {
           
@@ -286,8 +291,7 @@ mockBookings = result.data.bookings.map(b => {
                           body: JSON.stringify({ action: 'updateBookingStatus', id: booking.id, status: 'キャンセル' })
                       }).then(res => res.json()).then(result => {
                           if (result.success) {
-                              mockBookings = mockBookings.filter(b => String(b.id) !== String(booking.id));
-                              renderTimeline(currentTimelineDate);
+                              fetchAdminData();
                           } else {
                               alert('エラー: ' + result.error);
                           }
@@ -297,8 +301,19 @@ mockBookings = result.data.bookings.map(b => {
               return; // In block mode, don't open details modal
           }
           
-          const dDt = document.getElementById('detail-datetime');
-          if(dDt) dDt.innerText = booking.date.replace(/-/g, '/') + ' ' + booking.startTime;
+          const dTitle = document.getElementById('details-modal-title');
+          if(dTitle) dTitle.innerText = isBlock ? 'ブロックの詳細' : '予約詳細';
+          
+          const dNameLabel = document.querySelector('#detail-name-container .form-label');
+          if(dNameLabel) dNameLabel.style.display = isBlock ? 'none' : 'block';
+          
+          const dPhoneContainer = document.getElementById('detail-phone-container');
+          if(dPhoneContainer) {
+              if (isBlock) dPhoneContainer.classList.add('d-none');
+              else dPhoneContainer.classList.remove('d-none');
+          }
+
+          const dTitle = document.getElementById('details-modal-title'); if(dTitle) dTitle.innerText = isBlock ? 'ブロックの詳細' : '予約詳細'; const dNameLabel = document.querySelector('#detail-name-container .form-label'); if(dNameLabel) dNameLabel.style.display = isBlock ? 'none' : 'block'; const dPhoneContainer = document.getElementById('detail-phone-container'); if(dPhoneContainer) { if (isBlock) dPhoneContainer.classList.add('d-none'); else dPhoneContainer.classList.remove('d-none'); } const dDt = document.getElementById('detail-datetime'); if(dDt) dDt.innerText = booking.date.replace(/-/g, '/') + ' ' + booking.startTime;
           
           const dMenu = document.getElementById('detail-menu');
           if(dMenu) dMenu.innerText = isBlock ? '休み（ブロック枠）' : booking.menu;
@@ -344,7 +359,7 @@ mockBookings = result.data.bookings.map(b => {
                              body: JSON.stringify({ action: 'createBooking', payload })
                          });
                      }).then(res => res.json()).then(result => {
-                         if (result.success) { booking.id = result.bookingId; }
+                         if (result.success) { fetchAdminData(); }
                      }).catch(err => console.error(err));
                  }
               } else {
@@ -450,12 +465,7 @@ mockBookings = result.data.bookings.map(b => {
       .then(res => res.json())
       .then(result => {
         if(result.success) {
-          mockBookings.push({
-            id: result.bookingId || ('MOCK-' + Date.now()),
-            ...payload, date: currentTimelineDate
-          });
-          exitBlockMode();
-          renderTimeline(currentTimelineDate);
+          exitBlockMode(); fetchAdminData();
         } else {
           alert('エラー: ' + result.error);
         }
@@ -497,12 +507,7 @@ mockBookings = result.data.bookings.map(b => {
       .then(res => res.json())
       .then(result => {
         if(result.success) {
-          mockBookings.push({
-            id: result.bookingId || ('MOCK-' + Date.now()),
-            ...payload, date: currentTimelineDate
-          });
-          document.getElementById('booking-modal').classList.add('d-none');
-          renderTimeline(currentTimelineDate);
+          document.getElementById('booking-modal').classList.add('d-none'); fetchAdminData();
         } else {
           alert('エラー: ' + result.error);
         }
