@@ -159,7 +159,7 @@ mockBookings = result.data.bookings.map(b => {
               id: v[0], date: dateStr, 
               startTime: st, duration: parseInt(v[3]), staff: v[4], type: v[9], name: v[5], phone: v[6], menu: v[8], memo: v[11] || '' 
             }; 
-          });
+          }).filter(b => b.type !== 'キャンセル');
           
 
 
