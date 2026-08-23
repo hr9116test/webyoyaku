@@ -288,7 +288,7 @@ mockBookings = result.data.bookings.map(b => {
                       fetch(GAS_URL, {
                           method: 'POST',
                           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                          body: JSON.stringify({ action: 'updateBookingStatus', id: booking.id, status: 'キャンセル' })
+                          body: JSON.stringify({ action: 'cancelBooking', payload: { bookingId: booking.id } })
                       }).then(res => res.json()).then(result => {
                           if (result.success) {
                               fetchAdminData();
@@ -346,7 +346,7 @@ mockBookings = result.data.bookings.map(b => {
                      fetch(GAS_URL, {
                          method: 'POST',
                          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                         body: JSON.stringify({ action: 'updateBookingStatus', id: booking.id, status: 'キャンセル' })
+                         body: JSON.stringify({ action: 'cancelBooking', payload: { bookingId: booking.id } })
                      }).then(() => {
                          const payload = {
                              date: formatDateWithDay(booking.date), startTime: booking.startTime, duration: booking.duration,
@@ -529,14 +529,13 @@ mockBookings = result.data.bookings.map(b => {
       fetch(GAS_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'updateBookingStatus', id: currentDetailId, status: 'キャンセル' })
+        body: JSON.stringify({ action: 'cancelBooking', payload: { bookingId: currentDetailId } })
       })
       .then(res => res.json())
       .then(result => {
         if(result.success) {
-          mockBookings = mockBookings.filter(b => String(b.id) !== String(currentDetailId));
           document.getElementById('details-modal').classList.add('d-none');
-          renderTimeline(currentTimelineDate);
+          fetchAdminData();
         } else {
           alert('エラー: ' + result.error);
         }
