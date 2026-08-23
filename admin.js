@@ -18,7 +18,6 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbx-b6WOncIt4M8nPkncMZfL
   let staffs = [];
   let mockBookings = [];
   const cancelledBookingIds = new Set();
-  const cancelledBookingIds = new Set();
   let mockCustomers = [];
   
   let currentTimelineDate = '';
