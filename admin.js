@@ -313,7 +313,7 @@ mockBookings = result.data.bookings.map(b => {
               else dPhoneContainer.classList.remove('d-none');
           }
 
-          const dTitle = document.getElementById('details-modal-title'); if(dTitle) dTitle.innerText = isBlock ? 'ブロックの詳細' : '予約詳細'; const dNameLabel = document.querySelector('#detail-name-container .form-label'); if(dNameLabel) dNameLabel.style.display = isBlock ? 'none' : 'block'; const dPhoneContainer = document.getElementById('detail-phone-container'); if(dPhoneContainer) { if (isBlock) dPhoneContainer.classList.add('d-none'); else dPhoneContainer.classList.remove('d-none'); } const dDt = document.getElementById('detail-datetime'); if(dDt) dDt.innerText = booking.date.replace(/-/g, '/') + ' ' + booking.startTime;
+          const dDt = document.getElementById('detail-datetime'); if(dDt) dDt.innerText = booking.date.replace(/-/g, '/') + ' ' + booking.startTime;
           
           const dMenu = document.getElementById('detail-menu');
           if(dMenu) dMenu.innerText = isBlock ? '休み（ブロック枠）' : booking.menu;
