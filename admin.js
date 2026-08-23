@@ -25,6 +25,7 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbx-b6WOncIt4M8nPkncMZfL
   
   let isBlockMode = false;
   let selectedBlockSlots = [];
+  let selectedCancelBlocks = [];
   
   let selectedMenuDuration = 0;
   let selectedMenuName = '';
@@ -207,7 +208,7 @@ mockBookings = result.data.bookings.map(b => {
             const rowSpan = Math.ceil(booking.duration / 30);
             const isBlock = booking.type === '休み' || booking.type === 'x' || booking.name === '休み' || booking.name === 'x';
             const bgCls = isBlock ? 'background-color:#E2E3E5; color:#383D41;' : 'background-color:#D4EDDA; color:#155724; cursor:pointer;';
-                        html += '<td rowspan="' + rowSpan + '" class="timeline-booking" data-id="' + booking.id + '" style="border:1px solid var(--color-border); padding:0.25rem; vertical-align:top; ' + bgCls + '">';
+                        html += '<td rowspan="' + rowSpan + '" class="timeline-booking" data-id="' + booking.id + '" style="border:' + (selectedCancelBlocks.includes(String(booking.id)) ? '2px solid #dc3545' : '1px solid var(--color-border)') + '; opacity:' + (selectedCancelBlocks.includes(String(booking.id)) ? '0.7' : '1') + '; padding:0.25rem; vertical-align:top; ' + bgCls + '">';
             if (!isBlock) {
               html += '<div style="font-size:0.75rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + booking.startTime + '</div>';
             }
@@ -285,22 +286,11 @@ mockBookings = result.data.bookings.map(b => {
           
           if (isBlockMode) {
               if (isBlock) {
-                  if (confirm("【確認】このブロック枠を解除しますか？\n※解除すると、この時間に予約が入るようになります。")) {
-                      fetch(GAS_URL, {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                          body: JSON.stringify({ action: 'cancelBooking', payload: { bookingId: booking.id } })
-                      }).then(res => res.json()).then(result => {
-                          if (result.success) {
-                              cancelledBookingIds.add(String(booking.id));
-                              mockBookings = mockBookings.filter(b => String(b.id) !== String(booking.id));
-                              renderTimeline(currentTimelineDate);
-                              fetchAdminData();
-                          } else {
-                              alert('エラー: ' + result.error);
-                          }
-                      }).catch(err => alert('通信エラー: ' + err.message));
-                  }
+                  const idStr = String(booking.id);
+                  const idx = selectedCancelBlocks.indexOf(idStr);
+                  if (idx > -1) selectedCancelBlocks.splice(idx, 1);
+                  else selectedCancelBlocks.push(idStr);
+                  renderTimeline(currentTimelineDate);
               }
               return; // In block mode, don't open details modal
           }
@@ -409,6 +399,7 @@ mockBookings = result.data.bookings.map(b => {
   const btnBlockMode = document.getElementById('btn-block-mode');
   const btnBlockConfirm = document.getElementById('btn-block-confirm');
   const btnBlockCancel = document.getElementById('btn-block-cancel');
+  const btnBlockDelete = document.getElementById('btn-block-delete');
 
   const exitBlockMode = () => {
       isBlockMode = false;
@@ -416,6 +407,7 @@ mockBookings = result.data.bookings.map(b => {
       if(btnBlockMode) btnBlockMode.classList.remove('d-none');
       if(btnBlockConfirm) btnBlockConfirm.classList.add('d-none');
       if(btnBlockCancel) btnBlockCancel.classList.add('d-none');
+      if(btnBlockDelete) btnBlockDelete.classList.add('d-none');
       if(timelineContainer) timelineContainer.classList.remove('block-mode-active');
   };
 
@@ -426,6 +418,7 @@ mockBookings = result.data.bookings.map(b => {
       btnBlockMode.classList.add('d-none');
       if(btnBlockConfirm) btnBlockConfirm.classList.remove('d-none');
       if(btnBlockCancel) btnBlockCancel.classList.remove('d-none');
+      if(btnBlockDelete) btnBlockDelete.classList.remove('d-none');
       if(timelineContainer) timelineContainer.classList.add('block-mode-active');
     });
   }
@@ -484,6 +477,45 @@ mockBookings = result.data.bookings.map(b => {
       });
     });
   }
+  if(btnBlockDelete) {
+    btnBlockDelete.addEventListener('click', () => {
+      if (selectedCancelBlocks.length === 0) {
+        alert('\u89e3\u9664\u3059\u308b\u67a0\u3092\u9078\u629e\u3057\u3066\u304f\u3060\u3055\u3044\u3002');
+        return;
+      }
+      
+      btnBlockDelete.innerText = '\u89e3\u9664\u4e2d...';
+      btnBlockDelete.disabled = true;
+
+      const promises = selectedCancelBlocks.map(id => {
+          cancelledBookingIds.add(id);
+          mockBookings = mockBookings.filter(b => String(b.id) !== id);
+          return fetch(GAS_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+              body: JSON.stringify({ action: 'cancelBooking', payload: { bookingId: id } })
+          }).then(res => res.json());
+      });
+
+      renderTimeline(currentTimelineDate);
+      
+      Promise.all(promises).then(results => {
+          const errors = results.filter(r => !r.success);
+          if (errors.length > 0) {
+              alert('\u4e00\u90e8\u306e\u89e3\u9664\u306b\u5931\u6557\u3057\u307e\u3057\u305f\u3002');
+          }
+          exitBlockMode();
+          fetchAdminData();
+      }).catch(err => {
+          alert('\u901a\u4fe1\u30a8\u30e9\u30fc: ' + err.message);
+          exitBlockMode();
+          fetchAdminData();
+      }).finally(() => {
+          btnBlockDelete.innerText = '\u89e3\u9664';
+          btnBlockDelete.disabled = false;
+      });
+    });
+  }}
 
   const proxyForm = document.getElementById('proxy-booking-form');
   if(proxyForm) {
