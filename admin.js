@@ -17,6 +17,8 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbx-b6WOncIt4M8nPkncMZfL
   let menus = [];
   let staffs = [];
   let mockBookings = [];
+  const cancelledBookingIds = new Set();
+  const cancelledBookingIds = new Set();
   let mockCustomers = [];
   
   let currentTimelineDate = '';
@@ -159,7 +161,7 @@ mockBookings = result.data.bookings.map(b => {
               id: v[0], date: dateStr, 
               startTime: st, duration: parseInt(v[3]), staff: v[4], type: v[9], name: v[5], phone: v[6], menu: v[8], memo: v[11] || '' 
             }; 
-          }).filter(b => b.type !== 'キャンセル');
+          }).filter(b => b.type && b.type.indexOf('キャンセル') === -1 && !cancelledBookingIds.has(String(b.id)));
           
 
 
@@ -291,6 +293,9 @@ mockBookings = result.data.bookings.map(b => {
                           body: JSON.stringify({ action: 'cancelBooking', payload: { bookingId: booking.id } })
                       }).then(res => res.json()).then(result => {
                           if (result.success) {
+                              cancelledBookingIds.add(String(booking.id));
+                              mockBookings = mockBookings.filter(b => String(b.id) !== String(booking.id));
+                              renderTimeline(currentTimelineDate);
                               fetchAdminData();
                           } else {
                               alert('エラー: ' + result.error);
@@ -348,6 +353,9 @@ mockBookings = result.data.bookings.map(b => {
                          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                          body: JSON.stringify({ action: 'cancelBooking', payload: { bookingId: booking.id } })
                      }).then(() => {
+                         cancelledBookingIds.add(String(booking.id));
+                              mockBookings = mockBookings.filter(b => String(b.id) !== String(booking.id));
+                         renderTimeline(currentTimelineDate);
                          const payload = {
                              date: formatDateWithDay(booking.date), startTime: booking.startTime, duration: booking.duration,
                              staff: booking.staff, name: finalName, phone: '', email: '', memo: '',
@@ -534,7 +542,10 @@ mockBookings = result.data.bookings.map(b => {
       .then(res => res.json())
       .then(result => {
         if(result.success) {
+          cancelledBookingIds.add(String(currentDetailId));
+          mockBookings = mockBookings.filter(b => String(b.id) !== String(currentDetailId));
           document.getElementById('details-modal').classList.add('d-none');
+          renderTimeline(currentTimelineDate);
           fetchAdminData();
         } else {
           alert('エラー: ' + result.error);
