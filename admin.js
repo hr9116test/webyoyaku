@@ -17,7 +17,6 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbx-b6WOncIt4M8nPkncMZfL
   let menus = [];
   let staffs = [];
   let mockBookings = [];
-  const cancelledBookingIds = new Set();
   let mockCustomers = [];
   
   let currentTimelineDate = '';
@@ -25,7 +24,6 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbx-b6WOncIt4M8nPkncMZfL
   
   let isBlockMode = false;
   let selectedBlockSlots = [];
-  let selectedCancelBlocks = [];
   
   let selectedMenuDuration = 0;
   let selectedMenuName = '';
@@ -132,7 +130,7 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbx-b6WOncIt4M8nPkncMZfL
           staffs = result.data.staffs.map(s => { const v = Object.values(s); return { id: v[0], name: v[1] }; });
 
           mockCustomers = (result.data.customers || []).map(c => {
-            return { id: c['\u9867\u5BA2ID'] || Object.values(c)[0] || '', name: c['\u304A\u5BA2\u69D8\u540D'] || Object.values(c)[1] || '', kana: c['\u3075\u308A\u304C\u306A'] || Object.values(c)[2] || '', address: c['\u4F4F\u6240\uFF08\u5E02\u753A\u6751\uFF09'] || Object.values(c)[3] || '', occupation: c['\u8077\u696D'] || Object.values(c)[4] || '', phone: c['\u96FB\u8A71\u756A\u53F7'] || Object.values(c)[5] || '', email: c['\u30E1\u30FC\u30EB\u30A2\u30C9\u30EC\u30B9'] || Object.values(c)[6] || '', firstVisit: c['\u521D\u56DE\u4E88\u7D04\u65E5'] || Object.values(c)[7] || '', lastVisit: c['\u6700\u7D42\u6765\u5E97\u65E5'] || Object.values(c)[8] || '', memo: c['\u30E1\u30E2'] || Object.values(c)[10] || '' }; }).filter(c => c.name && c.name.trim() !== '' && !['休み', 'x', '迎え', '用事', 'テスト'].includes(c.name));
+            return { id: c['\u9867\u5BA2ID'] || Object.values(c)[0] || '', name: c['\u304A\u5BA2\u69D8\u540D'] || Object.values(c)[1] || '', kana: c['\u3075\u308A\u304C\u306A'] || Object.values(c)[2] || '', address: c['\u4F4F\u6240\uFF08\u5E02\u753A\u6751\uFF09'] || Object.values(c)[3] || '', occupation: c['\u8077\u696D'] || Object.values(c)[4] || '', phone: c['\u96FB\u8A71\u756A\u53F7'] || Object.values(c)[5] || '', email: c['\u30E1\u30FC\u30EB\u30A2\u30C9\u30EC\u30B9'] || Object.values(c)[6] || '', firstVisit: c['\u521D\u56DE\u4E88\u7D04\u65E5'] || Object.values(c)[7] || '', lastVisit: c['\u6700\u7D42\u6765\u5E97\u65E5'] || Object.values(c)[8] || '', memo: c['\u30E1\u30E2'] || Object.values(c)[10] || '' }; });
 
 mockBookings = result.data.bookings.map(b => { 
             const v = Object.values(b); 
@@ -161,7 +159,7 @@ mockBookings = result.data.bookings.map(b => {
               id: v[0], date: dateStr, 
               startTime: st, duration: parseInt(v[3]), staff: v[4], type: v[9], name: v[5], phone: v[6], menu: v[8], memo: v[11] || '' 
             }; 
-          }).filter(b => b.type && b.type.indexOf('キャンセル') === -1 && !cancelledBookingIds.has(String(b.id)));
+          });
           
 
 
@@ -208,14 +206,9 @@ mockBookings = result.data.bookings.map(b => {
             const rowSpan = Math.ceil(booking.duration / 30);
             const isBlock = booking.type === '休み' || booking.type === 'x' || booking.name === '休み' || booking.name === 'x';
             const bgCls = isBlock ? 'background-color:#E2E3E5; color:#383D41;' : 'background-color:#D4EDDA; color:#155724; cursor:pointer;';
-                        html += '<td rowspan="' + rowSpan + '" class="timeline-booking" data-id="' + booking.id + '" style="border:' + (selectedCancelBlocks.includes(String(booking.id)) ? '2px solid #dc3545' : '1px solid var(--color-border)') + '; opacity:' + (selectedCancelBlocks.includes(String(booking.id)) ? '0.7' : '1') + '; padding:0.25rem; vertical-align:top; ' + bgCls + '">';
-            if (!isBlock) {
-              html += '<div style="font-size:0.75rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + booking.startTime + '</div>';
-            }
+            html += '<td rowspan="' + rowSpan + '" class="timeline-booking" data-id="' + booking.id + '" style="border:1px solid var(--color-border); padding:0.25rem; vertical-align:top; ' + bgCls + '">';
             html += '<div style="font-size:0.8rem; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + booking.name + '</div>';
-            if (!isBlock || booking.menu !== '休み設定') {
-              html += '<div style="font-size:0.75rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + booking.menu + '</div>';
-            }
+            html += '<div style="font-size:0.75rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + booking.menu + '</div>';
             html += '</td>';
           } else {
           
@@ -286,28 +279,41 @@ mockBookings = result.data.bookings.map(b => {
           
           if (isBlockMode) {
               if (isBlock) {
-                  const idStr = String(booking.id);
-                  const idx = selectedCancelBlocks.indexOf(idStr);
-                  if (idx > -1) selectedCancelBlocks.splice(idx, 1);
-                  else selectedCancelBlocks.push(idStr);
-                  renderTimeline(currentTimelineDate);
+                  if (confirm("【確認】このブロック枠を解除しますか？\n※解除すると、この時間に予約が入るようになります。")) {
+                      fetch(GAS_URL, {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                          body: JSON.stringify({ action: 'updateBookingStatus', id: booking.id, status: 'キャンセル' })
+                      }).then(res => res.json()).then(result => {
+                          if (result.success) {
+                              mockBookings = mockBookings.filter(b => String(b.id) !== String(booking.id));
+                              renderTimeline(currentTimelineDate);
+                          } else {
+                              alert('エラー: ' + result.error);
+                          }
+                      }).catch(err => alert('通信エラー: ' + err.message));
+                  }
               }
               return; // In block mode, don't open details modal
           }
           
-          const dTitle = document.getElementById('details-modal-title');
-          if(dTitle) dTitle.innerText = isBlock ? 'ブロックの詳細' : '予約詳細';
-          
-          const dNameLabel = document.querySelector('#detail-name-container .form-label');
-          if(dNameLabel) dNameLabel.style.display = isBlock ? 'none' : 'block';
-          
-          const dPhoneContainer = document.getElementById('detail-phone-container');
-          if(dPhoneContainer) {
-              if (isBlock) dPhoneContainer.classList.add('d-none');
-              else dPhoneContainer.classList.remove('d-none');
-          }
+                      const modalTitle = document.getElementById('details-modal-title');
+            if (modalTitle) {
+                modalTitle.innerText = isBlock ? 'ブロックの詳細' : '予約の詳細';
+            }
+            
+            const nameContainer = document.getElementById('detail-name-container');
+            if (nameContainer) {
+                nameContainer.style.display = isBlock ? 'none' : 'block';
+            }
 
-          const dDt = document.getElementById('detail-datetime'); if(dDt) dDt.innerText = booking.date.replace(/-/g, '/') + ' ' + booking.startTime;
+            const btnCancelTitle = document.getElementById('btn-cancel-booking');
+            if (btnCancelTitle) {
+                btnCancelTitle.innerText = isBlock ? 'ブロック解除(削除)' : '予約キャンセル(削除)';
+            }
+            
+            const dDt = document.getElementById('detail-datetime');
+          if(dDt) dDt.innerText = booking.date.replace(/-/g, '/') + ' ' + booking.startTime;
           
           const dMenu = document.getElementById('detail-menu');
           if(dMenu) dMenu.innerText = isBlock ? '休み（ブロック枠）' : booking.menu;
@@ -315,7 +321,7 @@ mockBookings = result.data.bookings.map(b => {
           const dStaff = document.getElementById('detail-staff');
           if(dStaff) dStaff.innerText = '担当: ' + (staffs.find(s => String(s.id) === String(booking.staff))?.name || '');
           
-                      const fullCustomer = (mockCustomers.find(c => c.name === booking.name && c.phone === booking.phone) || mockCustomers.find(c => c.phone && c.phone === booking.phone) || mockCustomers.find(c => c.name === booking.name)) || { name: booking.name, phone: booking.phone };
+                      const fullCustomer = mockCustomers.find(c => c.phone === booking.phone) || { name: booking.name, phone: booking.phone };
             if(document.getElementById('customer-name')) document.getElementById('customer-name').innerText = fullCustomer.name || '';
             if(document.getElementById('customer-kana')) document.getElementById('customer-kana').innerText = fullCustomer.kana || '';
             if(document.getElementById('customer-address')) document.getElementById('customer-address').innerText = fullCustomer.address || '';
@@ -340,15 +346,12 @@ mockBookings = result.data.bookings.map(b => {
                      fetch(GAS_URL, {
                          method: 'POST',
                          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                         body: JSON.stringify({ action: 'cancelBooking', payload: { bookingId: booking.id } })
+                         body: JSON.stringify({ action: 'updateBookingStatus', id: booking.id, status: 'キャンセル' })
                      }).then(() => {
-                         cancelledBookingIds.add(String(booking.id));
-                              mockBookings = mockBookings.filter(b => String(b.id) !== String(booking.id));
-                         renderTimeline(currentTimelineDate);
                          const payload = {
                              date: formatDateWithDay(booking.date), startTime: booking.startTime, duration: booking.duration,
                              staff: booking.staff, name: finalName, phone: '', email: '', memo: '',
-                             menu: '休み設定', type: 'blocked'
+                             menu: '休み設定', type: '休み'
                          };
                          return fetch(GAS_URL, {
                              method: 'POST',
@@ -356,14 +359,14 @@ mockBookings = result.data.bookings.map(b => {
                              body: JSON.stringify({ action: 'createBooking', payload })
                          });
                      }).then(res => res.json()).then(result => {
-                         if (result.success) { fetchAdminData(); }
+                         if (result.success) { booking.id = result.bookingId; }
                      }).catch(err => console.error(err));
                  }
               } else {
                 document.getElementById('details-modal').classList.add('d-none');
                 document.getElementById('customer-mgmt-modal').classList.remove('d-none');
                 returnToDetailsModal = true;
-                const fullCustomer = (mockCustomers.find(c => c.name === booking.name && c.phone === booking.phone) || mockCustomers.find(c => c.phone && c.phone === booking.phone) || mockCustomers.find(c => c.name === booking.name)) || { name: booking.name, phone: booking.phone };
+                const fullCustomer = mockCustomers.find(c => c.phone === booking.phone) || { name: booking.name, phone: booking.phone };
                   showCustomerFormView(fullCustomer);
               }
             };
@@ -398,14 +401,14 @@ mockBookings = result.data.bookings.map(b => {
 
   const btnBlockMode = document.getElementById('btn-block-mode');
   const btnBlockConfirm = document.getElementById('btn-block-confirm');
-    const btnBlockDelete = document.getElementById('btn-block-delete');
+  const btnBlockCancel = document.getElementById('btn-block-cancel');
 
   const exitBlockMode = () => {
       isBlockMode = false;
       selectedBlockSlots = [];
       if(btnBlockMode) btnBlockMode.classList.remove('d-none');
       if(btnBlockConfirm) btnBlockConfirm.classList.add('d-none');
-            if(btnBlockDelete) btnBlockDelete.classList.add('d-none');
+      if(btnBlockCancel) btnBlockCancel.classList.add('d-none');
       if(timelineContainer) timelineContainer.classList.remove('block-mode-active');
   };
 
@@ -415,12 +418,18 @@ mockBookings = result.data.bookings.map(b => {
       selectedBlockSlots = [];
       btnBlockMode.classList.add('d-none');
       if(btnBlockConfirm) btnBlockConfirm.classList.remove('d-none');
-            if(btnBlockDelete) btnBlockDelete.classList.remove('d-none');
+      if(btnBlockCancel) btnBlockCancel.classList.remove('d-none');
       if(timelineContainer) timelineContainer.classList.add('block-mode-active');
     });
   }
 
-  
+  if(btnBlockCancel) {
+    btnBlockCancel.addEventListener('click', () => {
+      exitBlockMode();
+      renderTimeline(currentTimelineDate);
+    });
+  }
+
   if(btnBlockConfirm) {
     btnBlockConfirm.addEventListener('click', () => {
       if (selectedBlockSlots.length === 0) {
@@ -445,7 +454,7 @@ mockBookings = result.data.bookings.map(b => {
         email: '',
         memo: '',
         menu: '休み設定',
-        type: 'blocked'
+        type: '休み'
       };
 
       fetch(GAS_URL, {
@@ -456,7 +465,12 @@ mockBookings = result.data.bookings.map(b => {
       .then(res => res.json())
       .then(result => {
         if(result.success) {
-          exitBlockMode(); fetchAdminData();
+          mockBookings.push({
+            id: result.bookingId || ('MOCK-' + Date.now()),
+            ...payload, date: currentTimelineDate
+          });
+          exitBlockMode();
+          renderTimeline(currentTimelineDate);
         } else {
           alert('エラー: ' + result.error);
         }
@@ -465,45 +479,6 @@ mockBookings = result.data.bookings.map(b => {
       .finally(() => {
         btnBlockConfirm.innerText = '確定';
         btnBlockConfirm.disabled = false;
-      });
-    });
-  }
-  if(btnBlockDelete) {
-    btnBlockDelete.addEventListener('click', () => {
-      if (selectedCancelBlocks.length === 0) {
-        alert('\u89e3\u9664\u3059\u308b\u67a0\u3092\u9078\u629e\u3057\u3066\u304f\u3060\u3055\u3044\u3002');
-        return;
-      }
-      
-      btnBlockDelete.innerText = '\u89e3\u9664\u4e2d...';
-      btnBlockDelete.disabled = true;
-
-      const promises = selectedCancelBlocks.map(id => {
-          cancelledBookingIds.add(id);
-          mockBookings = mockBookings.filter(b => String(b.id) !== id);
-          return fetch(GAS_URL, {
-              method: 'POST',
-              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-              body: JSON.stringify({ action: 'cancelBooking', payload: { bookingId: id } })
-          }).then(res => res.json());
-      });
-
-      renderTimeline(currentTimelineDate);
-      
-      Promise.all(promises).then(results => {
-          const errors = results.filter(r => !r.success);
-          if (errors.length > 0) {
-              alert('\u4e00\u90e8\u306e\u89e3\u9664\u306b\u5931\u6557\u3057\u307e\u3057\u305f\u3002');
-          }
-          exitBlockMode();
-          fetchAdminData();
-      }).catch(err => {
-          alert('\u901a\u4fe1\u30a8\u30e9\u30fc: ' + err.message);
-          exitBlockMode();
-          fetchAdminData();
-      }).finally(() => {
-          btnBlockDelete.innerText = '\u89e3\u9664';
-          btnBlockDelete.disabled = false;
       });
     });
   }
@@ -537,7 +512,12 @@ mockBookings = result.data.bookings.map(b => {
       .then(res => res.json())
       .then(result => {
         if(result.success) {
-          document.getElementById('booking-modal').classList.add('d-none'); fetchAdminData();
+          mockBookings.push({
+            id: result.bookingId || ('MOCK-' + Date.now()),
+            ...payload, date: currentTimelineDate
+          });
+          document.getElementById('booking-modal').classList.add('d-none');
+          renderTimeline(currentTimelineDate);
         } else {
           alert('エラー: ' + result.error);
         }
@@ -559,16 +539,14 @@ mockBookings = result.data.bookings.map(b => {
       fetch(GAS_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'cancelBooking', payload: { bookingId: currentDetailId } })
+        body: JSON.stringify({ action: 'updateBookingStatus', id: currentDetailId, status: 'キャンセル' })
       })
       .then(res => res.json())
       .then(result => {
         if(result.success) {
-          cancelledBookingIds.add(String(currentDetailId));
           mockBookings = mockBookings.filter(b => String(b.id) !== String(currentDetailId));
           document.getElementById('details-modal').classList.add('d-none');
           renderTimeline(currentTimelineDate);
-          fetchAdminData();
         } else {
           alert('エラー: ' + result.error);
         }
