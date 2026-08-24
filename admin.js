@@ -1,4 +1,4 @@
-let returnToDetailsModal = false;
+﻿let returnToDetailsModal = false;
 function formatDateWithDay(dateStr) {
     const days = ['日', '月', '火', '水', '木', '金', '土'];
     const dt = new Date(dateStr.replace(/-/g, '/'));
@@ -662,10 +662,7 @@ mockBookings = result.data.bookings.map(b => {
       if(document.getElementById('edit-customer-id')) document.getElementById('edit-customer-id').value = '';
     }
   };
-    const renderCustomerMgmtListNew = () => {
-    if (!customerTbody) return;
-    
-    const customers = mockCustomers;
+    const old_renderCustomerMgmtList = () => { if (!customerTbody) return; const customers = mockCustomers;
     
     const query = (customerSearchInput && customerSearchInput.value) ? normalizeForSearch(customerSearchInput.value) : '';
     const filtered = customers.filter(c => 
