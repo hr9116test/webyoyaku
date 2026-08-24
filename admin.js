@@ -163,7 +163,7 @@ mockBookings = result.data.bookings.map(b => {
           
 
 
-          renderCustomerMgmtList();
+          renderCustomerMgmtListNewNew();
           renderMenuButtons();
           updateDateDisplay();
         } else {
@@ -640,7 +640,7 @@ mockBookings = result.data.bookings.map(b => {
   const showCustomerListView = () => {
     if(customerFormView) customerFormView.classList.add('d-none');
     if(customerListView) customerListView.classList.remove('d-none');
-    renderCustomerMgmtList();
+    renderCustomerMgmtListNewNew();
   };
 
     const showCustomerFormView = (customer = null) => {
@@ -662,7 +662,7 @@ mockBookings = result.data.bookings.map(b => {
       if(document.getElementById('edit-customer-id')) document.getElementById('edit-customer-id').value = '';
     }
   };
-    const renderCustomerMgmtList = () => {
+    const renderCustomerMgmtListNew = () => {
     if (!customerTbody) return;
     
     const customers = mockCustomers;
@@ -714,7 +714,7 @@ mockBookings = result.data.bookings.map(b => {
     }
   });
 
-  if (customerSearchInput) customerSearchInput.addEventListener('input', renderCustomerMgmtList);
+  if (customerSearchInput) customerSearchInput.addEventListener('input', renderCustomerMgmtListNew);
 
     // Autocomplete for Proxy Booking
   const proxyNameInput = document.getElementById('proxy-name');
@@ -820,6 +820,142 @@ mockBookings = result.data.bookings.map(b => {
 
   // START
   fetchAdminData();
+
+    let currentCustomerView = 'list';
+    const btnViewList = document.getElementById('btn-view-list');
+    const btnViewCard = document.getElementById('btn-view-card');
+    const customerTableContainer = document.getElementById('customer-table-container');
+    const customerCardContainer = document.getElementById('customer-card-container');
+
+    if (btnViewList && btnViewCard) {
+      btnViewList.addEventListener('click', () => {
+        currentCustomerView = 'list';
+        btnViewList.style.background = '#fff';
+        btnViewList.style.borderColor = 'var(--color-border)';
+        btnViewList.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)';
+        btnViewList.style.color = 'var(--color-text)';
+        btnViewList.style.fontWeight = 'bold';
+        
+        btnViewCard.style.background = 'transparent';
+        btnViewCard.style.borderColor = 'transparent';
+        btnViewCard.style.boxShadow = 'none';
+        btnViewCard.style.color = 'var(--color-text-sub)';
+        btnViewCard.style.fontWeight = 'normal';
+        
+        if (customerTableContainer) customerTableContainer.classList.remove('d-none');
+        if (customerCardContainer) customerCardContainer.classList.add('d-none');
+        renderCustomerMgmtListNew();
+      });
+
+      btnViewCard.addEventListener('click', () => {
+        currentCustomerView = 'card';
+        btnViewCard.style.background = '#fff';
+        btnViewCard.style.borderColor = 'var(--color-border)';
+        btnViewCard.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)';
+        btnViewCard.style.color = 'var(--color-text)';
+        btnViewCard.style.fontWeight = 'bold';
+        
+        btnViewList.style.background = 'transparent';
+        btnViewList.style.borderColor = 'transparent';
+        btnViewList.style.boxShadow = 'none';
+        btnViewList.style.color = 'var(--color-text-sub)';
+        btnViewList.style.fontWeight = 'normal';
+        
+        if (customerTableContainer) customerTableContainer.classList.add('d-none');
+        if (customerCardContainer) customerCardContainer.classList.remove('d-none');
+        renderCustomerMgmtListNew();
+      });
+    }
+
+    const renderCustomerMgmtListNew = () => {
+      const customerTbody = document.getElementById('customer-tbody');
+      if (!customerTbody) return;
+      const cardContainer = document.getElementById('customer-card-container');
+      
+      const customers = mockCustomers;
+      const actualCustomers = customers.filter(c => c.name && c.name.trim() !== '' && !['休み', 'x', '迎え', '用事', 'テスト'].includes(c.name));
+      
+      const customerSearchInput = document.getElementById('customer-search-input');
+      const query = (customerSearchInput && customerSearchInput.value) ? normalizeForSearch(customerSearchInput.value) : '';
+      const filtered = actualCustomers.filter(c => 
+        normalizeForSearch(c.name || '').includes(query) || 
+        normalizeForSearch(c.kana || '').includes(query) || 
+        normalizeForSearch(c.phone || '').includes(query)
+      );
+  
+      customerTbody.innerHTML = '';
+      if (cardContainer) cardContainer.innerHTML = '';
+
+      if (filtered.length === 0) {
+        customerTbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 3rem; color: #777;">該当顧客が見つかりません</td></tr>';
+        if (cardContainer) cardContainer.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: #777;">該当顧客が見つかりません</div>';
+        return;
+      }
+  
+      filtered.forEach(c => {
+        // List View Row
+        const tr = document.createElement('tr');
+        tr.style.transition = 'background 0.2s';
+        tr.onmouseover = () => tr.style.background = '#f8fafc';
+        tr.onmouseout = () => tr.style.background = 'transparent';
+        
+        tr.innerHTML = `<td style="padding: 1rem; border-bottom: 1px solid var(--color-border);">
+            <div style="font-weight: bold; color: var(--color-text);">${c.name}</div>
+            ${c.kana ? `<div style="font-size: 0.85rem; color: var(--color-text-sub); margin-top: 0.2rem;">${c.kana}</div>` : ''}
+          </td>
+          <td style="padding: 1rem; border-bottom: 1px solid var(--color-border); color: var(--color-text-sub);">
+            ${c.phone || '-'}
+          </td>
+          <td style="padding: 1rem; border-bottom: 1px solid var(--color-border); text-align: right;">
+            <button class="btn btn-sm btn-outline edit-btn">詳細・編集</button>
+          </td>`;
+        
+        const editBtn = tr.querySelector('.edit-btn');
+        editBtn.addEventListener('click', () => {
+          showCustomerFormView(c);
+        });
+        customerTbody.appendChild(tr);
+
+        // Card View Item (Stitch Design)
+        if (cardContainer) {
+          const card = document.createElement('article');
+          card.style.background = '#fff';
+          card.style.border = '1px solid var(--color-border)';
+          card.style.borderRadius = '0.75rem';
+          card.style.padding = '1.5rem';
+          card.style.boxShadow = '0px 4px 20px rgba(0,0,0,0.03)';
+          card.style.display = 'flex';
+          card.style.flexDirection = 'column';
+          card.style.cursor = 'pointer';
+          card.style.transition = 'background-color 0.2s';
+          card.onmouseover = () => card.style.background = '#F8FAFC';
+          card.onmouseout = () => card.style.background = '#fff';
+
+          card.addEventListener('click', (e) => {
+             showCustomerFormView(c);
+          });
+
+          card.innerHTML = `<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+              <div>
+                <div style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; color: var(--color-text-sub); margin-bottom: 0.25rem;">${c.kana || ' '}</div>
+                <div style="font-size: 1.25rem; font-weight: 600; color: var(--color-text); line-height: 1.3;">${c.name}</div>
+              </div>
+            </div>
+            <div style="padding-top: 1rem; border-top: 1px solid var(--color-border); display: flex; flex-direction: column; gap: 0.75rem;">
+              <div style="display: flex; align-items: center; color: var(--color-text-sub);">
+                <span style="font-size: 1.1rem; margin-right: 0.5rem;">📞</span>
+                <span style="font-size: 0.875rem; line-height: 1.6;">${c.phone || '登録なし'}</span>
+              </div>
+              <div style="display: flex; align-items: center; color: var(--color-text-sub);">
+                <span style="font-size: 1.1rem; margin-right: 0.5rem;">📅</span>
+                <span style="font-size: 0.875rem; line-height: 1.6;">最終来店: ${c.lastVisit || '-'}</span>
+              </div>
+            </div>`;
+          cardContainer.appendChild(card);
+        }
+      });
+    };
+
 });
 
 
