@@ -1,4 +1,4 @@
-let returnToDetailsModal = false;
+﻿let returnToDetailsModal = false;
 function formatDateWithDay(dateStr) {
     const days = ['日', '月', '火', '水', '木', '金', '土'];
     const dt = new Date(dateStr.replace(/-/g, '/'));
@@ -684,35 +684,52 @@ mockBookings = result.data.bookings.map(b => {
       if(document.getElementById('edit-customer-id')) document.getElementById('edit-customer-id').value = '';
     }
   };
-    const renderCustomerMgmtList = () => {
-    if (!customerTbody) return;
-    
-    const customers = mockCustomers;
-    
-    const query = (customerSearchInput && customerSearchInput.value) ? normalizeForSearch(customerSearchInput.value) : '';
-    const filtered = customers.filter(c => 
-      normalizeForSearch(c.name || '').includes(query) || 
-      normalizeForSearch(c.kana || '').includes(query) || 
-      normalizeForSearch(c.phone || '').includes(query)
-    );
-
-    customerTbody.innerHTML = '';
-    if (filtered.length === 0) {
-      customerTbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 1rem; color: #777;">該当顧客が見つかりません</td></tr>';
-      return;
-    }
-
-    filtered.forEach(c => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = '<td>' + c.name + (c.kana ? '<br><small style="color:#999;">' + c.kana + '</small>' : '') + '</td><td>' + c.phone + '</td><td>' + c.lastVisit + '</td><td><button class="btn btn-sm btn-outline edit-btn">編集</button></td>';
+        const renderCustomerMgmtList = () => {
+      if (!customerTbody) return;
       
-      const editBtn = tr.querySelector('.edit-btn');
-      editBtn.addEventListener('click', () => {
-        showCustomerFormView(c);
+      const customers = mockCustomers;
+      const actualCustomers = customers.filter(c => c.name && c.name.trim() !== '' && !['休み', 'x', '迎え', '用事', 'テスト'].includes(c.name));
+      
+      const query = (customerSearchInput && customerSearchInput.value) ? normalizeForSearch(customerSearchInput.value) : '';
+      const filtered = actualCustomers.filter(c => 
+        normalizeForSearch(c.name || '').includes(query) || 
+        normalizeForSearch(c.kana || '').includes(query) || 
+        normalizeForSearch(c.phone || '').includes(query)
+      );
+  
+      customerTbody.innerHTML = '';
+      if (filtered.length === 0) {
+        customerTbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 3rem; color: #64748b; font-size: 0.95rem;">該当顧客が見つかりません</td></tr>';
+        return;
+      }
+  
+      filtered.forEach(c => {
+        const tr = document.createElement('tr');
+        tr.style.transition = 'background 0.2s';
+        tr.onmouseover = () => tr.style.background = '#f1f5f9';
+        tr.onmouseout = () => tr.style.background = 'transparent';
+
+        tr.innerHTML = `<td style="padding: 1.25rem 1rem; border-bottom: 1px solid var(--color-border); vertical-align: middle;">
+            <div style="font-weight: 600; color: var(--color-text); font-size: 1.05rem;">${c.name}</div>
+            ${c.kana ? `<div style="font-size: 0.8rem; color: #64748b; margin-top: 0.2rem; letter-spacing: 0.05em;">${c.kana}</div>` : ''}
+          </td>
+          <td style="padding: 1.25rem 1rem; border-bottom: 1px solid var(--color-border); color: #475569; vertical-align: middle;">
+            ${c.phone || '-'}
+          </td>
+          <td style="padding: 1.25rem 1rem; border-bottom: 1px solid var(--color-border); color: #475569; vertical-align: middle;">
+            ${c.lastVisit || '-'}
+          </td>
+          <td style="padding: 1.25rem 1rem; border-bottom: 1px solid var(--color-border); text-align: right; vertical-align: middle;">
+            <button class="btn btn-sm btn-outline edit-btn" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; border-radius: 0.375rem;">詳細・編集</button>
+          </td>`;
+        
+        const editBtn = tr.querySelector('.edit-btn');
+        editBtn.addEventListener('click', () => {
+          showCustomerFormView(c);
+        });
+        customerTbody.appendChild(tr);
       });
-      customerTbody.appendChild(tr);
-    });
-  };
+    };
 
   if (btnCloseMgmt) btnCloseMgmt.addEventListener('click', () => {
     customerMgmtModal.classList.add('d-none');
