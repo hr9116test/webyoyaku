@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
 
@@ -244,24 +244,40 @@
 
       <!-- List/Search View -->
       <div id="customer-list-view" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
-        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-          <input type="text" id="customer-search-input" class="form-input" placeholder="名前・ふりがな・電話番号で検索" style="flex: 1;">
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; align-items: center; flex-wrap: wrap;">
+          <input type="text" id="customer-search-input" class="form-input" placeholder="名前・ふりがな・電話番号で検索" style="flex: 1; min-width: 200px;">
+          
+          <!-- View Toggle -->
+          <div style="display: flex; background: rgba(0,0,0,0.05); border-radius: var(--radius-sm); padding: 0.25rem;">
+            <button id="btn-view-list" style="background: #fff; border: 1px solid var(--color-border); box-shadow: 0 1px 2px rgba(0,0,0,0.05); border-radius: 4px; padding: 0.4rem 0.8rem; font-size: 0.85rem; cursor: pointer; color: var(--color-text); font-weight: bold;">リスト</button>
+            <button id="btn-view-card" style="background: transparent; border: 1px solid transparent; border-radius: 4px; padding: 0.4rem 0.8rem; font-size: 0.85rem; cursor: pointer; color: var(--color-text-sub);">カード</button>
+          </div>
+
           <button class="btn" id="btn-new-customer" style="white-space: nowrap;">＋ 新規登録</button>
         </div>
         
-        <div style="background: var(--color-base); border-radius: var(--radius-sm); border: 1px solid var(--color-border); flex: 1; overflow-y: auto;">
-          <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left;">
-            <thead style="background: rgba(0,0,0,0.02); position: sticky; top: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
-              <tr>
-                <th style="padding: 0.75rem; border-bottom: 1px solid var(--color-border); color: var(--color-text-sub);">名前</th>
-                <th style="padding: 0.75rem; border-bottom: 1px solid var(--color-border); color: var(--color-text-sub);">電話番号</th>
-                <th style="padding: 0.75rem; border-bottom: 1px solid var(--color-border); color: var(--color-text-sub);"></th>
-              </tr>
-            </thead>
-            <tbody id="customer-tbody">
-              <!-- JS Populated -->
-            </tbody>
-          </table>
+        <div style="background: transparent; flex: 1; overflow-y: auto; display: flex; flex-direction: column;">
+          
+          <!-- Table View -->
+          <div id="customer-table-container" style="background: var(--color-base); border-radius: var(--radius-sm); border: 1px solid var(--color-border); overflow: hidden;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.95rem; text-align: left;">
+              <thead style="background: #f8fafc; position: sticky; top: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); z-index: 10;">
+                <tr>
+                  <th style="padding: 1rem; border-bottom: 1px solid var(--color-border); color: #64748b; font-weight: 600;">名前</th>
+                  <th style="padding: 1rem; border-bottom: 1px solid var(--color-border); color: #64748b; font-weight: 600;">電話番号</th>
+                  <th style="padding: 1rem; border-bottom: 1px solid var(--color-border); color: #64748b; font-weight: 600;"></th>
+                </tr>
+              </thead>
+              <tbody id="customer-tbody">
+                <!-- JS Populated -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Card View -->
+          <div id="customer-card-container" class="d-none" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; align-content: start;">
+            <!-- JS Populated -->
+          </div>
         </div>
       </div>
 
@@ -311,7 +327,7 @@
   </div>
 
   
-<script src="admin.js?v=54"></script>
+<script src="admin.js?v=55"></script>
 </body>
 </html>
 
