@@ -716,9 +716,7 @@ mockBookings = result.data.bookings.map(b => {
           <td style="padding: 1.25rem 1rem; border-bottom: 1px solid var(--color-border); color: #475569; vertical-align: middle;">
             ${c.phone || '-'}
           </td>
-          <td style="padding: 1.25rem 1rem; border-bottom: 1px solid var(--color-border); color: #475569; vertical-align: middle;">
-            ${c.lastVisit || '-'}
-          </td>
+          
           <td style="padding: 1.25rem 1rem; border-bottom: 1px solid var(--color-border); text-align: right; vertical-align: middle;">
             <button class="btn btn-sm btn-outline edit-btn" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; border-radius: 0.375rem;">詳細・編集</button>
           </td>`;
