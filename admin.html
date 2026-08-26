@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
 
@@ -37,6 +37,26 @@
       border-color: #999 !important;
     }
   </style>
+<style>
+@media (max-width: 767px) {
+  #customer-list-table {
+    table-layout: fixed;
+    word-wrap: break-word;
+  }
+  #customer-list-table th, #customer-list-table td {
+    padding: 0.5rem 0.25rem !important;
+  }
+  #customer-list-table td div {
+    font-size: 0.9rem !important;
+  }
+  #customer-list-table td button {
+    padding: 0.3rem 0.4rem !important;
+    font-size: 0.75rem !important;
+    white-space: normal !important;
+    word-break: keep-all;
+  }
+}
+</style>
 </head>
 <body>
   <header class="header">
@@ -250,7 +270,7 @@
         </div>
         
         <div style="background: var(--color-base); border-radius: var(--radius-sm); border: 1px solid var(--color-border); flex: 1; overflow-y: auto;">
-          <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left;">
+          <table id="customer-list-table" style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left; table-layout: fixed; word-wrap: break-word;">
                                         <thead style="background: #f8fafc; position: sticky; top: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); z-index: 10;">
                 <tr>
                   <th style="padding: 1rem; border-bottom: 1px solid var(--color-border); color: #475569; font-weight: 600; width: 45%;">お客様名</th>
@@ -311,7 +331,7 @@
   </div>
 
   
-<script src="admin.js?v=61"></script>
+<script src="admin.js?v=62"></script>
 </body>
 </html>
 
