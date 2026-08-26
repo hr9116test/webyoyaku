@@ -206,8 +206,16 @@ mockBookings = result.data.bookings.map(b => {
           const booking = mockBookings.find(b => b.date === dateStr && String(b.staff) === String(s.id) && timeToMinutes(b.startTime) === currentMins);
           if (booking && !isCovered) {
             const rowSpan = Math.ceil(booking.duration / 30);
-            const isBlock = booking.type === '休み' || booking.type === 'x' || booking.name === '休み' || booking.name === 'x';
-            const bgCls = isBlock ? 'background-color:#E2E3E5; color:#383D41;' : 'background-color:#D4EDDA; color:#155724; cursor:pointer;';
+            const isBlock = booking.type === '休み' || booking.type === 'x' || booking.name === '休み' || booking.name === 'x' || booking.type === 'blocked';
+              const isPhone = booking.type === '電話予約';
+              let bgCls = '';
+              if (isBlock) {
+                bgCls = 'background-color:#F8D7DA; color:#721C24; border-left: 4px solid #dc3545 !important;'; // Red for Block
+              } else if (isPhone) {
+                bgCls = 'background-color:#FFF2E4; color:#D06C14; border-left: 4px solid #fd7e14 !important; cursor:pointer;'; // Orange for Phone
+              } else {
+                bgCls = 'background-color:#D4EDDA; color:#155724; border-left: 4px solid #28a745 !important; cursor:pointer;'; // Green for Web
+              }
                         html += '<td rowspan="' + rowSpan + '" class="timeline-booking" data-id="' + booking.id + '" style="border:' + (selectedCancelBlocks.includes(String(booking.id)) ? '2px solid #dc3545' : '1px solid var(--color-border)') + '; opacity:' + (selectedCancelBlocks.includes(String(booking.id)) ? '0.7' : '1') + '; padding:0.25rem; vertical-align:top; ' + bgCls + '">';
             if (!isBlock) {
               html += '<div style="font-size:0.75rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + booking.startTime + '</div>';
@@ -282,9 +290,9 @@ mockBookings = result.data.bookings.map(b => {
         const id = td.dataset.id;
         const booking = mockBookings.find(b => String(b.id) === String(id));
         if (booking) {
-          const isBlock = booking.type === '休み' || booking.type === 'x' || booking.name === '休み' || booking.name === 'x';
-          
-          if (isBlockMode) {
+          const isBlock = booking.type === '休み' || booking.type === 'x' || booking.name === '休み' || booking.name === 'x' || booking.type === 'blocked';
+            
+            if (isBlockMode) {
               if (isBlock) {
                   const idStr = String(booking.id);
                   const idx = selectedCancelBlocks.indexOf(idStr);
