@@ -63,7 +63,63 @@
     height: auto !important;
     overflow: visible !important;
     background-color: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
+  /* Hide non-printable elements */
+  .header, .admin-sidebar, #details-modal, #booking-modal, #customer-mgmt-modal, button {
+    display: none !important;
+  }
+  
+  /* Make the main content area occupy full width/height for printing */
+  .admin-layout {
+    display: block !important;
+    height: auto !important;
+  }
+  #main-admin-content {
+    padding: 0 !important;
+    display: block !important;
+    height: auto !important;
+  }
+  
+  /* Ensure timeline is visible and not scrollable */
+  #timeline {
+    overflow: visible !important;
+    border: none !important;
+    padding: 0 !important;
+    display: block !important; /* block is better for printing tables than flex */
+  }
+  
+  /* Show the date as the page title */
+  #date-display {
+    display: block !important;
+    border: none !important;
+    font-size: 1.2rem !important;
+    font-weight: bold !important;
+    text-align: center !important;
+    margin-bottom: 5px !important;
+    padding: 0 !important;
+  }
+  
+  /* Compact the table to force it into one page */
+  .timeline-table th, .timeline-table td {
+    padding: 0.2rem !important; /* drastically reduce padding */
+    font-size: 0.75rem !important; /* smaller text */
+    line-height: 1.1 !important;
+  }
+  
+  /* Keep background colors */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  @page {
+    size: A4 portrait; /* portrait gives more vertical height, fitting 24 rows easily */
+    margin: 10mm;
+  }
+}
   /* Hide non-printable elements */
   .header, .admin-sidebar, #details-modal, #booking-modal, #customer-mgmt-modal, button {
     display: none !important;
@@ -386,7 +442,7 @@
   </div>
 
   
-<script src="admin.js?v=67"></script>
+<script src="admin.js?v=68"></script>
 </body>
 </html>
 
