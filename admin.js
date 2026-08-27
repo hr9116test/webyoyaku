@@ -323,7 +323,7 @@ mockBookings = result.data.bookings.map(b => {
           const dStaff = document.getElementById('detail-staff');
           if(dStaff) dStaff.innerText = '担当: ' + (staffs.find(s => String(s.id) === String(booking.staff))?.name || '');
           
-                      const fullCustomer = mockCustomers.find(c => c.phone === booking.phone) || { name: booking.name, phone: booking.phone };
+                      const fullCustomer = mockCustomers.find(c => c.name === booking.name && c.phone === booking.phone) || mockCustomers.find(c => c.phone && c.phone.trim() !== '' && c.phone === booking.phone) || mockCustomers.find(c => c.name === booking.name) || { name: booking.name, phone: booking.phone };
             if(document.getElementById('customer-name')) document.getElementById('customer-name').innerText = fullCustomer.name || '';
             if(document.getElementById('customer-kana')) document.getElementById('customer-kana').innerText = fullCustomer.kana || '';
             if(document.getElementById('customer-address')) document.getElementById('customer-address').innerText = fullCustomer.address || '';
@@ -371,7 +371,7 @@ mockBookings = result.data.bookings.map(b => {
                 document.getElementById('details-modal').classList.add('d-none');
                 document.getElementById('customer-mgmt-modal').classList.remove('d-none');
                 returnToDetailsModal = true;
-                const fullCustomer = mockCustomers.find(c => c.phone === booking.phone) || { name: booking.name, phone: booking.phone };
+                const fullCustomer = mockCustomers.find(c => c.name === booking.name && c.phone === booking.phone) || mockCustomers.find(c => c.phone && c.phone.trim() !== '' && c.phone === booking.phone) || mockCustomers.find(c => c.name === booking.name) || { name: booking.name, phone: booking.phone };
                   showCustomerFormView(fullCustomer);
               }
             };
