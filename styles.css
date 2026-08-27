@@ -588,7 +588,7 @@ a {
     flex-direction: row;
   }
   .admin-sidebar {
-    width: 280px;
+    width: 360px;
     height: 100%;
     overflow-y: auto;
     overflow-x: hidden;
