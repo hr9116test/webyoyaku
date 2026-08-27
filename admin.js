@@ -186,7 +186,8 @@ mockBookings = result.data.bookings.map(b => {
     const timeline = document.getElementById('timeline');
     if (!timeline) return;
     
-    let html = '<table class="timeline-table" style="width:100%; table-layout: fixed; border-collapse:collapse; text-align:center;">';
+    let html = '<div class="print-only" style="display: none; font-size: 1.5rem; font-weight: bold; text-align: center; margin-bottom: 10px; color: black !important; -webkit-print-color-adjust: exact !important;">' + formatDateWithDay(dateStr) + '</div>';
+      html += '<table class="timeline-table" style="width:100%; table-layout: fixed; border-collapse:collapse; text-align:center;">';
     html += '<thead style="position:sticky; top:0; background:var(--color-surface); z-index:10; box-shadow:0 1px 2px rgba(0,0,0,0.05);">';
     html += '<tr><th style="padding:0.5rem; border:1px solid var(--color-border); width:60px;">時間</th>';
     staffs.forEach(s => { html += '<th style="padding:0.5rem; border:1px solid var(--color-border);">' + s.name + '</th>'; });
