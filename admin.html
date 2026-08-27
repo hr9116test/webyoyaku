@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=69">
   <style>
     body { 
       font-family: 'Noto Sans JP', sans-serif; 
@@ -57,6 +57,7 @@
   }
 }
 </style>
+
 <style>
 @media print {
   body, html {
@@ -66,12 +67,9 @@
     margin: 0 !important;
     padding: 0 !important;
   }
-  /* Hide non-printable elements */
   .header, .admin-sidebar, #details-modal, #booking-modal, #customer-mgmt-modal, button {
     display: none !important;
   }
-  
-  /* Make the main content area occupy full width/height for printing */
   .admin-layout {
     display: block !important;
     height: auto !important;
@@ -81,16 +79,12 @@
     display: block !important;
     height: auto !important;
   }
-  
-  /* Ensure timeline is visible and not scrollable */
   #timeline {
     overflow: visible !important;
     border: none !important;
     padding: 0 !important;
-    display: block !important; /* block is better for printing tables than flex */
+    display: block !important;
   }
-  
-  /* Show the date as the page title */
   #date-display {
     display: block !important;
     border: none !important;
@@ -100,69 +94,18 @@
     margin-bottom: 5px !important;
     padding: 0 !important;
   }
-  
-  /* Compact the table to force it into one page */
   .timeline-table th, .timeline-table td {
-    padding: 0.2rem !important; /* drastically reduce padding */
-    font-size: 0.75rem !important; /* smaller text */
+    padding: 0.2rem !important;
+    font-size: 0.75rem !important;
     line-height: 1.1 !important;
   }
-  
-  /* Keep background colors */
   * {
     -webkit-print-color-adjust: exact !important;
     color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
-  
   @page {
-    size: A4 portrait; /* portrait gives more vertical height, fitting 24 rows easily */
-    margin: 10mm;
-  }
-}
-  /* Hide non-printable elements */
-  .header, .admin-sidebar, #details-modal, #booking-modal, #customer-mgmt-modal, button {
-    display: none !important;
-  }
-  
-  /* Make the main content area occupy full width/height for printing */
-  .admin-layout {
-    display: block !important;
-    height: auto !important;
-  }
-  #main-admin-content {
-    padding: 0 !important;
-    display: block !important;
-    height: auto !important;
-  }
-  
-  /* Ensure timeline is visible and not scrollable */
-  #timeline {
-    overflow: visible !important;
-    border: none !important;
-    padding-bottom: 0 !important;
-    display: flex !important;
-  }
-  
-  /* Show the date as the page title */
-  #date-display {
-    display: block !important;
-    border: none !important;
-    font-size: 1.5rem !important;
-    font-weight: bold !important;
-    text-align: left !important;
-    margin-bottom: 20px !important;
-  }
-  
-  /* Keep background colors */
-  * {
-    -webkit-print-color-adjust: exact !important;
-    color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-  
-  @page {
-    size: landscape;
+    size: A4 portrait;
     margin: 10mm;
   }
 }
@@ -442,7 +385,7 @@
   </div>
 
   
-<script src="admin.js?v=68"></script>
+<script src="admin.js?v=69"></script>
 </body>
 </html>
 
