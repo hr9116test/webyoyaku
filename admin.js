@@ -219,9 +219,9 @@ mockBookings = result.data.bookings.map(b => {
               }
                         html += '<td rowspan="' + rowSpan + '" class="timeline-booking" data-id="' + booking.id + '" style="border:' + (selectedCancelBlocks.includes(String(booking.id)) ? '2px solid #dc3545' : '1px solid var(--color-border)') + '; opacity:' + (selectedCancelBlocks.includes(String(booking.id)) ? '0.7' : '1') + '; padding:0.25rem; vertical-align:top; ' + bgCls + '">';
             if (!isBlock) {
-              html += '<div style="font-size:0.75rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + booking.startTime + '</div>';
+              html += '<div style="font-size:0.75rem; margin-bottom:0.2rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + booking.startTime + '</div>';
             }
-            html += '<div style="font-size:0.8rem; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + booking.name + '</div>';
+            html += '<div style="font-size:0.8rem; font-weight:bold; margin-bottom:0.2rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + booking.name + '</div>';
             if (!isBlock || booking.menu !== '休み設定') {
               html += '<div style="font-size:0.75rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + booking.menu + '</div>';
             }
