@@ -44,7 +44,7 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbx-b6WOncIt4M8nPkncMZfL
     const day = days[currentDate.getDay()];
     
     currentTimelineDate = y + '-' + m + '-' + d;
-    if(dateDisplay) dateDisplay.innerText = '\uD83D\uDCC5 ' + y + '/' + m + '/' + d + ' (' + day + ')';
+    if(dateDisplay) dateDisplay.innerText = y + '/' + m + '/' + d + ' (' + day + ')';
     if(dateInput) dateInput.value = currentTimelineDate;
     
     if (typeof renderTimeline !== 'undefined') renderTimeline(currentTimelineDate);
