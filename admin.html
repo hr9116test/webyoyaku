@@ -57,6 +57,60 @@
   }
 }
 </style>
+<style>
+@media print {
+  body, html {
+    height: auto !important;
+    overflow: visible !important;
+    background-color: white !important;
+  }
+  /* Hide non-printable elements */
+  .header, .admin-sidebar, #details-modal, #booking-modal, #customer-mgmt-modal, button {
+    display: none !important;
+  }
+  
+  /* Make the main content area occupy full width/height for printing */
+  .admin-layout {
+    display: block !important;
+    height: auto !important;
+  }
+  #main-admin-content {
+    padding: 0 !important;
+    display: block !important;
+    height: auto !important;
+  }
+  
+  /* Ensure timeline is visible and not scrollable */
+  #timeline {
+    overflow: visible !important;
+    border: none !important;
+    padding-bottom: 0 !important;
+    display: flex !important;
+  }
+  
+  /* Show the date as the page title */
+  #date-display {
+    display: block !important;
+    border: none !important;
+    font-size: 1.5rem !important;
+    font-weight: bold !important;
+    text-align: left !important;
+    margin-bottom: 20px !important;
+  }
+  
+  /* Keep background colors */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  @page {
+    size: landscape;
+    margin: 10mm;
+  }
+}
+</style>
 </head>
 <body>
   <header class="header">
@@ -80,6 +134,7 @@
               </div>
             </div>
             <button class="btn btn-outline" id="next-day" style="padding: 0.5rem 1rem;">&gt;</button>
+            <button class="btn btn-outline" id="btn-print" style="padding: 0.5rem 1rem; margin-left: 0.5rem; white-space: nowrap;" onclick="window.print()" title="予約台帳を印刷（PDF保存）">🖨️ 印刷</button>
           </div>
         </div>
         
@@ -331,7 +386,7 @@
   </div>
 
   
-<script src="admin.js?v=66"></script>
+<script src="admin.js?v=67"></script>
 </body>
 </html>
 
