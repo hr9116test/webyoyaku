@@ -5,7 +5,7 @@ function formatDateWithDay(dateStr) {
     return dateStr + '(' + days[dt.getDay()] + ')';
 }
 
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbx-b6WOncIt4M8nPkncMZfLDYc1MoV55tOvtL-cCT3ARdTSsZcMFUyk4d_J9Ur51cWi/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwZbBgKtHu1sQLa7l7YtDC3iNX6lB3PkIllYlSwwW65no0uxo4Q7_D70vZ-Jq5dav6L/exec';
 
   document.addEventListener('DOMContentLoaded', () => {
     const initDate = new Date();
