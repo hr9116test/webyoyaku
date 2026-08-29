@@ -9,6 +9,28 @@ function formatGasTime(isoString) {
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbx-b6WOncIt4M8nPkncMZfLDYc1MoV55tOvtL-cCT3ARdTSsZcMFUyk4d_J9Ur51cWi/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
+  // --- LIFF Initialization ---
+  if (typeof liff !== 'undefined') {
+    liff.init({ liffId: '2010034763-iXyqDV0H' }).then(() => {
+      if (liff.isLoggedIn()) {
+        liff.getProfile().then(profile => {
+          const userNameInput = document.getElementById('user-name');
+          if (userNameInput && !userNameInput.value) {
+            userNameInput.value = profile.displayName;
+          }
+          // Note: If you want to store the line userId, you can put it in memo or a hidden field
+          const userMemoInput = document.getElementById('user-memo');
+          if (userMemoInput) {
+            userMemoInput.value = (userMemoInput.value ? userMemoInput.value + '\n' : '') + '[LINE\u9023\u643A\u6E08]';
+          }
+        }).catch(err => console.error('LIFF getProfile Error:', err));
+      } else {
+        // If they open it in an external browser, we could liff.login() but let's just allow normal booking
+      }
+    }).catch(err => console.error('LIFF Init Error:', err));
+  }
+  // ---------------------------
+
   // State
   const state = {
     step: 1,
