@@ -26,21 +26,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (c.email && !document.getElementById('user-email').value) document.getElementById('user-email').value = c.email;
               } else {
                 // If not found in DB, just use LINE display name
-                if (!document.getElementById('user-name').value) {
-                  document.getElementById('user-name').value = profile.displayName;
-                }
+                
               }
             })
             .catch(err => {
-              if (!document.getElementById('user-name').value) {
-                document.getElementById('user-name').value = profile.displayName;
-              }
+              
             });
-          // Note: If you want to store the line userId, you can put it in memo or a hidden field
-          const userMemoInput = document.getElementById('user-memo');
-          if (userMemoInput) {
-            userMemoInput.value = (userMemoInput.value ? userMemoInput.value + '\n' : '') + '[LINE\u9023\u643A\u6E08]';
-          }
+
         }).catch(err => console.error('LIFF getProfile Error:', err));
       } else {
         // If they open it in an external browser, we could liff.login() but let's just allow normal booking
