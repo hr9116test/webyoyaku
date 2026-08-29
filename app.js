@@ -6,7 +6,7 @@ function formatGasTime(isoString) {
   const d = new Date(isoString);
   return d.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Tokyo" });
 }
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbx-b6WOncIt4M8nPkncMZfLDYc1MoV55tOvtL-cCT3ARdTSsZcMFUyk4d_J9Ur51cWi/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwZbBgKtHu1sQLa7l7YtDC3iNX6lB3PkIllYlSwwW65no0uxo4Q7_D70vZ-Jq5dav6L/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
   // --- LIFF Initialization ---
@@ -14,10 +14,28 @@ document.addEventListener('DOMContentLoaded', () => {
     liff.init({ liffId: '2010034763-iXyqDV0H' }).then(() => {
       if (liff.isLoggedIn()) {
         liff.getProfile().then(profile => {
-          const userNameInput = document.getElementById('user-name');
-          if (userNameInput && !userNameInput.value) {
-            userNameInput.value = profile.displayName;
-          }
+                    currentUserLineId = profile.userId;
+          // Fetch past data
+          fetch(GAS_URL + '?action=getCustomerByLineId&lineId=' + profile.userId)
+            .then(res => res.json())
+            .then(res => {
+              if (res.success && res.data && res.data.customer) {
+                const c = res.data.customer;
+                if (c.name && !document.getElementById('user-name').value) document.getElementById('user-name').value = c.name;
+                if (c.phone && !document.getElementById('user-phone').value) document.getElementById('user-phone').value = c.phone;
+                if (c.email && !document.getElementById('user-email').value) document.getElementById('user-email').value = c.email;
+              } else {
+                // If not found in DB, just use LINE display name
+                if (!document.getElementById('user-name').value) {
+                  document.getElementById('user-name').value = profile.displayName;
+                }
+              }
+            })
+            .catch(err => {
+              if (!document.getElementById('user-name').value) {
+                document.getElementById('user-name').value = profile.displayName;
+              }
+            });
           // Note: If you want to store the line userId, you can put it in memo or a hidden field
           const userMemoInput = document.getElementById('user-memo');
           if (userMemoInput) {
@@ -32,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ---------------------------
 
   // State
+  let currentUserLineId = null;
   const state = {
     step: 1,
     menu: null,
@@ -451,6 +470,7 @@ document.addEventListener('DOMContentLoaded', () => {
       email: document.getElementById('user-email').value,
       memo: document.getElementById('user-memo').value,
       menu: state.menuName,
+        lineUserId: currentUserLineId,
       type: '予約'
     };
 
@@ -462,7 +482,13 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(res => res.json())
     .then(result => {
       if(result.success) {
-        goToStep(5);
+                  goToStep(5);
+          if (typeof liff !== 'undefined' && liff.isLoggedIn() && result.data && result.data.bookingId) {
+            liff.sendMessages([{
+              type: 'text',
+              text: '\u4E88\u7D04\u767B\u9332: ' + result.data.bookingId
+            }]).catch(err => console.error('LIFF sendMessage Error:', err));
+          }
       } else {
         alert('予約エラー: ' + result.error);
         submitBtn.innerText = '予約確定';
