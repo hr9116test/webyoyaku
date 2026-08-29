@@ -6,7 +6,7 @@ function formatGasTime(isoString) {
   const d = new Date(isoString);
   return d.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Tokyo" });
 }
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwZbBgKtHu1sQLa7l7YtDC3iNX6lB3PkIllYlSwwW65no0uxo4Q7_D70vZ-Jq5dav6L/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzQHOMNzHlq83JByAg1BF2dg5L08164JaOWHP0ilHph0Yu3QZb4MXVAjstQYoi1y8K-/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
   // --- LIFF Initialization ---
