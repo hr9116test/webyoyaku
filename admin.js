@@ -529,10 +529,7 @@ mockBookings = result.data.bookings.map(b => {
         startTime: proxySelection.startTime,
         duration: proxySelection.duration,
         staff: proxySelection.staff,
-        name: document.getElementById('proxy-name').value,
-        phone: document.getElementById('proxy-phone').value,
-        email: '',
-        memo: '',
+        name: document.getElementById('proxy-name').value, phone: document.getElementById('proxy-phone').value, email: '', memo: document.getElementById('proxy-memo') ? document.getElementById('proxy-memo').value : '',
         menu: proxySelection.menu,
         type: '電話予約'
       };
