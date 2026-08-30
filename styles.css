@@ -684,3 +684,26 @@ a {
 .mb-4 { margin-bottom: 2rem; }
 .d-none { display: none !important; }
 
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: none;
+  background-color: var(--color-disabled);
+  color: var(--color-text-main);
+  border-radius: 50%;
+  font-size: 1.25rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.btn-icon:hover {
+  background-color: var(--color-border);
+}
+
+.btn-icon:active {
+  transform: scale(0.95);
+}
