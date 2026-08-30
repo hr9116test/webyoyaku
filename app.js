@@ -478,7 +478,7 @@ document.addEventListener('DOMContentLoaded', () => {
           if (typeof liff !== 'undefined' && liff.isLoggedIn() && result.data && result.data.bookingId) {
             liff.sendMessages([{
               type: 'text',
-              text: '\u4E88\u7D04\u767B\u9332: ' + result.data.bookingId
+              text: '\u7F8E\u5BB9\u5BA4HR \u4E88\u7D04'
             }]).catch(err => console.error('LIFF sendMessage Error:', err));
           }
       } else {
