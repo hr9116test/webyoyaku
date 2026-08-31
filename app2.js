@@ -180,11 +180,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const formattedPrice = priceNum > 0 ? '¥' + priceNum.toLocaleString() : '-';
       
       item.innerHTML = `
-        <div class="menu-info">
-          <div class="menu-name">${m.name}</div>
-          <div class="menu-meta">所要時間: ${m.duration}分 / ${formattedPrice}</div>
+        <div class="menu-info" style="width: 100%; text-align: center;">
+          <div class="menu-name" style="font-size: 1.1rem;">${m.name}</div>
         </div>
-        <div class="checkbox-circle"></div>
       `;
       
       item.addEventListener('click', () => {
