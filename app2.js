@@ -164,32 +164,67 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Step 1: Menus
   const renderMenus = () => {
-    const grid = document.getElementById('menu-grid');
-    if(!grid) return;
-    grid.innerHTML = '';
+    const list = document.getElementById('menu-list');
+    if(!list) return;
+    list.innerHTML = '';
+    
+    // Hide loading indicator if it exists (though innerHTML='' removes it anyway)
+    
     menus.forEach(m => {
-      const card = document.createElement('div');
-      card.className = 'selection-card';
-      card.dataset.id = m.id;
-      card.innerHTML = `
-        <div class="name">${m.name}</div>
-        <div class="price">¥${(m.price || "")}</div>
-        <div class="duration">目安: ${m.duration}分</div>
+      const item = document.createElement('div');
+      item.className = 'menu-list-item';
+      item.dataset.id = m.id;
+      
+      let priceStr = m.price ? String(m.price) : '0';
+      const priceNum = parseInt(priceStr.replace(/[^0-9]/g, ''), 10) || 0;
+      const formattedPrice = priceNum > 0 ? '¥' + priceNum.toLocaleString() : '-';
+      
+      item.innerHTML = `
+        <div class="menu-info">
+          <div class="menu-name">${m.name}</div>
+          <div class="menu-meta">所要時間: ${m.duration}分 / ${formattedPrice}</div>
+        </div>
+        <div class="checkbox-circle"></div>
       `;
-      card.addEventListener('click', () => {
-        grid.querySelectorAll('.selection-card').forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
-        state.menu = m.id;
-        state.menuName = m.name;
-        state.duration = m.duration;
-        btnNext1.classList.remove('btn-disabled');
-        btnNext1.disabled = false;
+      
+      item.addEventListener('click', () => {
+        const isSelected = item.classList.contains('selected');
+        if (isSelected) {
+          item.classList.remove('selected');
+          state.selectedMenus = state.selectedMenus.filter(sm => sm.id !== m.id);
+        } else {
+          item.classList.add('selected');
+          state.selectedMenus.push({ ...m, priceNum });
+        }
         
-        setTimeout(() => {
-          btnNext1.scrollIntoView({ behavior: 'smooth', block: 'end' });
-        }, 50);
+        let totalDuration = 0;
+        let totalPrice = 0;
+        state.selectedMenus.forEach(sm => {
+          totalDuration += sm.duration;
+          totalPrice += sm.priceNum;
+        });
+        
+        state.duration = totalDuration;
+        state.price = totalPrice;
+        
+        const footer = document.getElementById('menu-footer');
+        const durationEl = document.getElementById('total-duration');
+        const priceEl = document.getElementById('total-price');
+        const nextBtn = document.getElementById('btn-next-1');
+        
+        if (state.selectedMenus.length > 0) {
+          footer.classList.remove('d-none');
+          durationEl.innerText = totalDuration;
+          priceEl.innerText = '¥' + totalPrice.toLocaleString();
+          nextBtn.classList.remove('btn-disabled');
+          nextBtn.disabled = false;
+        } else {
+          footer.classList.add('d-none');
+          nextBtn.classList.add('btn-disabled');
+          nextBtn.disabled = true;
+        }
       });
-      grid.appendChild(card);
+      list.appendChild(item);
     });
   };
 
