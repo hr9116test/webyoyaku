@@ -303,7 +303,45 @@ mockBookings = result.data.bookings.map(b => {
               return; // In block mode, don't open details modal
           }
           
-          const dTitle = document.getElementById('details-modal-title');
+          
+            const dMenuWrapper = document.getElementById('detail-menu-wrapper');
+            const dStaffWrapper = document.getElementById('detail-staff-wrapper');
+            const dNameLabel = document.querySelector('#detail-name-wrapper .form-label');
+            const dPhoneWrapper = document.getElementById('detail-phone-wrapper');
+            const dMemoWrapper = document.getElementById('detail-memo-wrapper');
+            const dDatetimeWrapper = document.getElementById('detail-datetime-wrapper');
+            
+            if (isBlock) {
+              if (dMenuWrapper) dMenuWrapper.style.display = 'none';
+              if (dStaffWrapper) dStaffWrapper.style.display = 'none';
+              if (dNameLabel) dNameLabel.style.display = 'none';
+              if (dPhoneWrapper) dPhoneWrapper.style.display = 'none';
+              if (dMemoWrapper) dMemoWrapper.style.display = 'none';
+              if (dDatetimeWrapper) dDatetimeWrapper.style.display = 'none';
+              
+              const dNameWrapper = document.getElementById('detail-name-wrapper');
+              if (dNameWrapper) {
+                dNameWrapper.style.justifyContent = 'center';
+                dNameWrapper.style.borderBottom = 'none';
+                dNameWrapper.style.paddingBottom = '0';
+              }
+            } else {
+              if (dMenuWrapper) dMenuWrapper.style.display = 'flex';
+              if (dStaffWrapper) dStaffWrapper.style.display = 'flex';
+              if (dNameLabel) dNameLabel.style.display = 'block';
+              if (dPhoneWrapper) dPhoneWrapper.style.display = 'flex';
+              if (dMemoWrapper) dMemoWrapper.style.display = 'block';
+              if (dDatetimeWrapper) dDatetimeWrapper.style.display = 'flex';
+              
+              const dNameWrapper = document.getElementById('detail-name-wrapper');
+              if (dNameWrapper) {
+                dNameWrapper.style.justifyContent = 'space-between';
+                dNameWrapper.style.borderBottom = '1px dashed var(--color-border)';
+                dNameWrapper.style.paddingBottom = '0.75rem';
+              }
+            }
+
+            const dTitle = document.getElementById('details-modal-title');
           if(dTitle) dTitle.innerText = isBlock ? 'ブロックの詳細' : '予約詳細';
           
           const dNameLabel = document.querySelector('#detail-name-container .form-label');
