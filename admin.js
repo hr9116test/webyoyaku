@@ -344,8 +344,7 @@ mockBookings = result.data.bookings.map(b => {
             const dTitle = document.getElementById('details-modal-title');
           if(dTitle) dTitle.innerText = isBlock ? 'ブロックの詳細' : '予約詳細';
           
-          const dNameLabel = document.querySelector('#detail-name-container .form-label');
-          if(dNameLabel) dNameLabel.style.display = isBlock ? 'none' : 'block';
+          
           
           const dPhoneContainer = document.getElementById('detail-phone-container');
           if(dPhoneContainer) {
