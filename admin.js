@@ -216,7 +216,7 @@ mockBookings = result.data.bookings.map(b => {
               } else {
                 bgCls = 'background-color:#D4EDDA; color:#155724; border-left: 4px solid #28a745 !important; cursor:pointer;'; // Green for Web
               }
-                        html += '<td rowspan="' + rowSpan + '" class="timeline-booking" data-id="' + booking.id + '" style="border:' + (selectedCancelBlocks.includes(String(booking.id)) ? '2px solid #dc3545' : '1px solid var(--color-border)') + '; opacity:' + (selectedCancelBlocks.includes(String(booking.id)) ? '0.7' : '1') + '; padding:0.25rem; vertical-align:top; ' + bgCls + '">';
+                        html += '<td rowspan="' + rowSpan + '" class="timeline-booking" data-id="' + booking.id + '" style="position:relative; border:' + (selectedCancelBlocks.includes(String(booking.id)) ? '2px solid #dc3545' : '1px solid var(--color-border)') + '; opacity:' + (selectedCancelBlocks.includes(String(booking.id)) ? '0.7' : '1') + '; padding:0.25rem; vertical-align:top; ' + bgCls + '">';
             if (!isBlock) {
               html += '<div style="font-size:0.75rem; margin-bottom:0.2rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + booking.startTime + '</div>';
             }
@@ -224,7 +224,7 @@ mockBookings = result.data.bookings.map(b => {
             if (!isBlock || booking.menu !== '休み設定') {
               html += '<div style="font-size:0.75rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + booking.menu + '</div>';
             }
-            html += '</td>';
+            if (booking.memo && booking.memo.trim() !== '' && booking.memo.trim() !== 'なし') { html += '<div style="position:absolute; top:2px; right:2px; font-size:1.1rem; line-height:1; z-index: 5;" title="ご要望・メモあり">📝</div>'; } html += '</td>';
           } else {
           
                         if (!isCovered) {
