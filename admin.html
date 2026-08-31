@@ -228,30 +228,42 @@
   <div id="details-modal" class="d-none" style="position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.5); z-index: 100; display: flex; align-items: center; justify-content: center;">
     <div class="card" style="width: 100%; max-width: 400px; margin: 1rem; position: relative; max-height: 90vh; overflow-y: auto;">
       <h3 class="mb-4 text-center" id="details-modal-title">予約の詳細</h3>
-      
-      <div style="background-color: var(--color-base); padding: 1rem; border-radius: var(--radius-sm); margin-bottom: 1.5rem;">
-        <div class="mb-2" id="detail-datetime" style="font-size: 1.1rem; font-weight: bold; color: var(--color-text-main);"></div>
-        <div style="font-weight: bold;" id="detail-menu"></div>
-        <div class="meta-info mt-1" id="detail-staff"></div>
         
-        <div class="mt-3" id="detail-memo-container">
-          <div style="color: #d32f2f; font-weight: bold; font-size: 0.85rem; margin-bottom: 0.25rem;">ご要望・メモ</div>
-          <div id="detail-memo" style="font-size: 0.95rem; line-height: 1.5; white-space: pre-wrap; background-color: rgba(255, 255, 255, 0.6); padding: 0.5rem; border-radius: 4px;"></div>
+        <div style="background-color: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-sm);">
+          
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px dashed var(--color-border); margin-bottom: 0.75rem;">
+            <span style="color: var(--color-text-sub); font-size: 0.85rem;">日時</span>
+            <span id="detail-datetime" style="font-size: 1.05rem; font-weight: bold; color: var(--color-text-main);"></span>
+          </div>
+        
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px dashed var(--color-border); margin-bottom: 0.75rem;">
+            <span style="color: var(--color-text-sub); font-size: 0.85rem;">メニュー</span>
+            <span id="detail-menu" style="font-size: 1.05rem; font-weight: bold; color: var(--color-text-main);"></span>
+          </div>
+        
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px dashed var(--color-border); margin-bottom: 0.75rem;">
+            <span style="color: var(--color-text-sub); font-size: 0.85rem;">担当スタッフ</span>
+            <span id="detail-staff" style="font-size: 1.05rem; font-weight: bold; color: var(--color-text-main);"></span>
+          </div>
+        
+          <div id="detail-name-container" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px dashed var(--color-border); margin-bottom: 0.75rem;">
+            <span class="form-label" style="margin: 0; color: var(--color-text-sub); font-size: 0.85rem; font-weight: normal;">お客様名</span>
+            <span id="detail-name" style="font-size: 1.05rem; font-weight: bold; color: var(--color-accent); cursor: pointer; text-decoration: underline;"></span>
+          </div>
+        
+          <div id="detail-phone-container" class="d-none" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px dashed var(--color-border); margin-bottom: 0.75rem;">
+            <span class="form-label" style="margin: 0; color: var(--color-text-sub); font-size: 0.85rem; font-weight: normal;">電話番号</span>
+            <span id="detail-phone" style="font-size: 1.05rem; font-weight: bold; color: var(--color-text-main);"></span>
+          </div>
+        
+          <div id="detail-memo-container" style="margin-top: 0.5rem;">
+            <div style="color: var(--color-text-sub); font-size: 0.85rem; margin-bottom: 0.5rem;">ご要望・メモ</div>
+            <div id="detail-memo" style="font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap; background-color: var(--color-base); padding: 0.75rem; border-radius: var(--radius-sm); color: var(--color-text-main); min-height: 3rem;"></div>
+          </div>
+        
         </div>
-      </div>
-      
-      <div class="form-group" id="detail-name-container">          <label class="form-label">お客様名</label>          <div id="detail-name" style="font-size: 1.1rem; font-weight: bold; color: var(--color-primary); cursor: pointer; text-decoration: underline;"></div>
-      </div>
-      
-      <div class="form-group d-none" id="detail-phone-container">
-        <label class="form-label">電話番号</label>
-        <div id="detail-phone" style="font-size: 1.1rem; font-weight: bold;"></div>
-      </div>
-      
-
-
-
-      <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 2rem;">
+        
+        <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 2rem;">
         <button type="button" class="btn btn-outline btn-full" style="color: #721C24; border-color: #721C24;" id="btn-cancel-booking">予約をキャンセル(削除)</button>
         <button type="button" class="btn btn-outline btn-full" id="btn-close-details">閉じる</button>
       </div>
@@ -390,7 +402,7 @@
   </div>
 
   
-<script src="admin.js?v=80"></script>
+<script src="admin.js?v=81"></script>
 </body>
 </html>
 
