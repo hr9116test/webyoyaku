@@ -385,21 +385,7 @@ mockBookings = result.data.bookings.map(b => {
                      fetch(GAS_URL, {
                          method: 'POST',
                          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                         body: JSON.stringify({ action: 'cancelBooking', payload: { bookingId: booking.id } })
-                     }).then(() => {
-                         cancelledBookingIds.add(String(booking.id));
-                              mockBookings = mockBookings.filter(b => String(b.id) !== String(booking.id));
-                         renderTimeline(currentTimelineDate);
-                         const payload = {
-                             date: formatDateWithDay(booking.date), startTime: booking.startTime, duration: booking.duration,
-                             staff: booking.staff, name: finalName, phone: '', email: '', memo: '',
-                             menu: '休み設定', type: 'blocked'
-                         };
-                         return fetch(GAS_URL, {
-                             method: 'POST',
-                             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                             body: JSON.stringify({ action: 'createBooking', payload })
-                         });
+                         body: JSON.stringify({ action: 'updateBookingName', payload: { bookingId: booking.id, newName: finalName } })
                      }).then(res => res.json()).then(result => {
                          if (result.success) { fetchAdminData(); }
                      }).catch(err => console.error(err));
