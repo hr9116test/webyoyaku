@@ -158,7 +158,7 @@ mockBookings = result.data.bookings.map(b => {
                 st = st.padStart(5, '0').substring(0,5);
             }
             return { 
-              id: b['予約ID'] || v[0], date: dateStr, startTime: st, duration: parseInt(b['所要時間(分)'] || v[3]), staff: b['担当スタッフ'] || v[4], type: b['予約状況'] || v[10], name: b['お客様名'] || v[5], phone: b['電話番号'] || v[6], menu: b['メニュー名'] || v[8], memo: b['メモ'] || v[9] || '' 
+              id: b['\u4E88\u7D04ID'] || v[0], date: dateStr, startTime: st, duration: parseInt(b['\u6240\u8981\u6642\u9593(\u5206)'] || v[3]), staff: b['\u62C5\u5F53\u30B9\u30BF\u30C3\u30D5'] || v[4], type: b['\u4E88\u7D04\u72B6\u6CC1'] || v[10], name: b['\u304A\u5BA2\u69D8\u540D'] || v[5], phone: b['\u96FB\u8A71\u756A\u53F7'] || v[6], menu: b['\u30E1\u30CB\u30E5\u30FC\u540D'] || v[8], memo: b['\u30E1\u30E2'] || v[11] || '' 
             }; 
           }).filter(b => b.type && b.type.indexOf('キャンセル') === -1 && !cancelledBookingIds.has(String(b.id)));
           
