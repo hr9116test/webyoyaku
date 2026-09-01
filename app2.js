@@ -432,7 +432,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const dow = daysOfWeek[d.getDay()];
     const formattedDate = state.date.replace(/-/g, '/') + `(${dow})`;
 
-    document.getElementById('confirm-menu').innerText = state.selectedMenus.map(m => m.name).join(' + ') + ' (計' + state.duration + '分 / ¥' + state.price.toLocaleString() + ')';
+    document.getElementById('confirm-menu').innerText = state.selectedMenus.map(m => m.name).join(' + ');
     document.getElementById('confirm-staff').innerText = state.staffName;
     document.getElementById('confirm-datetime').innerText = `${formattedDate} ${state.time}～`;
   };
