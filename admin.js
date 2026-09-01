@@ -189,8 +189,21 @@ mockBookings = result.data.bookings.map(b => {
       html += '<table class="timeline-table" style="width:100%; table-layout: fixed; border-collapse:collapse; text-align:center;">';
     html += '<thead style="position:sticky; top:0; background:var(--color-surface); z-index:10; box-shadow:0 1px 2px rgba(0,0,0,0.05);">';
     html += '<tr><th style="padding:0.5rem; border:1px solid var(--color-border); width:60px;">時間</th>';
-    staffs.forEach(s => { html += '<th style="padding:0.5rem; border:1px solid var(--color-border);">' + s.name + '</th>'; });
+    staffs.forEach(s => { html += '<th style="padding:0.5rem; border:1px solid var(--color-border);">' + s.name + '<br><button class="btn btn-outline btn-allday" data-staff="' + s.id + '" style="font-size: 0.7rem; padding: 2px 6px; margin-top: 4px; line-height: 1;">終日休</button></th>'; });
     html += '</tr></thead><tbody>';
+    
+    const normalizedBookings = mockBookings.map(b => {
+        const startMins = timeToMinutes(b.startTime);
+        if (startMins < 540) {
+            const diff = 540 - startMins;
+            return {
+                ...b,
+                startTime: '09:00',
+                duration: Math.max(0, b.duration - diff)
+            };
+        }
+        return b;
+    });
     
     for (let h = 9; h <= 20; h++) {
       for (let m = 0; m < 60; m += 30) {
@@ -202,8 +215,8 @@ mockBookings = result.data.bookings.map(b => {
           const isSelected = selectedBlockSlots.includes(slotKey);
           
           const currentMins = h * 60 + m;
-          const isCovered = mockBookings.some(b => b.date === dateStr && String(b.staff) === String(s.id) && timeToMinutes(b.startTime) < currentMins && timeToMinutes(b.startTime) + b.duration > currentMins);
-          const booking = mockBookings.find(b => b.date === dateStr && String(b.staff) === String(s.id) && timeToMinutes(b.startTime) === currentMins);
+          const isCovered = normalizedBookings.some(b => b.date === dateStr && String(b.staff) === String(s.id) && timeToMinutes(b.startTime) < currentMins && timeToMinutes(b.startTime) + b.duration > currentMins);
+          const booking = normalizedBookings.find(b => b.date === dateStr && String(b.staff) === String(s.id) && timeToMinutes(b.startTime) === currentMins);
           if (booking && !isCovered) {
             const rowSpan = Math.ceil(booking.duration / 30);
             const isBlock = booking.type === '休み' || booking.type === 'x' || booking.name === '休み' || booking.name === 'x' || booking.type === 'blocked';
@@ -234,7 +247,7 @@ mockBookings = result.data.bookings.map(b => {
                   if (endMins > 20 * 60) {
                       isAvailableForMenu = false;
                   } else {
-                      const overlapping = mockBookings.some(b => b.date === dateStr && String(b.staff) === String(s.id) && timeToMinutes(b.startTime) < endMins && (timeToMinutes(b.startTime) + b.duration) > currentMins);
+                      const overlapping = normalizedBookings.some(b => b.date === dateStr && String(b.staff) === String(s.id) && timeToMinutes(b.startTime) < endMins && (timeToMinutes(b.startTime) + b.duration) > currentMins);
                       if (overlapping) isAvailableForMenu = false;
                   }
               }
@@ -253,6 +266,36 @@ mockBookings = result.data.bookings.map(b => {
     }
     html += '</tbody></table>';
     timeline.innerHTML = html;
+    
+    document.querySelectorAll('.btn-allday').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const staffId = btn.dataset.staff;
+        const staffName = staffs.find(s => String(s.id) === String(staffId)).name;
+        if (confirm(`${staffName} の ${formatDateWithDay(dateStr)} を【終日休み】としてブロックしますか？`)) {
+          const payload = {
+              date: formatDateWithDay(dateStr), 
+              startTime: '00:00', 
+              duration: 1440,
+              staff: staffId, 
+              name: '休み', 
+              phone: '', 
+              email: '', 
+              memo: '',
+              menu: '休み設定', 
+              type: 'blocked'
+          };
+          fetch(GAS_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+              body: JSON.stringify({ action: 'createBooking', payload })
+          }).then(res => res.json()).then(result => {
+              if (result.success) { fetchAdminData(); }
+          }).catch(err => console.error(err));
+        }
+      });
+    });
+
 
     timeline.querySelectorAll('.timeline-slot').forEach(td => {
       td.addEventListener('click', () => {
@@ -288,7 +331,7 @@ mockBookings = result.data.bookings.map(b => {
     timeline.querySelectorAll('.timeline-booking').forEach(td => {
       td.addEventListener('click', () => {
         const id = td.dataset.id;
-        const booking = mockBookings.find(b => String(b.id) === String(id));
+        const booking = normalizedBookings.find(b => String(b.id) === String(id));
         if (booking) {
           const isBlock = booking.type === '休み' || booking.type === 'x' || booking.name === '休み' || booking.name === 'x' || booking.type === 'blocked';
             
