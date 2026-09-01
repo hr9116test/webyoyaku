@@ -112,6 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const loadLocalData = () => {
+    localStorage.removeItem('hr_menus'); // FORCE CACHE CLEAR FOR DEBUGGING
     try {
       const localMenus = localStorage.getItem("hr_menus");
       const localStaffs = localStorage.getItem("hr_staffs");
