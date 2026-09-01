@@ -495,10 +495,17 @@ document.addEventListener('DOMContentLoaded', () => {
       submitBtn.classList.remove('btn-disabled');
     });
   });
+
+  const btnReturnTop = document.getElementById('btn-return-top');
+  if (btnReturnTop) {
+    btnReturnTop.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (typeof liff !== 'undefined' && liff.isInClient()) {
+        liff.closeWindow();
+      } else {
+        window.location.href = '../hp/index.html';
+      }
+    });
+  }
+
 });
-
-
-
-
-
-
