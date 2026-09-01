@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(res => res.json())
     .then(result => {
       if(result.success) {
-        menus = result.data.menus.map(m => { const v = Object.values(m); return { id: v[0], name: v[1], duration: parseInt(v[2]), price: v[3] }; });
+        menus = result.data.menus.map(m => { const v = Object.values(m); return { id: v[0], name: v[1], duration: parseInt(v[2]), price: v[3], exclusiveGroup: String(v[4] || '').trim() }; });
         staffs = result.data.staffs.map(s => { const v = Object.values(s); return { id: v[0], name: v[1] }; });
         bookings = result.data.bookings.map(b => { 
   const v = Object.values(b); 
@@ -189,6 +189,19 @@ document.addEventListener('DOMContentLoaded', () => {
           item.classList.remove('selected');
           state.selectedMenus = state.selectedMenus.filter(sm => sm.id !== m.id);
         } else {
+          // スプレッドシートの「排他グループ」列（E列）を使ったロジック
+          if (m.exclusiveGroup) {
+            state.selectedMenus = state.selectedMenus.filter(sm => {
+              if (sm.exclusiveGroup === m.exclusiveGroup && sm.id !== m.id) {
+                // 同じグループの既存選択を解除
+                const otherCard = list.querySelector(`.selection-card[data-id="${sm.id}"]`);
+                if (otherCard) otherCard.classList.remove('selected');
+                return false;
+              }
+              return true;
+            });
+          }
+
           item.classList.add('selected');
           state.selectedMenus.push({ ...m, priceNum });
         }
