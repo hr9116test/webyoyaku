@@ -172,15 +172,14 @@ document.addEventListener('DOMContentLoaded', () => {
     
     menus.forEach(m => {
       const item = document.createElement('div');
-      item.className = 'menu-list-item';
+      item.className = 'selection-card';
       item.dataset.id = m.id;
       
       let priceStr = m.price ? String(m.price) : '0';
       const priceNum = parseInt(priceStr.replace(/[^0-9]/g, ''), 10) || 0;
-      const formattedPrice = priceNum > 0 ? '¥' + priceNum.toLocaleString() : '-';
       
       item.innerHTML = `
-        <div class="menu-name">${m.name}</div>
+        <div class="name">${m.name}</div>
       `;
       
       item.addEventListener('click', () => {
