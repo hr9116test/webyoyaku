@@ -189,7 +189,7 @@ mockBookings = result.data.bookings.map(b => {
       html += '<table class="timeline-table" style="width:100%; table-layout: fixed; border-collapse:collapse; text-align:center;">';
     html += '<thead style="position:sticky; top:0; background:var(--color-surface); z-index:10; box-shadow:0 1px 2px rgba(0,0,0,0.05);">';
     html += '<tr><th style="padding:0.5rem; border:1px solid var(--color-border); width:60px;">時間</th>';
-    staffs.forEach(s => { html += '<th style="padding:0.5rem; border:1px solid var(--color-border);">' + s.name + '<br><button class="btn btn-outline btn-allday ' + (isBlockMode ? '' : 'd-none') + '" data-staff="' + s.id + '" style="font-size: 0.7rem; padding: 2px 6px; margin-top: 4px; line-height: 1;">終日休</button></th>'; });
+    staffs.forEach(s => { html += '<th style="padding:0.5rem; border:1px solid var(--color-border);">' + s.name + '<br><button class="btn btn-outline btn-allday ' + (isBlockMode ? '' : 'd-none') + '" data-staff="' + s.id + '" style="font-size: 0.7rem; padding: 2px 6px; margin-top: 4px; line-height: 1;">終日選択</button></th>'; });
     html += '</tr></thead><tbody>';
     
     const normalizedBookings = mockBookings.map(b => {
@@ -270,29 +270,52 @@ mockBookings = result.data.bookings.map(b => {
     document.querySelectorAll('.btn-allday').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
+        if (!isBlockMode) return;
+        
         const staffId = btn.dataset.staff;
-        const staffName = staffs.find(s => String(s.id) === String(staffId)).name;
-        if (confirm(`${staffName} の ${formatDateWithDay(dateStr)} を【終日休み】としてブロックしますか？`)) {
-          const payload = {
-              date: formatDateWithDay(dateStr), 
-              startTime: '00:00', 
-              duration: 1440,
-              staff: staffId, 
-              name: '休み', 
-              phone: '', 
-              email: '', 
-              memo: '',
-              menu: '休み設定', 
-              type: 'blocked'
-          };
-          fetch(GAS_URL, {
-              method: 'POST',
-              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-              body: JSON.stringify({ action: 'createBooking', payload })
-          }).then(res => res.json()).then(result => {
-              if (result.success) { fetchAdminData(); }
-          }).catch(err => console.error(err));
+        const dateStr = formatDateWithDay(currentTimelineDate);
+        
+        // Find if already selected
+        const hasSelectedSlot = selectedBlockSlots.some(k => k.startsWith(staffId + '-'));
+        const staffBlocks = normalizedBookings.filter(b => b.date === dateStr && String(b.staff) === String(staffId) && (b.type === '休み' || b.type === 'x' || b.name === '休み' || b.name === 'x' || b.type === 'blocked'));
+        const hasSelectedBlock = staffBlocks.some(b => selectedCancelBlocks.includes(String(b.id)));
+        
+        const isAlreadySelected = hasSelectedSlot || hasSelectedBlock;
+        
+        if (isAlreadySelected) {
+          // Deselect all
+          selectedBlockSlots = selectedBlockSlots.filter(k => !k.startsWith(staffId + '-'));
+          const staffBlockIds = staffBlocks.map(b => String(b.id));
+          selectedCancelBlocks = selectedCancelBlocks.filter(id => !staffBlockIds.includes(id));
+        } else {
+          // Select all empty slots
+          for (let h = 9; h <= 20; h++) {
+            for (let m = 0; m < 60; m += 30) {
+              const timeStr = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+              const slotKey = staffId + '-' + timeStr;
+              const currentMins = h * 60 + m;
+              const overlapping = normalizedBookings.some(b => b.date === dateStr && String(b.staff) === String(staffId) && timeToMinutes(b.startTime) < currentMins + 30 && (timeToMinutes(b.startTime) + b.duration) > currentMins);
+              if (!overlapping) {
+                if (!selectedBlockSlots.includes(slotKey)) selectedBlockSlots.push(slotKey);
+              }
+            }
+          }
+          // Select all existing blocks
+          staffBlocks.forEach(b => {
+            if (!selectedCancelBlocks.includes(String(b.id))) selectedCancelBlocks.push(String(b.id));
+          });
         }
+        
+        const btnBlockConfirm = document.getElementById('btn-block-confirm');
+        const btnBlockDelete = document.getElementById('btn-block-delete');
+        if (selectedBlockSlots.length > 0 || selectedCancelBlocks.length > 0) {
+          if (btnBlockConfirm) btnBlockConfirm.disabled = false;
+          if (btnBlockDelete) btnBlockDelete.disabled = false;
+        } else {
+          if (btnBlockConfirm) btnBlockConfirm.disabled = true;
+          if (btnBlockDelete) btnBlockDelete.disabled = true;
+        }
+        renderTimeline(currentTimelineDate);
       });
     });
 
