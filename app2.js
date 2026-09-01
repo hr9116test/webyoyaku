@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('booking-form');
 
   const fetchAndRefreshData = () => {
-    fetch(`${GAS_URL}?action=getInitialData`)
+    fetch(`${GAS_URL}?action=getInitialData&menuSheet=2&t=${Date.now()}`)
     .then(res => res.json())
     .then(result => {
       if(result.success) {
