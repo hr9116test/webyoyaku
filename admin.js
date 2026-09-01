@@ -189,7 +189,7 @@ mockBookings = result.data.bookings.map(b => {
       html += '<table class="timeline-table" style="width:100%; table-layout: fixed; border-collapse:collapse; text-align:center;">';
     html += '<thead style="position:sticky; top:0; background:var(--color-surface); z-index:10; box-shadow:0 1px 2px rgba(0,0,0,0.05);">';
     html += '<tr><th style="padding:0.5rem; border:1px solid var(--color-border); width:60px;">時間</th>';
-    staffs.forEach(s => { html += '<th style="padding:0.5rem; border:1px solid var(--color-border);">' + s.name + '<br><button class="btn btn-outline btn-allday" data-staff="' + s.id + '" style="font-size: 0.7rem; padding: 2px 6px; margin-top: 4px; line-height: 1;">終日休</button></th>'; });
+    staffs.forEach(s => { html += '<th style="padding:0.5rem; border:1px solid var(--color-border);">' + s.name + '<br><button class="btn btn-outline btn-allday ' + (isBlockMode ? '' : 'd-none') + '" data-staff="' + s.id + '" style="font-size: 0.7rem; padding: 2px 6px; margin-top: 4px; line-height: 1;">終日休</button></th>'; });
     html += '</tr></thead><tbody>';
     
     const normalizedBookings = mockBookings.map(b => {
@@ -473,14 +473,58 @@ mockBookings = result.data.bookings.map(b => {
   const btnBlockMode = document.getElementById('btn-block-mode');
   const btnBlockConfirm = document.getElementById('btn-block-confirm');
     const btnBlockDelete = document.getElementById('btn-block-delete');
+    
+    const btnStoreAllDay = document.getElementById('btn-store-allday');
+    if (btnStoreAllDay) {
+        btnStoreAllDay.addEventListener('click', () => {
+            if (confirm(`${formatDateWithDay(currentTimelineDate)} を【店舗全体（全スタッフ）終日休み】としてブロックしますか？`)) {
+                btnStoreAllDay.disabled = true;
+                btnStoreAllDay.innerText = '設定中...';
+                
+                const promises = staffs.map(staff => {
+                    const payload = {
+                        date: formatDateWithDay(currentTimelineDate), 
+                        startTime: '00:00', 
+                        duration: 1440,
+                        staff: staff.id, 
+                        name: '店休', 
+                        phone: '', 
+                        email: '', 
+                        memo: '',
+                        menu: '休み設定', 
+                        type: 'blocked'
+                    };
+                    return fetch(GAS_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify({ action: 'createBooking', payload })
+                    }).then(res => res.json());
+                });
+                
+                Promise.all(promises).then(results => {
+                    btnStoreAllDay.disabled = false;
+                    btnStoreAllDay.innerText = '店舗一括 終日休';
+                    fetchAdminData();
+                }).catch(err => {
+                    alert('エラーが発生しました: ' + err.message);
+                    btnStoreAllDay.disabled = false;
+                    btnStoreAllDay.innerText = '店舗一括 終日休';
+                    fetchAdminData();
+                });
+            }
+        });
+    }
+
 
   const exitBlockMode = () => {
       isBlockMode = false;
       selectedBlockSlots = [];
       if(btnBlockMode) btnBlockMode.classList.remove('d-none');
+        if(btnStoreAllDay) btnStoreAllDay.classList.remove('d-none');
       if(btnBlockConfirm) btnBlockConfirm.classList.add('d-none');
             if(btnBlockDelete) btnBlockDelete.classList.add('d-none');
       if(timelineContainer) timelineContainer.classList.remove('block-mode-active');
+        document.querySelectorAll('.btn-allday').forEach(el => el.classList.add('d-none'));
   };
 
   if(btnBlockMode) {
@@ -488,6 +532,9 @@ mockBookings = result.data.bookings.map(b => {
       isBlockMode = true;
       selectedBlockSlots = [];
       btnBlockMode.classList.add('d-none');
+        if(btnStoreAllDay) btnStoreAllDay.classList.add('d-none');
+        document.querySelectorAll('.btn-allday').forEach(el => el.classList.remove('d-none'));
+        document.querySelectorAll('.btn-allday').forEach(el => el.classList.remove('d-none'));
       if(btnBlockConfirm) btnBlockConfirm.classList.remove('d-none');
             if(btnBlockDelete) btnBlockDelete.classList.remove('d-none');
       if(timelineContainer) timelineContainer.classList.add('block-mode-active');
