@@ -180,9 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const formattedPrice = priceNum > 0 ? '¥' + priceNum.toLocaleString() : '-';
       
       item.innerHTML = `
-        <div class="menu-info" style="width: 100%; text-align: center;">
-          <div class="menu-name" style="font-size: 1.1rem;">${m.name}</div>
-        </div>
+        <div class="menu-name">${m.name}</div>
       `;
       
       item.addEventListener('click', () => {
@@ -434,7 +432,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const dow = daysOfWeek[d.getDay()];
     const formattedDate = state.date.replace(/-/g, '/') + `(${dow})`;
 
-    document.getElementById('confirm-menu').innerText = state.menuName;
+    document.getElementById('confirm-menu').innerText = state.selectedMenus.map(m => m.name).join(' + ') + ' (計' + state.duration + '分 / ¥' + state.price.toLocaleString() + ')';
     document.getElementById('confirm-staff').innerText = state.staffName;
     document.getElementById('confirm-datetime').innerText = `${formattedDate} ${state.time}～`;
   };
