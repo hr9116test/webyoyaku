@@ -504,6 +504,18 @@ mockBookings = result.data.bookings.map(b => {
                 Promise.all(promises).then(results => {
                     btnStoreAllDay.disabled = false;
                     btnStoreAllDay.innerText = '店舗一括 終日休';
+                    
+                    const failedStaffs = [];
+                    results.forEach((res, index) => {
+                        if (!res.success) {
+                            failedStaffs.push(staffs[index].name);
+                        }
+                    });
+                    
+                    if (failedStaffs.length > 0) {
+                        alert(failedStaffs.join(', ') + ' には既に予約（または別の休み）が入っているため、終日ブロックできませんでした。\n先に既存の予約をキャンセルするか、空いている時間のみをブロックしてください。');
+                    }
+                    
                     fetchAdminData();
                 }).catch(err => {
                     alert('エラーが発生しました: ' + err.message);
